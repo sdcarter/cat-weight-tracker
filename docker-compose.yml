@@ -12,6 +12,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    # Improve security by not exposing the database port to the host
+    expose:
+      - "5432"
+    # Set resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
 
   backend:
     build: ./backend
@@ -41,6 +50,12 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
+    # Set resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
   frontend:
     build: ./frontend
@@ -54,6 +69,12 @@ services:
       - /app/node_modules
     environment:
       - REACT_APP_API_URL=/api
+    # Set resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
 volumes:
   postgres_data:

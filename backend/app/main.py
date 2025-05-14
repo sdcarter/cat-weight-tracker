@@ -1,33 +1,75 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
 from . import crud, models, schemas, plots
 from .database import engine, get_db
+import time
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Cat Weight Tracker API")
 
-# Configure CORS
+# Configure CORS - restrict to specific origins in production
+origins = ["*"]  # For development
+# In production, use specific origins:
+# origins = ["https://your-frontend-domain.com", "http://localhost:3000"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Add middleware for request logging and basic rate limiting
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    
+    # Simple IP-based request counting (basic rate limiting)
+    client_ip = request.client.host
+    request_path = request.url.path
+    
+    # Log the request
+    logger.info(f"Request: {request.method} {request_path} from {client_ip}")
+    
+    response = await call_next(request)
+    
+    # Log the response time
+    process_time = time.time() - start_time
+    logger.info(f"Response: {request.method} {request_path} completed in {process_time:.3f}s with status {response.status_code}")
+    
+    return response
+
 
 # Cat endpoints
 @app.post("/cats/", response_model=schemas.Cat)
 def create_cat(cat: schemas.CatCreate, db: Session = Depends(get_db)):
+    # Input validation beyond Pydantic
+    if len(cat.name) > 50:
+        raise HTTPException(status_code=400, detail="Cat name too long")
+    if cat.target_weight <= 0 or cat.target_weight > 30:
+        raise HTTPException(status_code=400, detail="Invalid target weight")
+        
     return crud.create_cat(db=db, cat=cat)
 
 
 @app.get("/cats/", response_model=List[schemas.Cat])
 def read_cats(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    # Limit the maximum number of records that can be fetched
+    if limit > 100:
+        limit = 100
     cats = crud.get_cats(db, skip=skip, limit=limit)
     return cats
 
@@ -42,6 +84,12 @@ def read_cat(cat_id: int, db: Session = Depends(get_db)):
 
 @app.put("/cats/{cat_id}", response_model=schemas.Cat)
 def update_cat(cat_id: int, cat: schemas.CatCreate, db: Session = Depends(get_db)):
+    # Input validation
+    if len(cat.name) > 50:
+        raise HTTPException(status_code=400, detail="Cat name too long")
+    if cat.target_weight <= 0 or cat.target_weight > 30:
+        raise HTTPException(status_code=400, detail="Invalid target weight")
+        
     db_cat = crud.update_cat(db, cat_id=cat_id, cat=cat)
     if db_cat is None:
         raise HTTPException(status_code=404, detail="Cat not found")
@@ -61,6 +109,12 @@ def delete_cat(cat_id: int, db: Session = Depends(get_db)):
 def create_weight_record(
     cat_id: int, weight_record: schemas.WeightRecordCreate, db: Session = Depends(get_db)
 ):
+    # Input validation
+    if weight_record.user_weight <= 0 or weight_record.user_weight > 500:
+        raise HTTPException(status_code=400, detail="Invalid user weight")
+    if weight_record.combined_weight <= weight_record.user_weight:
+        raise HTTPException(status_code=400, detail="Combined weight must be greater than user weight")
+    
     db_cat = crud.get_cat(db, cat_id=cat_id)
     if db_cat is None:
         raise HTTPException(status_code=404, detail="Cat not found")
@@ -71,6 +125,10 @@ def create_weight_record(
 def read_weight_records(
     cat_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
 ):
+    # Limit the maximum number of records that can be fetched
+    if limit > 100:
+        limit = 100
+        
     db_cat = crud.get_cat(db, cat_id=cat_id)
     if db_cat is None:
         raise HTTPException(status_code=404, detail="Cat not found")

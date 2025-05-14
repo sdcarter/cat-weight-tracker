@@ -7,8 +7,9 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV GENERATE_SOURCEMAP=false
 
 # Copy package files first (leverages Docker layer caching)
-COPY package.json package-lock.json ./
-RUN npm ci --silent
+COPY package.json ./
+# Install dependencies
+RUN npm install --silent
 
 # Copy only necessary files for the build
 COPY public/ ./public/

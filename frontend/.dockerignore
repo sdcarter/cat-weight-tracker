@@ -1,38 +1,78 @@
-# Dependencies
-node_modules
-npm-debug.log
-yarn-debug.log
-yarn-error.log
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 package-lock.json
+yarn.lock
 
 # Build outputs
-build
-dist
-coverage
+build/
+dist/
+coverage/
 
 # Version control
-.git
-.github
+.git/
+.github/
 .gitignore
 
-# Documentation
-*.md
-LICENSE
+# Cache directories
+.npm/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
 
-# Environment and IDE files
-.env*
-.DS_Store
-.idea
-.vscode
+# IDE files
+.idea/
+.vscode/
+*.sublime-*
 *.swp
 *.swo
 
-# Test files
-__tests__
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+
+# Testing
+coverage/
+.nyc_output/
+__tests__/
+__mocks__/
 *.test.js
 *.spec.js
+test/
+tests/
 
-# Other unnecessary files
-*.log
-.npm
+# Documentation
+docs/
+*.md
+LICENSE
+
+# Other
 .eslintcache
+.stylelintcache
+.prettierignore
+.prettierrc
+.babelrc
+.editorconfig

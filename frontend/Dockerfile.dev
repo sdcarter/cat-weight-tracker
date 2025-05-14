@@ -2,19 +2,22 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package.json ./
-RUN npm install
+# Install md5sum utility
+RUN apk add --no-cache coreutils
 
-# No need to copy source files as they will be mounted as volumes
+# Don't run npm install in the Dockerfile
+# We'll handle it in an entrypoint script instead
 
-# Add development environment variables
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+EXPOSE 3000
+
 ENV FAST_REFRESH=true
 ENV TSC_COMPILE_ON_ERROR=true
 ENV ESLINT_NO_DEV_ERRORS=true
 ENV CHOKIDAR_USEPOLLING=true
 ENV WDS_SOCKET_PORT=0
 
-EXPOSE 3000
-
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["npm", "start"]

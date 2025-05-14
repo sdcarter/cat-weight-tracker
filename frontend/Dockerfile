@@ -7,8 +7,9 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV GENERATE_SOURCEMAP=false
 
 # Copy package files first (leverages Docker layer caching)
-COPY package*.json ./
-RUN npm install
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --silent
 
 # Copy only necessary files for the build
 COPY public/ ./public/
@@ -20,10 +21,12 @@ COPY .env ./
 
 # Run linting during build
 RUN npm run lint
+# Build the app using react-scripts directly instead of craco
 RUN npm run build
 
 FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
+# Copy the build output to replace the default nginx contents
+COPY --from=build /app/build/ /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80

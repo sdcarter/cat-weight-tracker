@@ -16,7 +16,7 @@ COPY public/ ./public/
 COPY src/ ./src/
 COPY .eslintrc.json ./
 COPY tailwind.config.js ./
-COPY .env ./
+COPY .env.production ./
 
 # Run linting during build
 RUN npm run lint

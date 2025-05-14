@@ -1,0 +1,143 @@
+version: '3'
+
+tasks:
+  pull-images:
+    desc: Pull required Docker images
+    cmds:
+      - docker pull postgres:15
+      - docker pull node:18-alpine
+      - docker pull nginx:alpine
+      - docker pull python:3.11-slim
+
+  launch:
+    desc: Launch the application in specified environment (prod or dev)
+    cmds:
+      - task: pull-images
+      - echo "Starting Cat Weight Tracker in {{.ENV}} mode..."
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} up --build -d
+      - sleep 10
+      - echo "Application started in {{.ENV}} mode"
+      - |
+        if [ "{{.ENV}}" = "dev" ]; then
+          echo "- Frontend: http://localhost:3000"
+        else
+          echo "- Frontend: http://localhost:80"
+        fi
+        echo "- Backend API: http://localhost:4000"
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  stop:
+    desc: Stop the application in specified environment
+    cmds:
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} down
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  logs:
+    desc: Show logs for all or specific service
+    cmds:
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} logs {{.SERVICE}} {{.FOLLOW}}
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      SERVICE: '{{.SERVICE | default ""}}'
+      FOLLOW: '{{if .FOLLOW}}-f{{end}}'
+
+  lint:
+    desc: Run linting checks
+    cmds:
+      - echo "Running frontend linting..."
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm frontend npm run lint
+      - echo "Running backend linting..."
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend flake8
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  lint-fix:
+    desc: Run linting and fix issues automatically where possible
+    cmds:
+      - echo "Running frontend linting with auto-fix..."
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm frontend npm run lint -- --fix
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  test:
+    desc: Run tests
+    cmds:
+      - echo "Running frontend tests..."
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm frontend npm test -- --watchAll=false
+      - echo "Running backend tests..."
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend pytest
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  db:
+    desc: Database operations (migrate, reset)
+    cmds:
+      - |
+        if [ "{{.OP}}" = "migrate" ]; then
+          echo "Running database migrations..."
+          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
+        elif [ "{{.OP}}" = "reset" ]; then
+          echo "Resetting database..."
+          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} down -v
+          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} up -d db
+          sleep 5
+          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
+        else
+          echo "Unknown operation: {{.OP}}"
+          echo "Available operations: migrate, reset"
+        fi
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      OP: '{{.OP | default "migrate"}}'
+
+  shell:
+    desc: Open a shell in a service container
+    cmds:
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec {{.SERVICE}} sh
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      SERVICE: '{{.SERVICE | default "backend"}}'
+      
+  release:
+    desc: Create a new release with semantic versioning
+    cmds:
+      - |
+        CURRENT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "Current version: $CURRENT_VERSION"
+        
+        if [ "{{.TYPE}}" = "" ]; then
+          echo "Release type options: patch, minor, major"
+          echo "Usage: task release TYPE=patch|minor|major"
+          exit 1
+        fi
+        
+        # Remove 'v' prefix for version calculation
+        VERSION_NUM=${CURRENT_VERSION#v}
+        IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_NUM"
+        
+        case {{.TYPE}} in
+          patch)
+            NEW_PATCH=$((PATCH + 1))
+            NEW_VERSION="v$MAJOR.$MINOR.$NEW_PATCH"
+            ;;
+          minor)
+            NEW_MINOR=$((MINOR + 1))
+            NEW_VERSION="v$MAJOR.$NEW_MINOR.0"
+            ;;
+          major)
+            NEW_MAJOR=$((MAJOR + 1))
+            NEW_VERSION="v$NEW_MAJOR.0.0"
+            ;;
+          *)
+            echo "Invalid release type: {{.TYPE}}. Use: patch, minor, or major"
+            exit 1
+            ;;
+        esac
+        
+        echo "Creating new release: $NEW_VERSION"
+        git tag -a $NEW_VERSION -m "Release $NEW_VERSION"
+        echo "Tag created. To push to remote, run: git push origin $NEW_VERSION"
+    vars:
+      TYPE: '{{.TYPE}}'

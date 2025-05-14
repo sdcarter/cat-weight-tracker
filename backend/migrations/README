@@ -1,0 +1,7 @@
+Generic single-database configuration with Alembic.
+
+To create a new migration:
+alembic revision --autogenerate -m "description"
+
+To apply migrations:
+alembic upgrade head

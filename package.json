@@ -1,0 +1,10 @@
+{
+  "name": "cat-weight-tracker",
+  "version": "1.0.0",
+  "description": "A modern web application for tracking the weekly weight of cats",
+  "scripts": {
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && flake8",
+    "lint": "npm run lint:frontend && npm run lint:backend"
+  }
+}

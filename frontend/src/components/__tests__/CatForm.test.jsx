@@ -12,25 +12,26 @@ describe('CatForm', () => {
   test('renders empty form correctly', () => {
     render(<CatForm onSubmit={mockSubmit} />);
     
-    expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/cat name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/target weight/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /add cat/i })).toBeInTheDocument();
   });
   
   test('renders form with initial data', () => {
     const initialData = { name: 'Whiskers', target_weight: 4.5 };
     render(<CatForm onSubmit={mockSubmit} initialData={initialData} />);
     
-    expect(screen.getByLabelText(/name/i)).toHaveValue('Whiskers');
+    expect(screen.getByLabelText(/cat name/i)).toHaveValue('Whiskers');
     expect(screen.getByLabelText(/target weight/i)).toHaveValue(4.5);
+    expect(screen.getByRole('button', { name: /update cat/i })).toBeInTheDocument();
   });
   
   test('submits form with entered data', () => {
     render(<CatForm onSubmit={mockSubmit} />);
     
-    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Mittens' } });
+    fireEvent.change(screen.getByLabelText(/cat name/i), { target: { value: 'Mittens' } });
     fireEvent.change(screen.getByLabelText(/target weight/i), { target: { value: '5.2' } });
-    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add cat/i }));
     
     expect(mockSubmit).toHaveBeenCalledWith({
       name: 'Mittens',
@@ -42,7 +43,7 @@ describe('CatForm', () => {
     render(<CatForm onSubmit={mockSubmit} />);
     
     // Submit without entering data
-    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add cat/i }));
     
     // Form should not submit
     expect(mockSubmit).not.toHaveBeenCalled();

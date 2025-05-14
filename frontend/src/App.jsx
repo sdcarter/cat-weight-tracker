@@ -8,8 +8,8 @@ import WeightChart from './components/WeightChart';
 import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } from './components/ui/toast';
 import { Button } from './components/ui/button';
 
-// API base URL - use simple relative path for production
-const API_URL = '/api';
+// API base URL - use environment-specific URL
+const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api';
 
 function App() {
   const [cats, setCats] = useState([]);
@@ -23,6 +23,7 @@ function App() {
   // Fetch cats on component mount
   useEffect(() => {
     fetchCats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch weights when a cat is selected
@@ -34,6 +35,7 @@ function App() {
       setWeights([]);
       setPlotData(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCatId]);
 
   const fetchCats = async () => {
@@ -206,8 +208,7 @@ function App() {
                 <h2 className="text-2xl font-bold">Record Weight</h2>
                 {selectedCatId ? (
                   <WeightForm 
-                    onSubmit={handleAddWeight} 
-                    catId={selectedCatId} 
+                    onSubmit={handleAddWeight}
                   />
                 ) : (
                   <p className="text-muted-foreground">Select a cat to record weight</p>

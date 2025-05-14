@@ -19,10 +19,14 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Cat Weight Tracker API")
 
-# Configure CORS - restrict to specific origins in production
-origins = ["*"]  # For development
-# In production, use specific origins:
-origins = ["http://localhost", "http://localhost:80", "http://frontend", "http://frontend:80"]
+# Configure CORS - allow both development and production origins
+origins = [
+    "http://localhost:3000",  # Development frontend
+    "http://localhost", 
+    "http://localhost:80", 
+    "http://frontend", 
+    "http://frontend:80"
+]
 
 app.add_middleware(
     CORSMiddleware,

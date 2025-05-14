@@ -17,7 +17,7 @@ const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (
 ))
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
-const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
+const Toast = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <ToastPrimitives.Root
       ref={ref}

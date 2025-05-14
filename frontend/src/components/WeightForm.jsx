@@ -5,7 +5,7 @@ import { Label } from './ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/card';
 import { format } from 'date-fns';
 
-const WeightForm = ({ onSubmit, catId }) => {
+const WeightForm = ({ onSubmit }) => {
   const today = format(new Date(), 'yyyy-MM-dd');
   
   const [formData, setFormData] = useState({

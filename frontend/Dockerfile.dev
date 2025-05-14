@@ -2,10 +2,18 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy package files and install dependencies
+COPY package.json ./
 RUN npm install
 
-COPY . .
+# No need to copy source files as they will be mounted as volumes
+
+# Add development environment variables
+ENV FAST_REFRESH=true
+ENV TSC_COMPILE_ON_ERROR=true
+ENV ESLINT_NO_DEV_ERRORS=true
+ENV CHOKIDAR_USEPOLLING=true
+ENV WDS_SOCKET_PORT=0
 
 EXPOSE 3000
 

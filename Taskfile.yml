@@ -14,8 +14,14 @@ tasks:
     cmds:
       - task: pull-images
       - echo "Starting Cat Weight Tracker in {{.ENV}} mode..."
-      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} up --build -d
-      - sleep 10
+      - |
+        if [ "{{.ENV}}" = "dev" ]; then
+          # For dev, only start the services that are needed
+          docker-compose -f docker-compose.dev.yml up --build -d
+        else
+          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} up --build -d
+        fi
+      - sleep 5
       - echo "Application started in {{.ENV}} mode"
       - |
         if [ "{{.ENV}}" = "dev" ]; then
@@ -251,3 +257,12 @@ tasks:
     vars:
       TYPE: '{{.TYPE}}'
       MESSAGE: '{{.MESSAGE}}'
+      
+  dev-clean:
+    desc: Clean development environment (remove containers, volumes, and node_modules)
+    cmds:
+      - echo "Stopping development containers..."
+      - docker-compose -f docker-compose.dev.yml down -v
+      - echo "Removing frontend node_modules volume..."
+      - docker volume rm diet_frontend_node_modules || true
+      - echo "Development environment cleaned successfully!"

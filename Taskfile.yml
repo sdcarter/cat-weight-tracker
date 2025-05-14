@@ -109,7 +109,7 @@ tasks:
         
         if [ "{{.TYPE}}" = "" ]; then
           echo "Release type options: patch, minor, major"
-          echo "Usage: task release TYPE=patch|minor|major"
+          echo "Usage: task release TYPE=patch|minor|major MESSAGE='Your release message'"
           exit 1
         fi
         
@@ -136,8 +136,49 @@ tasks:
             ;;
         esac
         
+        # Default message if none provided
+        MESSAGE="{{.MESSAGE}}"
+        if [ -z "$MESSAGE" ]; then
+          MESSAGE="Release $NEW_VERSION"
+        fi
+        
+        # Update CHANGELOG.md
+        DATE=$(date +%Y-%m-%d)
+        echo "Updating CHANGELOG.md..."
+        
+        # Create a temporary file
+        TEMP_FILE=$(mktemp)
+        
+        # Write the new version header and message to the temp file
+        echo "# Changelog" > $TEMP_FILE
+        echo "" >> $TEMP_FILE
+        echo "All notable changes to this project will be documented in this file." >> $TEMP_FILE
+        echo "" >> $TEMP_FILE
+        echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," >> $TEMP_FILE
+        echo "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)." >> $TEMP_FILE
+        echo "" >> $TEMP_FILE
+        echo "## [$NEW_VERSION] - $DATE" >> $TEMP_FILE
+        echo "" >> $TEMP_FILE
+        echo "### Changed" >> $TEMP_FILE
+        echo "- $MESSAGE" >> $TEMP_FILE
+        echo "" >> $TEMP_FILE
+        
+        # Append the existing content after the first line
+        tail -n +7 CHANGELOG.md >> $TEMP_FILE
+        
+        # Replace the original file with the temp file
+        mv $TEMP_FILE CHANGELOG.md
+        
+        # Commit the CHANGELOG update
+        git add CHANGELOG.md
+        git commit -m "Update CHANGELOG for $NEW_VERSION"
+        
+        # Create the tag
         echo "Creating new release: $NEW_VERSION"
-        git tag -a $NEW_VERSION -m "Release $NEW_VERSION"
-        echo "Tag created. To push to remote, run: git push origin $NEW_VERSION"
+        git tag -a $NEW_VERSION -m "$MESSAGE"
+        
+        echo "Tag created. To push changes and tag to remote, run:"
+        echo "git push && git push origin $NEW_VERSION"
     vars:
       TYPE: '{{.TYPE}}'
+      MESSAGE: '{{.MESSAGE}}'

@@ -57,11 +57,20 @@ task db OP=reset    # Reset database
 # Open a shell in a container
 task shell SERVICE=backend
 task shell SERVICE=frontend
+```
 
+### Releases and Versioning
+
+This project uses [Semantic Versioning](https://semver.org/) for release management. All changes are documented in the [CHANGELOG.md](CHANGELOG.md) file.
+
+```bash
 # Create a new release
-task release TYPE=patch  # For patch version (0.0.x)
-task release TYPE=minor  # For minor version (0.x.0)
-task release TYPE=major  # For major version (x.0.0)
+task release TYPE=patch MESSAGE='Fixed bug in weight calculation'
+task release TYPE=minor MESSAGE='Added new chart visualization'
+task release TYPE=major MESSAGE='Complete UI redesign'
+
+# Push changes and tags to remote
+git push && git push origin --tags
 ```
 
 #### Using Docker Compose directly
@@ -121,5 +130,6 @@ cat-weight-tracker/
 ├── docker-compose.yml
 ├── docker-compose.dev.yml
 ├── Taskfile.yml
+├── CHANGELOG.md
 └── README.md
 ```

@@ -9,7 +9,7 @@ import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } fro
 import { Button } from './components/ui/button';
 
 // API base URL - use environment variable or default
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+const API_URL = process.env.REACT_APP_API_URL || '/api';
 
 function App() {
   const [cats, setCats] = useState([]);

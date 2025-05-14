@@ -176,55 +176,63 @@ tasks:
       BACKUP: '{{.BACKUP}}'
       
   release:
-    desc: Create a new release with semantic versioning
+    desc: Create a new release with automated semantic versioning
     cmds:
       - |
-        CURRENT_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-        echo "Current version: $CURRENT_VERSION"
+        # Get current version from package.json
+        CURRENT_VERSION=$(grep '"version":' package.json | cut -d'"' -f4)
+        echo "Current version: v$CURRENT_VERSION"
         
-        if [ "{{.TYPE}}" = "" ]; then
-          echo "Release type options: patch, minor, major"
-          echo "Usage: task release TYPE=patch|minor|major MESSAGE='Your release message'"
-          exit 1
+        # Determine bump type based on commit messages
+        determine_bump_type() {
+          # Get all commits since the last tag
+          local commits=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s")
+          
+          # Check for breaking changes or feat commits
+          if echo "$commits" | grep -q "BREAKING CHANGE" || echo "$commits" | grep -q "!:"; then
+            echo "major"
+          elif echo "$commits" | grep -q "^feat"; then
+            echo "minor"
+          else
+            echo "patch"
+          fi
+        }
+        
+        # If type is provided, use it; otherwise determine automatically
+        if [ -n "{{.TYPE}}" ]; then
+          BUMP_TYPE="{{.TYPE}}"
+        else
+          BUMP_TYPE=$(determine_bump_type)
+          echo "Detected change type: $BUMP_TYPE"
         fi
         
-        # Remove 'v' prefix for version calculation
-        VERSION_NUM=${CURRENT_VERSION#v}
-        IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_NUM"
+        # Parse current version
+        IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
         
-        case {{.TYPE}} in
-          patch)
-            NEW_PATCH=$((PATCH + 1))
-            NEW_VERSION="v$MAJOR.$MINOR.$NEW_PATCH"
+        # Calculate new version
+        case $BUMP_TYPE in
+          major)
+            NEW_VERSION="$((MAJOR + 1)).0.0"
             ;;
           minor)
-            NEW_MINOR=$((MINOR + 1))
-            NEW_VERSION="v$MAJOR.$NEW_MINOR.0"
+            NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
             ;;
-          major)
-            NEW_MAJOR=$((MAJOR + 1))
-            NEW_VERSION="v$NEW_MAJOR.0.0"
-            ;;
-          *)
-            echo "Invalid release type: {{.TYPE}}. Use: patch, minor, or major"
-            exit 1
+          patch|*)
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
             ;;
         esac
         
-        # Default message if none provided
-        MESSAGE="{{.MESSAGE}}"
-        if [ -z "$MESSAGE" ]; then
-          MESSAGE="Release $NEW_VERSION"
-        fi
+        echo "New version: v$NEW_VERSION"
         
-        # Update CHANGELOG.md
+        # Update version in package.json
+        sed -i.bak "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" package.json
+        rm package.json.bak
+        
+        # Generate changelog entry
         DATE=$(date +%Y-%m-%d)
-        echo "Updating CHANGELOG.md..."
-        
-        # Create a temporary file
         TEMP_FILE=$(mktemp)
         
-        # Write the new version header and message to the temp file
+        # Write header to temp file
         echo "# Changelog" > $TEMP_FILE
         echo "" >> $TEMP_FILE
         echo "All notable changes to this project will be documented in this file." >> $TEMP_FILE
@@ -232,28 +240,57 @@ tasks:
         echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)," >> $TEMP_FILE
         echo "and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)." >> $TEMP_FILE
         echo "" >> $TEMP_FILE
-        echo "## [$NEW_VERSION] - $DATE" >> $TEMP_FILE
-        echo "" >> $TEMP_FILE
-        echo "### Changed" >> $TEMP_FILE
-        echo "- $MESSAGE" >> $TEMP_FILE
+        
+        # Add new version section
+        echo "## [v$NEW_VERSION] - $DATE" >> $TEMP_FILE
         echo "" >> $TEMP_FILE
         
-        # Append the existing content after the first line
+        # Add features
+        FEATURES=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s" | grep "^feat" | sed 's/feat: /- /' | sed 's/feat(\([^)]*\)): /- /')
+        if [ ! -z "$FEATURES" ]; then
+          echo "### Features" >> $TEMP_FILE
+          echo "$FEATURES" >> $TEMP_FILE
+          echo "" >> $TEMP_FILE
+        fi
+        
+        # Add fixes
+        FIXES=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s" | grep "^fix" | sed 's/fix: /- /' | sed 's/fix(\([^)]*\)): /- /')
+        if [ ! -z "$FIXES" ]; then
+          echo "### Bug Fixes" >> $TEMP_FILE
+          echo "$FIXES" >> $TEMP_FILE
+          echo "" >> $TEMP_FILE
+        fi
+        
+        # Add other changes
+        OTHERS=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s" | grep -v "^feat" | grep -v "^fix" | sed 's/^/- /')
+        if [ ! -z "$OTHERS" ]; then
+          echo "### Other Changes" >> $TEMP_FILE
+          echo "$OTHERS" >> $TEMP_FILE
+          echo "" >> $TEMP_FILE
+        fi
+        
+        # If message is provided, add it
+        if [ -n "{{.MESSAGE}}" ]; then
+          echo "### Notes" >> $TEMP_FILE
+          echo "- {{.MESSAGE}}" >> $TEMP_FILE
+          echo "" >> $TEMP_FILE
+        fi
+        
+        # Append the existing content after the header
         tail -n +7 CHANGELOG.md >> $TEMP_FILE
         
         # Replace the original file with the temp file
         mv $TEMP_FILE CHANGELOG.md
         
-        # Commit the CHANGELOG update
-        git add CHANGELOG.md
-        git commit -m "Update CHANGELOG for $NEW_VERSION"
+        # Commit changes
+        git add package.json CHANGELOG.md
+        git commit -m "chore(release): v$NEW_VERSION"
         
-        # Create the tag
-        echo "Creating new release: $NEW_VERSION"
-        git tag -a $NEW_VERSION -m "$MESSAGE"
+        # Create tag
+        git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
         
-        echo "Tag created. To push changes and tag to remote, run:"
-        echo "git push && git push origin $NEW_VERSION"
+        echo "Release v$NEW_VERSION created successfully!"
+        echo "Run 'git push && git push --tags' to publish the release."
     vars:
       TYPE: '{{.TYPE}}'
       MESSAGE: '{{.MESSAGE}}'

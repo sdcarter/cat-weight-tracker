@@ -100,6 +100,75 @@ tasks:
       ENV: '{{.ENV | default "prod"}}'
       SERVICE: '{{.SERVICE | default "backend"}}'
       
+  backup:
+    desc: Backup the database to a local file
+    cmds:
+      - |
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        BACKUP_DIR="./backups"
+        mkdir -p $BACKUP_DIR
+        BACKUP_FILE="${BACKUP_DIR}/cat_weight_tracker_${TIMESTAMP}.sql"
+        
+        echo "Creating database backup to ${BACKUP_FILE}..."
+        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db pg_dump -U postgres cat_weight_tracker > "${BACKUP_FILE}"
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Backup completed successfully!"
+          echo "Backup saved to: ${BACKUP_FILE}"
+          echo "To restore this backup, run: task restore BACKUP=${BACKUP_FILE}"
+        else
+          echo "❌ Backup failed!"
+          rm -f "${BACKUP_FILE}"
+        fi
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  restore:
+    desc: Restore the database from a backup file
+    cmds:
+      - |
+        if [ -z "{{.BACKUP}}" ]; then
+          echo "❌ Error: No backup file specified!"
+          echo "Usage: task restore BACKUP=./backups/filename.sql"
+          exit 1
+        fi
+        
+        if [ ! -f "{{.BACKUP}}" ]; then
+          echo "❌ Error: Backup file not found: {{.BACKUP}}"
+          exit 1
+        fi
+        
+        echo "⚠️  WARNING: This will overwrite the current database!"
+        echo "Are you sure you want to restore from {{.BACKUP}}? (y/n)"
+        read -r confirm
+        
+        if [ "$confirm" != "y" ]; then
+          echo "Restore cancelled."
+          exit 0
+        fi
+        
+        echo "Restoring database from {{.BACKUP}}..."
+        
+        # Make sure the database is running
+        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} up -d db
+        sleep 5
+        
+        # Drop and recreate the database
+        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db psql -U postgres -c "DROP DATABASE IF EXISTS cat_weight_tracker;"
+        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db psql -U postgres -c "CREATE DATABASE cat_weight_tracker;"
+        
+        # Restore from backup
+        cat "{{.BACKUP}}" | docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db psql -U postgres -d cat_weight_tracker
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Restore completed successfully!"
+        else
+          echo "❌ Restore failed!"
+        fi
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      BACKUP: '{{.BACKUP}}'
+      
   release:
     desc: Create a new release with semantic versioning
     cmds:

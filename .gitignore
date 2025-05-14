@@ -49,3 +49,6 @@ build/
 
 # Database
 postgres_data/
+
+# Backups
+backups/*.sql

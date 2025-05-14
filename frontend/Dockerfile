@@ -4,6 +4,7 @@ WORKDIR /app
 
 # Increase Node.js memory limit
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV GENERATE_SOURCEMAP=false
 
 # Copy package files first (leverages Docker layer caching)
 COPY package*.json ./
@@ -14,6 +15,8 @@ COPY public/ ./public/
 COPY src/ ./src/
 COPY .eslintrc.json ./
 COPY tailwind.config.js ./
+COPY craco.config.js ./
+COPY .env ./
 
 # Run linting during build
 RUN npm run lint

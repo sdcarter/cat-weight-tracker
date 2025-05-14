@@ -8,20 +8,19 @@ ENV GENERATE_SOURCEMAP=false
 
 # Copy package files first (leverages Docker layer caching)
 COPY package.json ./
-COPY package-lock.json ./
-RUN npm ci --silent
+# Install dependencies
+RUN npm install --silent
 
 # Copy only necessary files for the build
 COPY public/ ./public/
 COPY src/ ./src/
 COPY .eslintrc.json ./
 COPY tailwind.config.js ./
-COPY craco.config.js ./
 COPY .env ./
 
 # Run linting during build
 RUN npm run lint
-# Build the app using react-scripts directly instead of craco
+# Build the app
 RUN npm run build
 
 FROM nginx:alpine

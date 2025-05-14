@@ -22,7 +22,7 @@ app = FastAPI(title="Cat Weight Tracker API")
 # Configure CORS - restrict to specific origins in production
 origins = ["*"]  # For development
 # In production, use specific origins:
-# origins = ["https://your-frontend-domain.com", "http://localhost:3000"]
+origins = ["http://localhost", "http://localhost:80", "http://frontend", "http://frontend:80"]
 
 app.add_middleware(
     CORSMiddleware,

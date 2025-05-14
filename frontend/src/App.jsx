@@ -8,8 +8,8 @@ import WeightChart from './components/WeightChart';
 import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } from './components/ui/toast';
 import { Button } from './components/ui/button';
 
-// API base URL - use environment variable or default
-const API_URL = process.env.REACT_APP_API_URL || '/api';
+// API base URL - use simple relative path for production
+const API_URL = '/api';
 
 function App() {
   const [cats, setCats] = useState([]);
@@ -38,7 +38,9 @@ function App() {
 
   const fetchCats = async () => {
     try {
+      console.log('Fetching cats from:', `${API_URL}/cats/`);
       const response = await axios.get(`${API_URL}/cats/`);
+      console.log('Cats data received:', response.data);
       setCats(response.data);
       
       // Select the first cat if none is selected

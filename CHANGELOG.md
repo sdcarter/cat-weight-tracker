@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v0.2.2] - 2025-05-14
 
+### Changed
+- Improved release process:
+  - Integrated automated semantic versioning into Taskfile
+  - Removed standalone release.sh script
+  - Updated README with comprehensive documentation
+  - Fixed Taskfile.yml structure and removed duplications
+
 
 ## [v0.2.1] - 2025-05-15
 

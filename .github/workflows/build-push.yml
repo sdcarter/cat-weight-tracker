@@ -63,8 +63,8 @@ jobs:
       - name: Update image tags in Kubernetes manifests
         run: |
           echo "Updating image tags to ${{ github.sha }}"
-          sed -i "s|ghcr.io/yourusername/cat-weight-tracker-backend:latest|ghcr.io/${{ github.repository_owner }}/cat-weight-tracker-backend:${{ github.sha }}|g" k8s/base/backend.yaml
-          sed -i "s|ghcr.io/yourusername/cat-weight-tracker-frontend:latest|ghcr.io/${{ github.repository_owner }}/cat-weight-tracker-frontend:${{ github.sha }}|g" k8s/base/frontend.yaml
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|ghcr.io/${{ github.repository_owner }}/cat-weight-tracker-backend:${{ github.sha }}|g" k8s/base/backend.yaml
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|ghcr.io/${{ github.repository_owner }}/cat-weight-tracker-frontend:${{ github.sha }}|g" k8s/base/frontend.yaml
           
       - name: Commit and push updated manifests
         run: |

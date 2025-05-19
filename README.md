@@ -21,7 +21,7 @@ A simple application to track your cat's weight over time.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/cat-weight-tracker.git
+git clone https://github.com/sdcarter/cat-weight-tracker.git
 cd cat-weight-tracker
 ```
 

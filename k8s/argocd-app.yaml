@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/yourusername/cat-weight-tracker.git
+    repoURL: https://github.com/sdcarter/cat-weight-tracker.git
     targetRevision: main
     path: k8s/overlays/prod
   destination:

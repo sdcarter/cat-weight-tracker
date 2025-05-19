@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ghcr.io/yourusername/cat-weight-tracker-backend:latest
+        image: ghcr.io/sdcarter/cat-weight-tracker-backend:latest
         ports:
         - containerPort: 4000
         env:

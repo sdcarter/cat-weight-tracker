@@ -249,6 +249,7 @@ tasks:
         FEATURES=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s" | grep "^feat" | sed 's/feat: /- /' | sed 's/feat(\([^)]*\)): /- /')
         if [ ! -z "$FEATURES" ]; then
           echo "### Features" >> $TEMP_FILE
+          echo "" >> $TEMP_FILE
           echo "$FEATURES" >> $TEMP_FILE
           echo "" >> $TEMP_FILE
         fi
@@ -257,49 +258,57 @@ tasks:
         FIXES=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s" | grep "^fix" | sed 's/fix: /- /' | sed 's/fix(\([^)]*\)): /- /')
         if [ ! -z "$FIXES" ]; then
           echo "### Bug Fixes" >> $TEMP_FILE
+          echo "" >> $TEMP_FILE
           echo "$FIXES" >> $TEMP_FILE
           echo "" >> $TEMP_FILE
         fi
         
         # Add other changes
-        OTHERS=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s" | grep -v "^feat" | grep -v "^fix" | sed 's/^/- /')
-        if [ ! -z "$OTHERS" ]; then
+        OTHER=$(git log $(git describe --tags --abbrev=0)..HEAD --pretty=format:"%s" | grep -v "^feat" | grep -v "^fix" | grep -v "^docs" | grep -v "^chore" | grep -v "^test" | grep -v "^ci" | grep -v "^style" | grep -v "^refactor" | sed 's/^/- /')
+        if [ ! -z "$OTHER" ]; then
           echo "### Other Changes" >> $TEMP_FILE
-          echo "$OTHERS" >> $TEMP_FILE
+          echo "" >> $TEMP_FILE
+          echo "$OTHER" >> $TEMP_FILE
           echo "" >> $TEMP_FILE
         fi
         
-        # If message is provided, add it
-        if [ -n "{{.MESSAGE}}" ]; then
-          echo "### Notes" >> $TEMP_FILE
-          echo "- {{.MESSAGE}}" >> $TEMP_FILE
-          echo "" >> $TEMP_FILE
+        # Read existing changelog
+        if [ -f "CHANGELOG.md" ]; then
+          tail -n +2 "CHANGELOG.md" >> $TEMP_FILE
         fi
         
-        # Append the existing content after the header
-        tail -n +7 CHANGELOG.md >> $TEMP_FILE
-        
-        # Replace the original file with the temp file
+        # Replace changelog
         mv $TEMP_FILE CHANGELOG.md
         
         # Commit changes
         git add package.json CHANGELOG.md
-        git commit -m "chore(release): v$NEW_VERSION"
-        
-        # Create tag
+        git commit -m "chore: bump version to v$NEW_VERSION"
         git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
         
-        echo "Release v$NEW_VERSION created successfully!"
-        echo "Run 'git push && git push --tags' to publish the release."
+        echo "✅ Version bumped to v$NEW_VERSION"
+        echo "To push changes and tag, run: git push && git push --tags"
     vars:
-      TYPE: '{{.TYPE}}'
-      MESSAGE: '{{.MESSAGE}}'
+      TYPE: '{{.TYPE | default ""}}'
       
-  dev-clean:
-    desc: Clean development environment (remove containers, volumes, and node_modules)
+  build-images:
+    desc: Build Docker images locally
     cmds:
-      - echo "Stopping development containers..."
-      - docker-compose -f docker-compose.dev.yml down -v
-      - echo "Removing frontend node_modules volume..."
-      - docker volume rm diet_frontend_node_modules || true
-      - echo "Development environment cleaned successfully!"
+      - docker build -t ghcr.io/yourusername/cat-weight-tracker-backend:latest ./backend
+      - docker build -t ghcr.io/yourusername/cat-weight-tracker-frontend:latest ./frontend
+      
+  push-images:
+    desc: Push Docker images to GitHub Container Registry
+    cmds:
+      - echo "Pushing images to GitHub Container Registry..."
+      - docker push ghcr.io/yourusername/cat-weight-tracker-backend:latest
+      - docker push ghcr.io/yourusername/cat-weight-tracker-frontend:latest
+      
+  k8s-apply:
+    desc: Apply Kubernetes manifests using kubectl
+    cmds:
+      - kubectl apply -k k8s/overlays/prod
+      
+  argocd-deploy:
+    desc: Deploy the application using ArgoCD
+    cmds:
+      - kubectl apply -f k8s/argocd-app.yaml

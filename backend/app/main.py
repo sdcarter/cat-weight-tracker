@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
@@ -19,13 +19,17 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Cat Weight Tracker API")
 
+# Create API router for /api prefix
+api_router = APIRouter(prefix="/api")
+
 # Configure CORS - allow both development and production origins
 origins = [
     "http://localhost:3000",  # Development frontend
     "http://localhost", 
     "http://localhost:80", 
     "http://frontend", 
-    "http://frontend:80"
+    "http://frontend:80",
+    "*"  # Allow all origins in production
 ]
 
 app.add_middleware(
@@ -57,7 +61,8 @@ async def log_requests(request: Request, call_next):
     return response
 
 
-# Cat endpoints
+# Define routes for both root and /api prefix
+# Cat endpoints for root path
 @app.post("/cats/", response_model=schemas.Cat)
 def create_cat(cat: schemas.CatCreate, db: Session = Depends(get_db)):
     # Input validation beyond Pydantic
@@ -108,6 +113,32 @@ def delete_cat(cat_id: int, db: Session = Depends(get_db)):
     return {"detail": "Cat deleted successfully"}
 
 
+# Cat endpoints for /api prefix
+@app.post("/api/cats/", response_model=schemas.Cat)
+def create_cat_api(cat: schemas.CatCreate, db: Session = Depends(get_db)):
+    return create_cat(cat, db)
+
+
+@app.get("/api/cats/", response_model=List[schemas.Cat])
+def read_cats_api(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return read_cats(skip, limit, db)
+
+
+@app.get("/api/cats/{cat_id}", response_model=schemas.CatWithRecords)
+def read_cat_api(cat_id: int, db: Session = Depends(get_db)):
+    return read_cat(cat_id, db)
+
+
+@app.put("/api/cats/{cat_id}", response_model=schemas.Cat)
+def update_cat_api(cat_id: int, cat: schemas.CatCreate, db: Session = Depends(get_db)):
+    return update_cat(cat_id, cat, db)
+
+
+@app.delete("/api/cats/{cat_id}")
+def delete_cat_api(cat_id: int, db: Session = Depends(get_db)):
+    return delete_cat(cat_id, db)
+
+
 # Weight record endpoints
 @app.post("/cats/{cat_id}/weights/", response_model=schemas.WeightRecord)
 def create_weight_record(
@@ -147,6 +178,26 @@ def delete_weight_record(record_id: int, db: Session = Depends(get_db)):
     return {"detail": "Weight record deleted successfully"}
 
 
+# Weight record endpoints with /api prefix
+@app.post("/api/cats/{cat_id}/weights/", response_model=schemas.WeightRecord)
+def create_weight_record_api(
+    cat_id: int, weight_record: schemas.WeightRecordCreate, db: Session = Depends(get_db)
+):
+    return create_weight_record(cat_id, weight_record, db)
+
+
+@app.get("/api/cats/{cat_id}/weights/", response_model=List[schemas.WeightRecord])
+def read_weight_records_api(
+    cat_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
+):
+    return read_weight_records(cat_id, skip, limit, db)
+
+
+@app.delete("/api/weights/{record_id}")
+def delete_weight_record_api(record_id: int, db: Session = Depends(get_db)):
+    return delete_weight_record(record_id, db)
+
+
 # Plot data endpoint
 @app.get("/cats/{cat_id}/plot", response_model=schemas.PlotData)
 def get_plot_data(cat_id: int, db: Session = Depends(get_db)):
@@ -159,3 +210,9 @@ def get_plot_data(cat_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Failed to generate plot data")
     
     return plot_data
+
+
+# Plot data endpoint with /api prefix
+@app.get("/api/cats/{cat_id}/plot", response_model=schemas.PlotData)
+def get_plot_data_api(cat_id: int, db: Session = Depends(get_db)):
+    return get_plot_data(cat_id, db)

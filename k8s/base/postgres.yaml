@@ -20,7 +20,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 10Gi
+  storageClassName: standard-rwo
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -49,6 +50,7 @@ spec:
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
+          subPath: postgres-data
         resources:
           limits:
             cpu: "1"

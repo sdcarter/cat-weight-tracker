@@ -1,0 +1,53 @@
+name: Deploy to GCP Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Images"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          
+      - name: Configure kubectl
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+          location: ${{ secrets.GKE_CLUSTER_LOCATION }}
+          
+      - name: Update Kubernetes manifests
+        run: |
+          # Set the image tag to the commit SHA from the build workflow
+          export IMAGE_TAG=$(git rev-parse --short HEAD)
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|ghcr.io/${{ github.repository_owner }}/cat-weight-tracker-backend:$IMAGE_TAG|g" k8s/base/backend.yaml
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|ghcr.io/${{ github.repository_owner }}/cat-weight-tracker-frontend:$IMAGE_TAG|g" k8s/base/frontend.yaml
+          
+      - name: Apply Kubernetes manifests
+        run: |
+          # Create namespace if it doesn't exist
+          kubectl apply -f k8s/base/namespace.yaml
+          
+          # Apply all manifests
+          kubectl apply -f k8s/base/postgres.yaml
+          kubectl apply -f k8s/base/backend.yaml
+          kubectl apply -f k8s/base/frontend.yaml
+          kubectl apply -f k8s/base/ingress.yaml
+          
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/backend -n cat-weight-tracker
+          kubectl rollout status deployment/frontend -n cat-weight-tracker

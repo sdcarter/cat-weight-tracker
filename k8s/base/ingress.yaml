@@ -4,11 +4,14 @@ metadata:
   name: cat-weight-tracker-ingress
   namespace: cat-weight-tracker
   annotations:
+    kubernetes.io/ingress.class: "gce"
     kubernetes.io/ingress.allow-http: "true"
-    cloud.google.com/load-balancer-type: "External"
-    ingress.gcp.kubernetes.io/v1beta1.BackendConfig: '{"default": {"healthCheck": {"checkIntervalSec": 15, "timeoutSec": 5, "healthyThreshold": 1, "unhealthyThreshold": 2, "type": "HTTP", "requestPath": "/", "port": 80}}}'
 spec:
-  ingressClassName: gce
+  defaultBackend:
+    service:
+      name: frontend
+      port:
+        number: 80
   rules:
   - http:
       paths:
@@ -19,10 +22,3 @@ spec:
             name: backend
             port:
               number: 4000
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 80

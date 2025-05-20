@@ -4,8 +4,10 @@ metadata:
   name: cat-weight-tracker-ingress
   namespace: cat-weight-tracker
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/ingress.allow-http: "true"
+    cloud.google.com/load-balancer-type: "External"
 spec:
+  ingressClassName: gce
   rules:
   - http:
       paths:

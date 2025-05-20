@@ -56,11 +56,13 @@ This application is deployed to a personal GCP Kubernetes cluster using GitHub A
    - `GCP_SA_KEY`: The base64-encoded content of the key.json file
    - `GKE_CLUSTER_NAME`: The name of your GKE cluster (e.g., cat-weight-tracker)
    - `GKE_CLUSTER_LOCATION`: The zone of your GKE cluster (e.g., us-central1-a)
+   - `DOCKERHUB_USERNAME`: Your Docker Hub username
+   - `DOCKERHUB_TOKEN`: Your Docker Hub access token (create at https://hub.docker.com/settings/security)
 
 ### Deployment Process
 
 1. Push changes to the main branch
-2. GitHub Actions will build and push Docker images to GitHub Container Registry
+2. GitHub Actions will build and push Docker images to Docker Hub
 3. A second workflow will deploy the application to your GKE cluster
 
 ### Accessing the Application

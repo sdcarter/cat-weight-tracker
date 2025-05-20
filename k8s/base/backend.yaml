@@ -14,8 +14,6 @@ spec:
       labels:
         app: backend
     spec:
-      imagePullSecrets:
-      - name: github-registry-secret
       containers:
       - name: backend
         image: ghcr.io/sdcarter/cat-weight-tracker-backend:latest

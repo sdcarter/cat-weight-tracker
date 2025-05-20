@@ -36,6 +36,20 @@ jobs:
           location: ${{ secrets.GKE_CLUSTER_LOCATION }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           
+      - name: Create GitHub Registry Secret
+        run: |
+          kubectl create namespace cat-weight-tracker --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Delete the secret if it exists to update it
+          kubectl delete secret github-registry-secret -n cat-weight-tracker --ignore-not-found
+          
+          # Create the secret with GitHub token
+          kubectl create secret docker-registry github-registry-secret \
+            --namespace cat-weight-tracker \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.repository_owner }} \
+            --docker-password=${{ secrets.GITHUB_TOKEN }}
+          
       - name: Update Kubernetes manifests
         run: |
           # Set the image tag to the commit SHA from the build workflow

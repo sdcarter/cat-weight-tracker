@@ -38,10 +38,9 @@ jobs:
           
       - name: Update Kubernetes manifests
         run: |
-          # Set the image tag to the commit SHA from the build workflow
-          export IMAGE_TAG=$(git rev-parse --short HEAD)
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:$IMAGE_TAG|g" k8s/base/backend.yaml
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:$IMAGE_TAG|g" k8s/base/frontend.yaml
+          # Use latest tag instead of commit SHA
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:latest|g" k8s/base/backend.yaml
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:latest|g" k8s/base/frontend.yaml
           
       - name: Apply Kubernetes manifests
         run: |

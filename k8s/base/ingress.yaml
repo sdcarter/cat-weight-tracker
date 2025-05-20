@@ -3,8 +3,10 @@ kind: Ingress
 metadata:
   name: cat-weight-tracker-ingress
   namespace: cat-weight-tracker
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "true"
 spec:
-  ingressClassName: gce
   rules:
   - http:
       paths:

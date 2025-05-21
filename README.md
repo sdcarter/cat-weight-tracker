@@ -1,6 +1,22 @@
 # Cat Weight Tracker
 
-A web application for tracking cat weights over time.
+A web application for tracking cat weights over time. This application allows users to add cats, record their weights, and visualize weight trends over time.
+
+## Features
+
+- Add, edit, and delete cats with target weights
+- Record weight measurements for each cat
+- Visualize weight trends with interactive charts
+- Responsive design for desktop and mobile
+- RESTful API for data management
+
+## Tech Stack
+
+- **Frontend**: React, Tailwind CSS
+- **Backend**: FastAPI (Python)
+- **Database**: PostgreSQL
+- **Deployment**: Docker, Kubernetes, GCP
+- **CI/CD**: GitHub Actions
 
 ## GCP Kubernetes Deployment
 
@@ -70,7 +86,7 @@ This application is deployed to a personal GCP Kubernetes cluster using GitHub A
 After deployment, you can access the application using the external IP provided by GCP:
 
 ```bash
-kubectl get ingress cat-weight-tracker-ingress -n cat-weight-tracker
+kubectl get gateway cat-weight-tracker-gateway -n cat-weight-tracker
 ```
 
 ## Local Development
@@ -80,3 +96,38 @@ To run the application locally:
 ```bash
 docker-compose -f docker-compose.dev.yml up
 ```
+
+## Testing
+
+### Backend Tests
+
+```bash
+cd backend
+pytest
+```
+
+### Frontend Tests
+
+```bash
+cd frontend
+npm test
+```
+
+## CI/CD Pipeline
+
+The project includes three GitHub Actions workflows:
+
+1. **CI**: Runs tests for both frontend and backend
+2. **Build and Push Images**: Builds Docker images and pushes them to Docker Hub
+3. **Deploy to GCP**: Deploys the application to GKE
+
+## API Endpoints
+
+- `GET /cats/`: List all cats
+- `POST /cats/`: Create a new cat
+- `GET /cats/{cat_id}`: Get a specific cat
+- `PUT /cats/{cat_id}`: Update a cat
+- `DELETE /cats/{cat_id}`: Delete a cat
+- `GET /cats/{cat_id}/weights/`: Get weight records for a cat
+- `POST /cats/{cat_id}/weights/`: Add a weight record for a cat
+- `DELETE /weights/{record_id}`: Delete a weight record

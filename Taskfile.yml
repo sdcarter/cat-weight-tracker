@@ -68,14 +68,30 @@ tasks:
       ENV: '{{.ENV | default "prod"}}'
 
   test:
-    desc: Run tests
+    desc: Run all tests
+    cmds:
+      - echo "Running all tests..."
+      - task: test-frontend
+      - task: test-backend
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  test-frontend:
+    desc: Run frontend tests
     cmds:
       - echo "Running frontend tests..."
       - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm frontend npm test -- --watchAll=false
-      - echo "Running backend tests..."
-      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend pytest
     vars:
       ENV: '{{.ENV | default "prod"}}'
+
+  test-backend:
+    desc: Run backend tests
+    cmds:
+      - echo "Running backend tests..."
+      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend pytest {{.ARGS}}
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      ARGS: '{{.ARGS | default ""}}'
 
   db:
     desc: Database operations (migrate, reset)

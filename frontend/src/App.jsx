@@ -5,13 +5,16 @@ import CatList from './components/CatList';
 import WeightForm from './components/WeightForm';
 import WeightTable from './components/WeightTable';
 import WeightChart from './components/WeightChart';
+import AuthScreen from './components/AuthScreen';
 import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } from './components/ui/toast';
 import { Button } from './components/ui/button';
+import { useAuth } from './context/AuthContext';
 
 // API base URL - use environment-specific URL
 const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api';
 
 function App() {
+  const { user, loading, logout } = useAuth();
   const [cats, setCats] = useState([]);
   const [selectedCatId, setSelectedCatId] = useState(null);
   const [weights, setWeights] = useState([]);
@@ -20,11 +23,13 @@ function App() {
   const [showAddCat, setShowAddCat] = useState(false);
   const [toast, setToast] = useState({ open: false, title: '', description: '' });
 
-  // Fetch cats on component mount
+  // Fetch cats when user is authenticated
   useEffect(() => {
-    fetchCats();
+    if (user) {
+      fetchCats();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   // Fetch weights when a cat is selected
   useEffect(() => {
@@ -150,13 +155,36 @@ function App() {
     setTimeout(() => setToast({ open: false, title: '', description: '' }), 3000);
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Loading...</h2>
+          <p className="text-muted-foreground">Please wait</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show auth screen if not logged in
+  if (!user) {
+    return <AuthScreen />;
+  }
+
   return (
     <ToastProvider>
       <div className="min-h-screen bg-background">
         <header className="bg-primary text-primary-foreground py-6">
-          <div className="container">
-            <h1 className="text-3xl font-bold">Cat Weight Tracker</h1>
-            <p className="text-sm opacity-90">Monitor your cat&apos;s weight progress</p>
+          <div className="container flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold">Cat Weight Tracker</h1>
+              <p className="text-sm opacity-90">Monitor your cat&apos;s weight progress</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm">Logged in as {user.username}</span>
+              <Button variant="outline" onClick={logout}>Logout</Button>
+            </div>
           </div>
         </header>
 

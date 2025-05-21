@@ -1,6 +1,7 @@
 // Inspired by react-hot-toast library
 import * as React from "react"
 
+// eslint-disable-next-line no-unused-vars
 import { Toast, ToastTitle, ToastDescription } from "./toast"
 
 const TOAST_LIMIT = 1

@@ -17,7 +17,7 @@ import { useAuth } from './context/AuthContext';
 const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api';
 
 function App() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
   const [cats, setCats] = useState([]);
   const [selectedCatId, setSelectedCatId] = useState(null);
   const [weights, setWeights] = useState([]);

@@ -44,14 +44,8 @@ jobs:
           
       - name: Apply Kubernetes manifests
         run: |
-          # Create namespace if it doesn't exist
-          kubectl apply -f k8s/base/namespace.yaml
-          
-          # Apply all manifests
-          kubectl apply -f k8s/base/postgres.yaml
-          kubectl apply -f k8s/base/backend.yaml
-          kubectl apply -f k8s/base/frontend.yaml
-          kubectl apply -f k8s/base/ingress.yaml
+          # Apply all manifests using kustomize
+          kubectl apply -k k8s/base/
           
       - name: Verify deployment
         run: |

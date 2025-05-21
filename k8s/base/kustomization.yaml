@@ -9,4 +9,3 @@ resources:
   - gateway.yaml
   - backend-config.yaml
   - frontend-config.yaml
-  - health-check-policy.yaml

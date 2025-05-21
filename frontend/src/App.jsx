@@ -267,8 +267,7 @@ function App() {
           </div>
         </footer>
       </div>
-    );
-  };
+  );
 
   return (
     <ToastProvider>

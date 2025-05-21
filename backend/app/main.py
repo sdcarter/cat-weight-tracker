@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from datetime import timedelta
+from contextlib import asynccontextmanager
 from . import crud, models, schemas, plots, auth
 from .database import engine, get_db
 import time
@@ -19,7 +20,17 @@ logger = logging.getLogger(__name__)
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Cat Weight Tracker API")
+# Define lifespan context manager for startup/shutdown events
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Create default user
+    db = next(get_db())
+    crud.create_default_user(db)
+    yield
+    # Shutdown: Nothing to do here
+
+# Create FastAPI app with lifespan
+app = FastAPI(title="Cat Weight Tracker API", lifespan=lifespan)
 
 # Create API router for /api prefix
 api_router = APIRouter(prefix="/api")
@@ -373,10 +384,3 @@ def read_own_cats_api(
     db: Session = Depends(get_db)
 ):
     return read_own_cats(skip, limit, current_user, db)
-
-
-# Create a default user on startup and associate existing cats with it
-@app.on_event("startup")
-async def startup_event():
-    db = next(get_db())
-    crud.create_default_user(db)

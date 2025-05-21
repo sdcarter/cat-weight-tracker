@@ -18,8 +18,7 @@ class User(UserBase):
     id: int
     is_active: bool
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 class Token(BaseModel):
     access_token: str
@@ -40,8 +39,7 @@ class Cat(CatBase):
     id: int
     user_id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 # Weight record schemas
 class WeightRecordBase(BaseModel):
@@ -57,22 +55,19 @@ class WeightRecord(WeightRecordBase):
     cat_weight: float
     cat_id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 # Extended Cat schema with weight records
 class CatWithRecords(Cat):
     weight_records: List[WeightRecord] = []
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 # Extended User schema with cats
 class UserWithCats(User):
     cats: List[Cat] = []
 
-    class Config:
-        orm_mode = True
+    model_config = {"from_attributes": True}
 
 # Plot data schema
 class PlotData(BaseModel):

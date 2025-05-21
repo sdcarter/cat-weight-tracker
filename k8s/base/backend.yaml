@@ -17,6 +17,7 @@ spec:
       containers:
       - name: backend
         image: ghcr.io/sdcarter/cat-weight-tracker-backend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 4000
         env:

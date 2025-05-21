@@ -18,6 +18,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
+      - name: Download version artifact
+        uses: dawidd6/action-download-artifact@v2
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          workflow: build-push.yml
+          workflow_conclusion: success
+          name: version-info
+          path: ./artifacts
+          
+      - name: Generate version tag
+        id: version
+        run: |
+          if [ -f "./artifacts/version.txt" ]; then
+            VERSION=$(cat ./artifacts/version.txt)
+          else
+            VERSION=$(date +'%Y%m%d%H%M%S')
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Using version: $VERSION"
+        
       - name: Google Auth
         id: auth
         uses: google-github-actions/auth@v1
@@ -38,9 +58,10 @@ jobs:
           
       - name: Update Kubernetes manifests
         run: |
-          # Use latest tag instead of commit SHA
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:latest|g" k8s/base/backend.yaml
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:latest|g" k8s/base/frontend.yaml
+          # Use version tag instead of latest
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:$VERSION|g" k8s/base/backend.yaml
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:$VERSION|g" k8s/base/frontend.yaml
           
       - name: Apply Kubernetes manifests
         run: |

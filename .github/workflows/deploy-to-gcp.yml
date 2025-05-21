@@ -38,9 +38,16 @@ jobs:
           
       - name: Update Kubernetes manifests
         run: |
-          # Use latest tag
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:latest|g" k8s/base/backend.yaml
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:latest|g" k8s/base/frontend.yaml
+          # Generate timestamp for forcing new deployments
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Replace image references and add timestamp
+          sed -i "s|sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:latest|g" k8s/base/backend.yaml
+          sed -i "s|sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:latest|g" k8s/base/frontend.yaml
+          
+          # Replace timestamp placeholder
+          sed -i "s|\${TIMESTAMP}|$TIMESTAMP|g" k8s/base/backend.yaml
+          sed -i "s|\${TIMESTAMP}|$TIMESTAMP|g" k8s/base/frontend.yaml
           
       - name: Apply Kubernetes manifests
         run: |

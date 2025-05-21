@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: backend
+      annotations:
+        deployment.kubernetes.io/revision: "${TIMESTAMP}"
     spec:
       containers:
       - name: backend

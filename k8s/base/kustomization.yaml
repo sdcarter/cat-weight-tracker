@@ -7,3 +7,5 @@ resources:
   - backend.yaml
   - frontend.yaml
   - gateway.yaml
+  - backend-config.yaml
+  - frontend-config.yaml

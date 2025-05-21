@@ -1,0 +1,40 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: cat-weight-tracker-gateway
+  namespace: cat-weight-tracker
+spec:
+  gatewayClassName: gke-l7-global-external-managed
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: cat-weight-tracker-routes
+  namespace: cat-weight-tracker
+spec:
+  parentRefs:
+  - name: cat-weight-tracker-gateway
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    backendRefs:
+    - name: backend
+      port: 4000
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: frontend
+      port: 80

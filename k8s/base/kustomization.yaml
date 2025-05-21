@@ -6,4 +6,4 @@ resources:
   - postgres.yaml
   - backend.yaml
   - frontend.yaml
-  - ingress.yaml
+  - gateway.yaml

@@ -7,6 +7,7 @@ from datetime import timedelta
 from contextlib import asynccontextmanager
 from . import crud, models, schemas, plots, auth
 from .database import engine, get_db
+from .config import settings
 import time
 import logging
 
@@ -87,6 +88,10 @@ def health_check() -> Dict[str, str]:
 # Authentication endpoints
 @app.post("/auth/register", response_model=schemas.User)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Check if registration is enabled
+    if not settings.REGISTRATION_ENABLED:
+        raise HTTPException(status_code=403, detail="Registration is currently disabled")
+    
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -364,6 +369,66 @@ def get_plot_data_api(
 @app.post("/api/auth/register", response_model=schemas.User)
 def register_user_api(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return register_user(user, db)
+
+# Registration status endpoint
+@app.get("/auth/registration-status")
+def get_registration_status():
+    return {"enabled": settings.REGISTRATION_ENABLED}
+
+@app.get("/api/auth/registration-status")
+def get_registration_status_api():
+    return get_registration_status()
+    
+# User profile endpoints
+@app.put("/auth/me", response_model=schemas.User)
+def update_user_profile(
+    user_update: schemas.UserUpdate,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    updated_user = crud.update_user(db, current_user.id, user_update)
+    if not updated_user:
+        raise HTTPException(
+            status_code=400, 
+            detail="Username or email already taken"
+        )
+    return updated_user
+
+@app.put("/auth/me/password")
+def change_password(
+    password_change: schemas.UserPasswordChange,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    success = crud.change_user_password(
+        db, 
+        current_user.id, 
+        password_change.current_password, 
+        password_change.new_password
+    )
+    if not success:
+        raise HTTPException(
+            status_code=400, 
+            detail="Current password is incorrect"
+        )
+    return {"detail": "Password changed successfully"}
+
+# API prefix versions of user profile endpoints
+@app.put("/api/auth/me", response_model=schemas.User)
+def update_user_profile_api(
+    user_update: schemas.UserUpdate,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    return update_user_profile(user_update, current_user, db)
+
+@app.put("/api/auth/me/password")
+def change_password_api(
+    password_change: schemas.UserPasswordChange,
+    current_user: models.User = Depends(auth.get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    return change_password(password_change, current_user, db)
 
 
 @app.post("/api/auth/login", response_model=schemas.Token)

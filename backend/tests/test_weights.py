@@ -5,10 +5,11 @@ from datetime import date
 
 def test_create_weight_record(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
     test_db.add(cat)
     test_db.commit()
     
@@ -37,10 +38,11 @@ def test_create_weight_record(client, test_db):
 
 def test_get_weight_records(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
     test_db.add(cat)
     test_db.commit()
     
@@ -73,10 +75,11 @@ def test_get_weight_records(client, test_db):
 
 def test_delete_weight_record(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
     test_db.add(cat)
     test_db.commit()
     
@@ -101,10 +104,11 @@ def test_delete_weight_record(client, test_db):
 
 def test_get_plot_data(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
     test_db.add(cat)
     test_db.commit()
     

@@ -1,5 +1,6 @@
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings
 from typing import Optional
+import os
 
 class Settings(BaseSettings):
     # Database settings
@@ -17,4 +18,5 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
+# Load environment variables
 settings = Settings()

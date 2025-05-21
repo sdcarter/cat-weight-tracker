@@ -10,10 +10,7 @@ spec:
       httpHealthCheck:
         portSpecification: USE_SERVING_PORT
         requestPath: /cats/
-      checkIntervalSec: 15
-      timeoutSec: 5
-      healthyThreshold: 1
-      unhealthyThreshold: 2
+        port: 4000
   targetRef:
     group: ""
     kind: Service
@@ -31,10 +28,7 @@ spec:
       httpHealthCheck:
         portSpecification: USE_SERVING_PORT
         requestPath: /
-      checkIntervalSec: 15
-      timeoutSec: 5
-      healthyThreshold: 1
-      unhealthyThreshold: 2
+        port: 80
   targetRef:
     group: ""
     kind: Service

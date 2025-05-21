@@ -1,11 +1,11 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field
 from datetime import date
-from typing import List, Optional
+from typing import List, Optional, Union
 
 # User schemas
 class UserBase(BaseModel):
     username: str
-    email: EmailStr
+    email: str  # Changed from EmailStr to str
 
 class UserCreate(UserBase):
     password: str

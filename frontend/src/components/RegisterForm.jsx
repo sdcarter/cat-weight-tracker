@@ -18,7 +18,7 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
     
     // Form validation
     if (password !== confirmPassword) {
-      setFormError("Passwords don't match");
+      setFormError("Passwords don&apos;t match");
       return;
     }
     

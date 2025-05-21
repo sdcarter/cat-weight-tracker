@@ -19,20 +19,7 @@ jobs:
       - name: Generate version tag
         id: version
         run: |
-          VERSION=$(date +'%Y%m%d%H%M%S')
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "Generated version: $VERSION"
-          
-      - name: Create version file
-        run: |
-          echo "${{ steps.version.outputs.VERSION }}" > version.txt
-          
-      - name: Upload version artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: build-version
-          path: version.txt
-          retention-days: 1
+          echo "VERSION=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
 
   build-backend:
     needs: generate-version

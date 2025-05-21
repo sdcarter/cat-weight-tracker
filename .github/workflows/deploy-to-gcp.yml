@@ -18,21 +18,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Set version tag for manual runs
-        if: github.event_name == 'workflow_dispatch'
-        id: manual_version
-        run: |
-          echo "VERSION=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+      - name: Download version artifact
+        uses: actions/download-artifact@v2
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          name: build-version
+          path: ./artifacts
           
       - name: Generate version tag
         id: version
         run: |
-          VERSION=$(date +'%Y%m%d%H%M%S')
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            VERSION="${{ steps.manual_version.outputs.VERSION }}"
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ -f "./artifacts/version.txt" ]; then
+            VERSION=$(cat ./artifacts/version.txt)
+            echo "Using version from build workflow: $VERSION"
+          else
+            VERSION=$(date +'%Y%m%d%H%M%S')
+            echo "Generated new version for manual run: $VERSION"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "Using version: $VERSION"
         
       - name: Google Auth
         id: auth

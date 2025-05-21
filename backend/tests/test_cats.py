@@ -19,11 +19,15 @@ def test_create_cat(client, test_db):
     assert cat is not None
     assert cat.name == "Whiskers"
     assert cat.target_weight == 4.5
+    assert cat.user_id is not None  # Check that the cat is associated with a user
 
 def test_get_cats(client, test_db):
-    # Add test cats to the database
-    cat1 = Cat(name="Whiskers", target_weight=4.5)
-    cat2 = Cat(name="Mittens", target_weight=5.0)
+    # Get the test user ID
+    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    
+    # Add test cats to the database with user_id
+    cat1 = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat2 = Cat(name="Mittens", target_weight=5.0, user_id=user_id)
     test_db.add(cat1)
     test_db.add(cat2)
     test_db.commit()
@@ -37,8 +41,11 @@ def test_get_cats(client, test_db):
     assert data[1]["name"] == "Mittens"
 
 def test_get_cat(client, test_db):
+    # Get the test user ID
+    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
     test_db.add(cat)
     test_db.commit()
     
@@ -55,8 +62,11 @@ def test_get_cat(client, test_db):
     assert response.status_code == 404
 
 def test_update_cat(client, test_db):
+    # Get the test user ID
+    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
     test_db.add(cat)
     test_db.commit()
     
@@ -76,8 +86,11 @@ def test_update_cat(client, test_db):
     assert updated_cat.target_weight == 4.2
 
 def test_delete_cat(client, test_db):
+    # Get the test user ID
+    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
     test_db.add(cat)
     test_db.commit()
     

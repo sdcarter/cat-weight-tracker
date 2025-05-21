@@ -1,11 +1,14 @@
 from fastapi.testclient import TestClient
 import pytest
-from app.models import Cat, WeightRecord
+from app.models import Cat, WeightRecord, User
 from datetime import date
 
 def test_create_weight_record(client, test_db):
+    # Get the test user ID
+    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
     test_db.add(cat)
     test_db.commit()
     
@@ -33,8 +36,11 @@ def test_create_weight_record(client, test_db):
     assert weight.cat_weight == 4.5
 
 def test_get_weight_records(client, test_db):
+    # Get the test user ID
+    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
     test_db.add(cat)
     test_db.commit()
     
@@ -66,8 +72,11 @@ def test_get_weight_records(client, test_db):
     assert data[1]["cat_weight"] == 4.3
 
 def test_delete_weight_record(client, test_db):
+    # Get the test user ID
+    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
     test_db.add(cat)
     test_db.commit()
     
@@ -91,8 +100,11 @@ def test_delete_weight_record(client, test_db):
     assert deleted_weight is None
 
 def test_get_plot_data(client, test_db):
+    # Get the test user ID
+    user_id = test_db.query(User).filter_by(username="testuser").first().id
+    
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
     test_db.add(cat)
     test_db.commit()
     

@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 import pytest
-from app.models import Cat
+from app.models import Cat, User
 
 def test_create_cat(client, test_db):
     # Test creating a cat
@@ -23,11 +23,12 @@ def test_create_cat(client, test_db):
 
 def test_get_cats(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add test cats to the database with user_id
-    cat1 = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
-    cat2 = Cat(name="Mittens", target_weight=5.0, user_id=user_id)
+    cat1 = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
+    cat2 = Cat(name="Mittens", target_weight=5.0, user_id=user.id)
     test_db.add(cat1)
     test_db.add(cat2)
     test_db.commit()
@@ -42,10 +43,11 @@ def test_get_cats(client, test_db):
 
 def test_get_cat(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
     test_db.add(cat)
     test_db.commit()
     
@@ -63,10 +65,11 @@ def test_get_cat(client, test_db):
 
 def test_update_cat(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
     test_db.add(cat)
     test_db.commit()
     
@@ -87,10 +90,11 @@ def test_update_cat(client, test_db):
 
 def test_delete_cat(client, test_db):
     # Get the test user ID
-    user_id = test_db.query(Cat).filter_by(name="testuser").first().id
+    user = test_db.query(User).filter_by(username="testuser").first()
+    assert user is not None, "Test user not found"
     
     # Add a test cat to the database
-    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user_id)
+    cat = Cat(name="Whiskers", target_weight=4.5, user_id=user.id)
     test_db.add(cat)
     test_db.commit()
     

@@ -57,14 +57,3 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           
-      - name: Save version to artifact
-        run: |
-          mkdir -p ./artifacts
-          echo "${{ steps.version.outputs.VERSION }}" > ./artifacts/version.txt
-          
-      - name: Upload version artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: version-info
-          path: ./artifacts/version.txt
-          retention-days: 1

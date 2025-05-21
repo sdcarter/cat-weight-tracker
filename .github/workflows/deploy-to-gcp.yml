@@ -18,22 +18,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Download version artifact
-        uses: dawidd6/action-download-artifact@v2
-        if: github.event_name != 'workflow_dispatch'
-        with:
-          workflow: build-push.yml
-          workflow_conclusion: success
-          name: version-info
-          path: ./artifacts
+      - name: Set version tag for manual runs
+        if: github.event_name == 'workflow_dispatch'
+        id: manual_version
+        run: |
+          echo "VERSION=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
           
       - name: Generate version tag
         id: version
         run: |
-          if [ -f "./artifacts/version.txt" ]; then
-            VERSION=$(cat ./artifacts/version.txt)
-          else
-            VERSION=$(date +'%Y%m%d%H%M%S')
+          VERSION=$(date +'%Y%m%d%H%M%S')
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ steps.manual_version.outputs.VERSION }}"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Using version: $VERSION"

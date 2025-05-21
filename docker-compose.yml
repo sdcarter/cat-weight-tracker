@@ -45,7 +45,7 @@ services:
       - ./backend:/app
     restart: on-failure
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4000/cats/"]
+      test: ["CMD", "curl", "-f", "http://localhost:4000/"]
       interval: 10s
       timeout: 5s
       retries: 3

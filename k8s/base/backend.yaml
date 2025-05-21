@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ghcr.io/sdcarter/cat-weight-tracker-backend:latest
+        image: sdcarter/cat-weight-tracker-backend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 4000
@@ -49,13 +49,13 @@ spec:
             memory: "256Mi"
         readinessProbe:
           httpGet:
-            path: /cats/
+            path: /
             port: 4000
           initialDelaySeconds: 10
           periodSeconds: 10
         livenessProbe:
           httpGet:
-            path: /cats/
+            path: /
             port: 4000
           initialDelaySeconds: 30
           periodSeconds: 30
@@ -63,7 +63,7 @@ spec:
         args:
           - |
             sleep 5 &&
-            alembic upgrade head &&
+            alembic upgrade heads &&
             uvicorn app.main:app --host 0.0.0.0 --port 4000
 ---
 apiVersion: v1

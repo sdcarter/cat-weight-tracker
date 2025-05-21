@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card } from './ui/card';
-import { toast } from './ui/toast';
+import { toast } from './ui/use-toast';
 import axios from 'axios';
 
 const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api';

@@ -18,10 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Generate version tag
-        id: version
-        run: |
-          echo "VERSION=latest" >> $GITHUB_OUTPUT
+
         
       - name: Google Auth
         id: auth
@@ -43,10 +40,9 @@ jobs:
           
       - name: Update Kubernetes manifests
         run: |
-          # Use version tag instead of latest
-          VERSION="${{ steps.version.outputs.VERSION }}"
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:$VERSION|g" k8s/base/backend.yaml
-          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:$VERSION|g" k8s/base/frontend.yaml
+          # Use latest tag
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-backend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-backend:latest|g" k8s/base/backend.yaml
+          sed -i "s|ghcr.io/sdcarter/cat-weight-tracker-frontend:latest|${{ secrets.DOCKERHUB_USERNAME }}/cat-weight-tracker-frontend:latest|g" k8s/base/frontend.yaml
           
       - name: Apply Kubernetes manifests
         run: |

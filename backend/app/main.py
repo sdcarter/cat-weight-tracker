@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, APIRouter
+from fastapi import FastAPI, Depends, HTTPException, Request, APIRouter, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict, Any
 from . import crud, models, schemas, plots
 from .database import engine, get_db
 import time
@@ -60,6 +60,15 @@ async def log_requests(request: Request, call_next):
     
     return response
 
+
+# Health check endpoint for root path
+@app.get("/")
+def health_check() -> Dict[str, str]:
+    """
+    Health check endpoint for the root path.
+    This is used by the GCP load balancer to check if the service is healthy.
+    """
+    return {"status": "ok"}
 
 # Define routes for both root and /api prefix
 # Cat endpoints for root path

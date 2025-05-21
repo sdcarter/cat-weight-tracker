@@ -1,0 +1,41 @@
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: backend-health-check
+  namespace: cat-weight-tracker
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        portSpecification: USE_SERVING_PORT
+        requestPath: /cats/
+      checkIntervalSec: 15
+      timeoutSec: 5
+      healthyThreshold: 1
+      unhealthyThreshold: 2
+  targetRef:
+    group: ""
+    kind: Service
+    name: backend
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: frontend-health-check
+  namespace: cat-weight-tracker
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        portSpecification: USE_SERVING_PORT
+        requestPath: /
+      checkIntervalSec: 15
+      timeoutSec: 5
+      healthyThreshold: 1
+      unhealthyThreshold: 2
+  targetRef:
+    group: ""
+    kind: Service
+    name: frontend

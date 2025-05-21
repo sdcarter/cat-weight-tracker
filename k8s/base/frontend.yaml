@@ -47,8 +47,6 @@ kind: Service
 metadata:
   name: frontend
   namespace: cat-weight-tracker
-  annotations:
-    cloud.google.com/backend-config: '{"default": "frontend-config"}'
 spec:
   ports:
   - port: 80

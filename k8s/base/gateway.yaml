@@ -3,6 +3,9 @@ kind: Gateway
 metadata:
   name: cat-weight-tracker-gateway
   namespace: cat-weight-tracker
+  annotations:
+    networking.gke.io/health-check-path-backend: "/cats/"
+    networking.gke.io/health-check-path-frontend: "/"
 spec:
   gatewayClassName: gke-l7-global-external-managed
   listeners:

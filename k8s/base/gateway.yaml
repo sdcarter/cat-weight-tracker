@@ -3,6 +3,10 @@ kind: Gateway
 metadata:
   name: cat-weight-tracker-gateway
   namespace: cat-weight-tracker
+  annotations:
+    networking.gke.io/health-check-port: "80"
+    networking.gke.io/health-check-path: "/"
+    networking.gke.io/v1beta1.BackendConfig: '{"default": {"healthCheck": {"checkIntervalSec": 15, "timeoutSec": 5, "healthyThreshold": 1, "unhealthyThreshold": 2, "type": "HTTP", "requestPath": "/", "port": 80}}}'
 spec:
   gatewayClassName: gke-l7-global-external-managed
   listeners:
@@ -31,6 +35,12 @@ spec:
     backendRefs:
     - name: backend
       port: 4000
+      kind: Service
+      group: ""
+      filters:
+      - type: HealthCheck
+        healthCheck:
+          path: /cats/
   - matches:
     - path:
         type: PathPrefix
@@ -38,3 +48,5 @@ spec:
     backendRefs:
     - name: frontend
       port: 80
+      kind: Service
+      group: ""

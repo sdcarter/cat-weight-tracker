@@ -48,18 +48,20 @@ const LoginForm = ({ onToggleForm }) => {
           Login
         </Button>
       </form>
-      <div className="mt-4 text-center">
-        <p className="text-sm text-gray-600">
-          Don&apos;t have an account?{' '}
-          <button
-            type="button"
-            onClick={onToggleForm}
-            className="text-primary hover:underline"
-          >
-            Register
-          </button>
-        </p>
-      </div>
+      {onToggleForm && (
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">
+            Don&apos;t have an account?{' '}
+            <button
+              type="button"
+              onClick={onToggleForm}
+              className="text-primary hover:underline"
+            >
+              Register
+            </button>
+          </p>
+        </div>
+      )}
     </Card>
   );
 };

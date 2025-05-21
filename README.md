@@ -1,133 +1,65 @@
 # Cat Weight Tracker
 
-A web application for tracking cat weights over time. This application allows users to add cats, record their weights, and visualize weight trends over time.
+A web application for tracking your cat's weight over time.
 
 ## Features
 
-- Add, edit, and delete cats with target weights
-- Record weight measurements for each cat
-- Visualize weight trends with interactive charts
-- Responsive design for desktop and mobile
-- RESTful API for data management
+- User authentication (login/register)
+- User profile management
+- Cat management (add, edit, delete)
+- Weight tracking with charts
+- Responsive design
 
-## Tech Stack
+## Environment Variables
 
-- **Frontend**: React, Tailwind CSS
-- **Backend**: FastAPI (Python)
-- **Database**: PostgreSQL
-- **Deployment**: Docker, Kubernetes, GCP
-- **CI/CD**: GitHub Actions
+### Backend
 
-## GCP Kubernetes Deployment
+- `DATABASE_URL`: PostgreSQL connection string
+- `SECRET_KEY`: Secret key for JWT token generation
+- `ALGORITHM`: Algorithm for JWT token (default: HS256)
+- `ACCESS_TOKEN_EXPIRE_MINUTES`: JWT token expiration time in minutes
+- `REGISTRATION_ENABLED`: Feature flag to enable/disable user registration (true/false)
 
-This application is deployed to a personal GCP Kubernetes cluster using GitHub Actions.
+## Development
 
 ### Prerequisites
 
-1. Install Google Cloud SDK:
-   ```bash
-   # For macOS
-   brew install --cask google-cloud-sdk
-   
-   # Initialize
-   gcloud init
-   ```
+- Docker and Docker Compose
+- Node.js and npm (for local frontend development)
+- Python 3.9+ (for local backend development)
 
-2. Create a GCP project:
-   ```bash
-   gcloud projects create YOUR_PROJECT_ID
-   gcloud config set project YOUR_PROJECT_ID
-   ```
-
-3. Enable required APIs:
-   ```bash
-   gcloud services enable container.googleapis.com
-   ```
-
-4. Create a small GKE cluster:
-   ```bash
-   gcloud container clusters create cat-weight-tracker \
-     --num-nodes=1 \
-     --machine-type=e2-small \
-     --zone=us-central1-a
-   ```
-
-5. Create a service account for GitHub Actions:
-   ```bash
-   gcloud iam service-accounts create github-actions
-   
-   gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-     --member="serviceAccount:github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
-     --role="roles/container.developer"
-   
-   gcloud iam service-accounts keys create key.json \
-     --iam-account=github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com
-   
-   # Base64 encode the key file for GitHub secrets
-   cat key.json | base64
-   ```
-
-6. Add the following secrets to your GitHub repository:
-   - `GCP_PROJECT_ID`: Your GCP project ID
-   - `GCP_SA_KEY`: The base64-encoded content of the key.json file
-   - `GKE_CLUSTER_NAME`: The name of your GKE cluster (e.g., cat-weight-tracker)
-   - `GKE_CLUSTER_LOCATION`: The zone of your GKE cluster (e.g., us-central1-a)
-   - `DOCKERHUB_USERNAME`: Your Docker Hub username
-   - `DOCKERHUB_TOKEN`: Your Docker Hub access token (create at https://hub.docker.com/settings/security)
-
-### Deployment Process
-
-1. Push changes to the main branch
-2. GitHub Actions will build and push Docker images to Docker Hub
-3. A second workflow will deploy the application to your GKE cluster
-
-### Accessing the Application
-
-After deployment, you can access the application using the external IP provided by GCP:
+### Running with Docker Compose
 
 ```bash
-kubectl get gateway cat-weight-tracker-gateway -n cat-weight-tracker
-```
-
-## Local Development
-
-To run the application locally:
-
-```bash
+# Development mode
 docker-compose -f docker-compose.dev.yml up
+
+# Production mode
+docker-compose up
 ```
 
-## Testing
+### Local Development
 
-### Backend Tests
+#### Backend
 
 ```bash
 cd backend
-pytest
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 4000
 ```
 
-### Frontend Tests
+#### Frontend
 
 ```bash
 cd frontend
-npm test
+npm install
+npm start
 ```
 
-## CI/CD Pipeline
+## Deployment
 
-The project includes three GitHub Actions workflows:
+The application can be deployed to Google Kubernetes Engine (GKE) using the GitHub Actions workflow.
 
-1. **CI**: Runs tests for both frontend and backend
-2. **Build and Push Images**: Builds Docker images and pushes them to Docker Hub
-3. **Deploy to GCP**: Deploys the application to GKE
+## License
 
-## API Endpoints
-
-- `GET /cats/`: List all cats
-- `POST /cats/`: Create a new cat
-- `GET /cats/{cat_id}`: Get a specific cat
-- `PUT /cats/{cat_id}`: Update a cat
-- `DELETE /cats/{cat_id}`: Delete a cat
-- `GET /cats/{cat_id}/weights/`: Get weight records for a cat
-- `POST /cats/{cat_id}/weights/`: Add a weight record for a cat
-- `DELETE /weights/{record_id}`: Delete a weight record
+MIT

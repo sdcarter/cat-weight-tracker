@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [registrationEnabled, setRegistrationEnabled] = useState(false);
 
   // Initialize auth state from localStorage
   useEffect(() => {
@@ -89,13 +90,31 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Check if registration is enabled
+  const checkRegistrationStatus = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/auth/registration-status`);
+      setRegistrationEnabled(response.data.enabled);
+    } catch (error) {
+      console.error('Error checking registration status:', error);
+      setRegistrationEnabled(false); // Default to disabled if there's an error
+    }
+  };
+
+  // Check registration status on initial load
+  useEffect(() => {
+    checkRegistrationStatus();
+  }, []);
+
   const value = {
     user,
+    setUser,
     loading,
     error,
     login,
     register,
-    logout
+    logout,
+    registrationEnabled
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

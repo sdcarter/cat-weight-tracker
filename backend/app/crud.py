@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
-from .auth import get_password_hash
+from .auth import get_password_hash, verify_password
 
 
 # User CRUD operations
@@ -27,6 +27,45 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
+    db_user = get_user(db, user_id)
+    if not db_user:
+        return None
+    
+    # Check if username is being updated and is not already taken
+    if user_update.username and user_update.username != db_user.username:
+        existing_user = get_user_by_username(db, user_update.username)
+        if existing_user:
+            return None  # Username already taken
+        db_user.username = user_update.username
+    
+    # Check if email is being updated and is not already taken
+    if user_update.email and user_update.email != db_user.email:
+        existing_user = get_user_by_email(db, user_update.email)
+        if existing_user:
+            return None  # Email already taken
+        db_user.email = user_update.email
+    
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def change_user_password(db: Session, user_id: int, current_password: str, new_password: str):
+    db_user = get_user(db, user_id)
+    if not db_user:
+        return False
+    
+    # Verify current password
+    if not verify_password(current_password, db_user.hashed_password):
+        return False
+    
+    # Update password
+    db_user.hashed_password = get_password_hash(new_password)
+    db.commit()
+    return True
 
 
 # Cat CRUD operations

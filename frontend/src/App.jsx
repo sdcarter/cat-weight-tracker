@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import CatForm from './components/CatForm';
 import CatList from './components/CatList';
@@ -6,6 +7,8 @@ import WeightForm from './components/WeightForm';
 import WeightTable from './components/WeightTable';
 import WeightChart from './components/WeightChart';
 import AuthScreen from './components/AuthScreen';
+import ProfilePage from './pages/ProfilePage';
+import UserMenu from './components/UserMenu';
 import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } from './components/ui/toast';
 import { Button } from './components/ui/button';
 import { useAuth } from './context/AuthContext';
@@ -167,26 +170,19 @@ function App() {
     );
   }
 
-  // Show auth screen if not logged in
-  if (!user) {
-    return <AuthScreen />;
-  }
+  // Auth handling is now done in the Router
 
-  return (
-    <ToastProvider>
-      <div className="min-h-screen bg-background">
-        <header className="bg-primary text-primary-foreground py-6">
-          <div className="container flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold">Cat Weight Tracker</h1>
-              <p className="text-sm opacity-90">Monitor your cat&apos;s weight progress</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm">Logged in as {user.username}</span>
-              <Button variant="outline" onClick={logout}>Logout</Button>
-            </div>
+  const HomePage = () => (
+    <div className="min-h-screen bg-background">
+      <header className="bg-primary text-primary-foreground py-6">
+        <div className="container flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Cat Weight Tracker</h1>
+            <p className="text-sm opacity-90">Monitor your cat&apos;s weight progress</p>
           </div>
-        </header>
+          <UserMenu />
+        </div>
+      </header>
 
         <main className="container py-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -271,14 +267,30 @@ function App() {
           </div>
         </footer>
       </div>
+    );
+  };
 
-      {toast.open && (
-        <Toast>
-          <ToastTitle>{toast.title}</ToastTitle>
-          <ToastDescription>{toast.description}</ToastDescription>
-        </Toast>
-      )}
-      <ToastViewport />
+  return (
+    <ToastProvider>
+      <Router>
+        {!user ? (
+          <AuthScreen />
+        ) : (
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        )}
+        
+        {toast.open && (
+          <Toast>
+            <ToastTitle>{toast.title}</ToastTitle>
+            <ToastDescription>{toast.description}</ToastDescription>
+          </Toast>
+        )}
+        <ToastViewport />
+      </Router>
     </ToastProvider>
   );
 }

@@ -1,11 +1,11 @@
 services:
-  jira:
+  atlassian:
     image: mcp/atlassian:latest
-    container_name: jira-server
+    container_name: atlassian-server
     ports:
       - "9000:8080"
     volumes:
-      - jira_data:/var/atlassian/application-data/jira
+      - atlassian_data:/var/atlassian/application-data/jira
     environment:
       - MCP_LICENSE=trial
       - MCP_PRODUCT=jira
@@ -17,4 +17,4 @@ services:
           memory: 2G
 
 volumes:
-  jira_data:
+  atlassian_data:

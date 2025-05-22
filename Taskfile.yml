@@ -341,10 +341,10 @@ tasks:
     cmds:
       - task: mcp-pull-images
       - |
-        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "jira" ] || [ -z "{{.SERVER}}" ]; then
-          echo "Starting Jira MCP server..."
-          docker-compose -f docker-compose.jira.yml up -d
-          echo "Jira is starting up at http://localhost:9000"
+        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "atlassian" ] || [ -z "{{.SERVER}}" ]; then
+          echo "Starting Atlassian MCP server..."
+          docker-compose -f docker-compose.atlassian.yml up -d
+          echo "Atlassian is starting up at http://localhost:9000"
         fi
         
         if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "github" ]; then
@@ -361,9 +361,9 @@ tasks:
     desc: Stop MCP servers (jira, github, or all)
     cmds:
       - |
-        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "jira" ] || [ -z "{{.SERVER}}" ]; then
-          echo "Stopping Jira MCP server..."
-          docker-compose -f docker-compose.jira.yml down
+        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "atlassian" ] || [ -z "{{.SERVER}}" ]; then
+          echo "Stopping Atlassian MCP server..."
+          docker-compose -f docker-compose.atlassian.yml down
         fi
         
         if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "github" ]; then
@@ -381,7 +381,7 @@ tasks:
     cmds:
       - |
         echo "Checking MCP server status..."
-        echo "Jira server -"
-        docker ps --filter "name=jira-server" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"
+        echo "Atlassian server -"
+        docker ps --filter "name=atlassian-server" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"
         echo "GitHub server -"
         docker ps --filter "name=github-server" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"

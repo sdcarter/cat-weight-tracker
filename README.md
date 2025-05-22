@@ -9,7 +9,7 @@ A web application for tracking your cat's weight over time.
 - Cat management (add, edit, delete)
 - Weight tracking with charts
 - Responsive design
-- Jira and GitHub MCP server integration for project management
+- Atlassian and GitHub MCP server integration for project management
 
 ## Environment Variables
 
@@ -59,7 +59,7 @@ npm start
 
 ## MCP Integration
 
-This project includes local Jira and GitHub MCP servers for managing issues and stories.
+This project includes local Atlassian and GitHub MCP servers for managing issues and stories.
 
 ### Managing MCP Servers
 
@@ -68,7 +68,7 @@ This project includes local Jira and GitHub MCP servers for managing issues and 
 task mcp-start
 
 # Start specific MCP server
-task mcp-start SERVER=jira
+task mcp-start SERVER=atlassian
 task mcp-start SERVER=github
 
 # Check MCP server status
@@ -76,13 +76,13 @@ task mcp-status
 
 # Stop MCP servers
 task mcp-stop
-task mcp-stop SERVER=jira
+task mcp-stop SERVER=atlassian
 task mcp-stop SERVER=github
 ```
 
 ### MCP Server URLs
 
-- Jira MCP: http://localhost:9000
+- Atlassian MCP: http://localhost:9000
 - GitHub MCP: http://localhost:9001
 
 ### VS Code Integration

@@ -335,7 +335,7 @@ tasks:
     cmds:
       - docker pull postgres:13
       - docker pull atlassian/jira-software:9.4
-      - echo "Note - GitHub Enterprise image requires authentication. Skipping pull."
+      - docker pull gogs/gogs:latest
 
   mcp-start:
     desc: Start MCP servers (jira, github, or all)
@@ -351,8 +351,7 @@ tasks:
         if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "github" ]; then
           echo "Starting GitHub MCP server..."
           docker-compose -f docker-compose.github.yml up -d
-          echo "GitHub is starting up at http://localhost:9001"
-          echo "Note - You'll need to replace the placeholder license key in docker-compose.github.yml"
+          echo "GitHub alternative (Gogs) is starting up at http://localhost:9001"
         fi
         
         echo "MCP servers are starting. They may take a few minutes to be fully available."

@@ -1,16 +1,14 @@
 services:
   github:
-    image: ghcr.io/github/github-ae:latest
+    image: gogs/gogs:latest
     container_name: github-server
     ports:
-      - "9001:8888"
+      - "9001:3000"
     volumes:
       - github_data:/data
     environment:
-      - GITHUB_LICENSE=<your-license-key>
-      - GITHUB_HOSTNAME=localhost
-      - GITHUB_PORT=9001
-      - GITHUB_PROTOCOL=http
+      - USER_UID=1000
+      - USER_GID=1000
     deploy:
       resources:
         limits:

@@ -7,10 +7,10 @@
 GET {{jiraUrl}}/rest/api/2/serverInfo
 Content-Type: application/json
 
-### GitHub API Examples
+### GitHub Alternative (Gogs) API Examples
 
-# Get GitHub server info
-GET {{githubUrl}}/api/v3
+# Get Gogs API info
+GET {{githubUrl}}/api/v1/version
 Content-Type: application/json
 
 ### Local API Examples

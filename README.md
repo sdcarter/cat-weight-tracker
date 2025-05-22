@@ -9,6 +9,7 @@ A web application for tracking your cat's weight over time.
 - Cat management (add, edit, delete)
 - Weight tracking with charts
 - Responsive design
+- Jira integration for project management
 
 ## Environment Variables
 
@@ -55,6 +56,33 @@ cd frontend
 npm install
 npm start
 ```
+
+## Jira Integration
+
+This project includes a local Jira server for managing issues and stories.
+
+### Starting Jira
+
+```bash
+./scripts/start-jira.sh
+```
+
+Access Jira at http://localhost:8080
+
+### Stopping Jira
+
+```bash
+./scripts/stop-jira.sh
+```
+
+### Jira Configuration
+
+During initial setup:
+1. Complete the setup wizard
+2. Enter your Atlassian license
+3. Configure your project
+
+Note: Jira data is stored in Docker volumes and persists between restarts.
 
 ## Deployment
 

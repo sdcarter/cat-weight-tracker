@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  jira:
+    image: atlassian/jira-software:9.4
+    container_name: jira-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - jira_data:/var/atlassian/application-data/jira
+    environment:
+      - ATL_PROXY_NAME=localhost
+      - ATL_PROXY_PORT=8080
+      - ATL_TOMCAT_SCHEME=http
+      - ATL_TOMCAT_SECURE=false
+      - JVM_MINIMUM_MEMORY=1024m
+      - JVM_MAXIMUM_MEMORY=2048m
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  # PostgreSQL database for Jira
+  jira-db:
+    image: postgres:13
+    container_name: jira-postgres
+    volumes:
+      - jira_postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=jira
+      - POSTGRES_PASSWORD=jirapassword
+      - POSTGRES_DB=jiradb
+    expose:
+      - "5433"
+    ports:
+      - "5433:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+volumes:
+  jira_data:
+  jira_postgres_data:

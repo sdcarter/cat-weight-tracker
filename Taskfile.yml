@@ -330,9 +330,17 @@ tasks:
       - kubectl apply -f k8s/argocd-app.yaml
 
   # MCP server tasks
+  mcp-pull-images:
+    desc: Pull required Docker images for MCP servers
+    cmds:
+      - docker pull postgres:13
+      - docker pull atlassian/jira-software:9.4
+      - echo "Note: GitHub Enterprise image requires authentication. Skipping pull."
+
   mcp-start:
     desc: Start MCP servers (jira, github, or all)
     cmds:
+      - task: mcp-pull-images
       - |
         if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "jira" ] || [ -z "{{.SERVER}}" ]; then
           echo "Starting Jira MCP server..."

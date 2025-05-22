@@ -5,12 +5,12 @@ services:
     image: atlassian/jira-software:9.4
     container_name: jira-server
     ports:
-      - "8080:8080"
+      - "9000:8080"
     volumes:
       - jira_data:/var/atlassian/application-data/jira
     environment:
       - ATL_PROXY_NAME=localhost
-      - ATL_PROXY_PORT=8080
+      - ATL_PROXY_PORT=9000
       - ATL_TOMCAT_SCHEME=http
       - ATL_TOMCAT_SECURE=false
       - JVM_MINIMUM_MEMORY=1024m

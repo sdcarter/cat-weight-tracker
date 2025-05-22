@@ -9,7 +9,7 @@ A web application for tracking your cat's weight over time.
 - Cat management (add, edit, delete)
 - Weight tracking with charts
 - Responsive design
-- Jira integration for project management
+- Jira and GitHub integration for project management
 
 ## Environment Variables
 
@@ -57,32 +57,42 @@ npm install
 npm start
 ```
 
-## Jira Integration
+## MCP Integration
 
-This project includes a local Jira server for managing issues and stories.
+This project includes local Jira and GitHub servers for managing issues and stories.
 
-### Starting Jira
-
-```bash
-./scripts/start-jira.sh
-```
-
-Access Jira at http://localhost:8080
-
-### Stopping Jira
+### Managing MCP Servers
 
 ```bash
-./scripts/stop-jira.sh
+# Start all MCP servers
+task mcp-start
+
+# Start specific MCP server
+task mcp-start SERVER=jira
+task mcp-start SERVER=github
+
+# Check MCP server status
+task mcp-status
+
+# Stop MCP servers
+task mcp-stop
+task mcp-stop SERVER=jira
+task mcp-stop SERVER=github
 ```
 
-### Jira Configuration
+### MCP Server URLs
 
-During initial setup:
-1. Complete the setup wizard
-2. Enter your Atlassian license
-3. Configure your project
+- Jira: http://localhost:9000
+- GitHub: http://localhost:9001
 
-Note: Jira data is stored in Docker volumes and persists between restarts.
+### VS Code Integration
+
+Install the recommended extensions:
+- Atlassian Jira (atlascode)
+- GitHub Pull Requests (vscode-pull-request-github)
+- REST Client (rest-client)
+
+Use the `.vscode/mcp.rest` file to interact with the MCP servers via REST API.
 
 ## Deployment
 

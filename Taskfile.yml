@@ -333,14 +333,40 @@ tasks:
   mcp-start:
     desc: Start MCP servers (jira, github, or all)
     cmds:
-      - ./scripts/start-mcp.sh {{.SERVER}}
+      - |
+        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "jira" ] || [ -z "{{.SERVER}}" ]; then
+          echo "Starting Jira MCP server..."
+          docker-compose -f docker-compose.jira.yml up -d
+          echo "Jira is starting up at http://localhost:9000"
+        fi
+        
+        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "github" ]; then
+          echo "Starting GitHub MCP server..."
+          docker-compose -f docker-compose.github.yml up -d
+          echo "GitHub is starting up at http://localhost:9001"
+          echo "Note: You'll need to replace the placeholder license key in docker-compose.github.yml"
+        fi
+        
+        echo "MCP servers are starting. They may take a few minutes to be fully available."
     vars:
       SERVER: '{{.SERVER | default "all"}}'
 
   mcp-stop:
     desc: Stop MCP servers (jira, github, or all)
     cmds:
-      - ./scripts/stop-mcp.sh {{.SERVER}}
+      - |
+        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "jira" ] || [ -z "{{.SERVER}}" ]; then
+          echo "Stopping Jira MCP server..."
+          docker-compose -f docker-compose.jira.yml down
+        fi
+        
+        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "github" ]; then
+          echo "Stopping GitHub MCP server..."
+          docker-compose -f docker-compose.github.yml down
+        fi
+        
+        echo "MCP servers have been stopped."
+        echo "Your data is preserved in Docker volumes."
     vars:
       SERVER: '{{.SERVER | default "all"}}'
 

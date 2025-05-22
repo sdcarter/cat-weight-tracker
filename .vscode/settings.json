@@ -19,8 +19,8 @@
     "$shared": {},
     "local": {
       "baseUrl": "http://localhost:4000",
-      "jiraUrl": "http://localhost:8080",
-      "githubUrl": "http://localhost:8888"
+      "jiraUrl": "http://localhost:9000",
+      "githubUrl": "http://localhost:9001"
     },
     "production": {
       "baseUrl": "https://your-production-url.com",

@@ -1,40 +1,19 @@
 services:
   github:
-    image: gogs/gogs:latest
+    image: mcp/github-mcp-server:latest
     container_name: github-server
     ports:
-      - "9001:3000"
+      - "9001:8080"
     volumes:
       - github_data:/data
     environment:
-      - USER_UID=1000
-      - USER_GID=1000
+      - MCP_LICENSE=trial
+      - MCP_PORT=9001
     deploy:
       resources:
         limits:
           cpus: '2'
           memory: 4G
 
-  # PostgreSQL database for GitHub
-  github-db:
-    image: postgres:13
-    container_name: github-postgres
-    volumes:
-      - github_postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=github
-      - POSTGRES_PASSWORD=githubpassword
-      - POSTGRES_DB=githubdb
-    expose:
-      - "5434"
-    ports:
-      - "5434:5432"
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-
 volumes:
   github_data:
-  github_postgres_data:

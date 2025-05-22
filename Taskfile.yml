@@ -107,8 +107,8 @@ tasks:
           sleep 5
           docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
         else
-          echo "Unknown operation: {{.OP}}"
-          echo "Available operations: migrate, reset"
+          echo "Unknown operation - {{.OP}}"
+          echo "Available operations - migrate, reset"
         fi
     vars:
       ENV: '{{.ENV | default "prod"}}'
@@ -136,7 +136,7 @@ tasks:
         
         if [ $? -eq 0 ]; then
           echo "✅ Backup completed successfully!"
-          echo "Backup saved to: ${BACKUP_FILE}"
+          echo "Backup saved to - ${BACKUP_FILE}"
           echo "To restore this backup, run: task restore BACKUP=${BACKUP_FILE}"
         else
           echo "❌ Backup failed!"
@@ -150,17 +150,17 @@ tasks:
     cmds:
       - |
         if [ -z "{{.BACKUP}}" ]; then
-          echo "❌ Error: No backup file specified!"
+          echo "❌ Error - No backup file specified!"
           echo "Usage: task restore BACKUP=./backups/filename.sql"
           exit 1
         fi
         
         if [ ! -f "{{.BACKUP}}" ]; then
-          echo "❌ Error: Backup file not found: {{.BACKUP}}"
+          echo "❌ Error - Backup file not found - {{.BACKUP}}"
           exit 1
         fi
         
-        echo "⚠️  WARNING: This will overwrite the current database!"
+        echo "⚠️  WARNING - This will overwrite the current database!"
         echo "Are you sure you want to restore from {{.BACKUP}}? (y/n)"
         read -r confirm
         
@@ -335,7 +335,7 @@ tasks:
     cmds:
       - docker pull postgres:13
       - docker pull atlassian/jira-software:9.4
-      - echo "Note: GitHub Enterprise image requires authentication. Skipping pull."
+      - echo "Note - GitHub Enterprise image requires authentication. Skipping pull."
 
   mcp-start:
     desc: Start MCP servers (jira, github, or all)
@@ -352,7 +352,7 @@ tasks:
           echo "Starting GitHub MCP server..."
           docker-compose -f docker-compose.github.yml up -d
           echo "GitHub is starting up at http://localhost:9001"
-          echo "Note: You'll need to replace the placeholder license key in docker-compose.github.yml"
+          echo "Note - You'll need to replace the placeholder license key in docker-compose.github.yml"
         fi
         
         echo "MCP servers are starting. They may take a few minutes to be fully available."
@@ -383,7 +383,7 @@ tasks:
     cmds:
       - |
         echo "Checking MCP server status..."
-        echo "Jira server:"
-        docker ps --filter "name=jira-server" --format "{{.Names}}: {{.Status}}"
-        echo "GitHub server:"
-        docker ps --filter "name=github-server" --format "{{.Names}}: {{.Status}}"
+        echo "Jira server -"
+        docker ps --filter "name=jira-server" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"
+        echo "GitHub server -"
+        docker ps --filter "name=github-server" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"

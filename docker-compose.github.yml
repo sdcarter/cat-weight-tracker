@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  github:
+    image: ghcr.io/github/github-ae:latest
+    container_name: github-server
+    ports:
+      - "8888:8888"
+    volumes:
+      - github_data:/data
+    environment:
+      - GITHUB_LICENSE=<your-license-key>
+      - GITHUB_HOSTNAME=localhost
+      - GITHUB_PORT=8888
+      - GITHUB_PROTOCOL=http
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+
+  # PostgreSQL database for GitHub
+  github-db:
+    image: postgres:13
+    container_name: github-postgres
+    volumes:
+      - github_postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=github
+      - POSTGRES_PASSWORD=githubpassword
+      - POSTGRES_DB=githubdb
+    expose:
+      - "5434"
+    ports:
+      - "5434:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+volumes:
+  github_data:
+  github_postgres_data:

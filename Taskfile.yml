@@ -328,3 +328,28 @@ tasks:
     desc: Deploy the application using ArgoCD
     cmds:
       - kubectl apply -f k8s/argocd-app.yaml
+
+  # MCP server tasks
+  mcp-start:
+    desc: Start MCP servers (jira, github, or all)
+    cmds:
+      - ./scripts/start-mcp.sh {{.SERVER}}
+    vars:
+      SERVER: '{{.SERVER | default "all"}}'
+
+  mcp-stop:
+    desc: Stop MCP servers (jira, github, or all)
+    cmds:
+      - ./scripts/stop-mcp.sh {{.SERVER}}
+    vars:
+      SERVER: '{{.SERVER | default "all"}}'
+
+  mcp-status:
+    desc: Check status of MCP servers
+    cmds:
+      - |
+        echo "Checking MCP server status..."
+        echo "Jira server:"
+        docker ps --filter "name=jira-server" --format "{{.Names}}: {{.Status}}"
+        echo "GitHub server:"
+        docker ps --filter "name=github-server" --format "{{.Names}}: {{.Status}}"

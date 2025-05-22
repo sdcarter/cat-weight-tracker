@@ -1,0 +1,31 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.formatting.provider": "black",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.nosetestsEnabled": false,
+  "python.testing.pytestArgs": [
+    "backend/tests"
+  ],
+  "eslint.workingDirectories": [
+    "./frontend"
+  ],
+  "rest-client.environmentVariables": {
+    "$shared": {},
+    "local": {
+      "baseUrl": "http://localhost:4000",
+      "jiraUrl": "http://localhost:8080",
+      "githubUrl": "http://localhost:8888"
+    },
+    "production": {
+      "baseUrl": "https://your-production-url.com",
+      "jiraUrl": "",
+      "githubUrl": ""
+    }
+  }
+}

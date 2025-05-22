@@ -1,0 +1,20 @@
+### This file contains REST API examples for interacting with MCP servers
+### Install the "REST Client" VS Code extension to use this file
+
+### Jira API Examples
+
+# Get Jira server info
+GET {{jiraUrl}}/rest/api/2/serverInfo
+Content-Type: application/json
+
+### GitHub API Examples
+
+# Get GitHub server info
+GET {{githubUrl}}/api/v3
+Content-Type: application/json
+
+### Local API Examples
+
+# Get all cats
+GET {{baseUrl}}/cats/
+Content-Type: application/json

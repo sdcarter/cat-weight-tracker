@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "humao.rest-client",
+    "atlassian.atlascode",
+    "github.vscode-pull-request-github"
+  ]
+}

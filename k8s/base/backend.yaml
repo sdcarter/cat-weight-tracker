@@ -44,11 +44,11 @@ spec:
           value: "5432"
         resources:
           limits:
-            cpu: "0.5"
-            memory: "512Mi"
+            cpu: "0.3"
+            memory: "384Mi"
           requests:
-            cpu: "0.2"
-            memory: "256Mi"
+            cpu: "0.1"
+            memory: "192Mi"
         readinessProbe:
           httpGet:
             path: /

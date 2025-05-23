@@ -1,5 +1,11 @@
 version: '3'
 
+includes:
+  frontend: ./frontend/Taskfile.yml
+  backend: ./backend/Taskfile.yml
+  mcp: ./mcp/Taskfile.yml
+  db: ./db/Taskfile.yml
+
 tasks:
   pull-images:
     desc: Pull required Docker images
@@ -50,20 +56,17 @@ tasks:
       FOLLOW: '{{if .FOLLOW}}-f{{end}}'
 
   lint:
-    desc: Run linting checks
+    desc: Run all linting checks
     cmds:
-      - echo "Running frontend linting..."
-      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm frontend npm run lint
-      - echo "Running backend linting..."
-      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend flake8
+      - task: frontend:lint
+      - task: backend:lint
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
   lint-fix:
-    desc: Run linting and fix issues automatically where possible
+    desc: Run all linting fixes
     cmds:
-      - echo "Running frontend linting with auto-fix..."
-      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm frontend npm run lint -- --fix
+      - task: frontend:lint-fix
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
@@ -71,48 +74,10 @@ tasks:
     desc: Run all tests
     cmds:
       - echo "Running all tests..."
-      - task: test-frontend
-      - task: test-backend
+      - task: frontend:test
+      - task: backend:test
     vars:
       ENV: '{{.ENV | default "prod"}}'
-
-  test-frontend:
-    desc: Run frontend tests
-    cmds:
-      - echo "Running frontend tests..."
-      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm frontend npm test -- --watchAll=false
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
-
-  test-backend:
-    desc: Run backend tests
-    cmds:
-      - echo "Running backend tests..."
-      - docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend pytest {{.ARGS}}
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
-      ARGS: '{{.ARGS | default ""}}'
-
-  db:
-    desc: Database operations (migrate, reset)
-    cmds:
-      - |
-        if [ "{{.OP}}" = "migrate" ]; then
-          echo "Running database migrations..."
-          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
-        elif [ "{{.OP}}" = "reset" ]; then
-          echo "Resetting database..."
-          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} down -v
-          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} up -d db
-          sleep 5
-          docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
-        else
-          echo "Unknown operation - {{.OP}}"
-          echo "Available operations - migrate, reset"
-        fi
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
-      OP: '{{.OP | default "migrate"}}'
 
   shell:
     desc: Open a shell in a service container
@@ -121,76 +86,7 @@ tasks:
     vars:
       ENV: '{{.ENV | default "prod"}}'
       SERVICE: '{{.SERVICE | default "backend"}}'
-      
-  backup:
-    desc: Backup the database to a local file
-    cmds:
-      - |
-        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-        BACKUP_DIR="./backups"
-        mkdir -p $BACKUP_DIR
-        BACKUP_FILE="${BACKUP_DIR}/cat_weight_tracker_${TIMESTAMP}.sql"
-        
-        echo "Creating database backup to ${BACKUP_FILE}..."
-        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db pg_dump -U postgres cat_weight_tracker > "${BACKUP_FILE}"
-        
-        if [ $? -eq 0 ]; then
-          echo "✅ Backup completed successfully!"
-          echo "Backup saved to - ${BACKUP_FILE}"
-          echo "To restore this backup, run: task restore BACKUP=${BACKUP_FILE}"
-        else
-          echo "❌ Backup failed!"
-          rm -f "${BACKUP_FILE}"
-        fi
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
 
-  restore:
-    desc: Restore the database from a backup file
-    cmds:
-      - |
-        if [ -z "{{.BACKUP}}" ]; then
-          echo "❌ Error - No backup file specified!"
-          echo "Usage: task restore BACKUP=./backups/filename.sql"
-          exit 1
-        fi
-        
-        if [ ! -f "{{.BACKUP}}" ]; then
-          echo "❌ Error - Backup file not found - {{.BACKUP}}"
-          exit 1
-        fi
-        
-        echo "⚠️  WARNING - This will overwrite the current database!"
-        echo "Are you sure you want to restore from {{.BACKUP}}? (y/n)"
-        read -r confirm
-        
-        if [ "$confirm" != "y" ]; then
-          echo "Restore cancelled."
-          exit 0
-        fi
-        
-        echo "Restoring database from {{.BACKUP}}..."
-        
-        # Make sure the database is running
-        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} up -d db
-        sleep 5
-        
-        # Drop and recreate the database
-        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db psql -U postgres -c "DROP DATABASE IF EXISTS cat_weight_tracker;"
-        docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db psql -U postgres -c "CREATE DATABASE cat_weight_tracker;"
-        
-        # Restore from backup
-        cat "{{.BACKUP}}" | docker-compose {{if eq .ENV "dev"}}-f docker-compose.dev.yml{{end}} exec -T db psql -U postgres -d cat_weight_tracker
-        
-        if [ $? -eq 0 ]; then
-          echo "✅ Restore completed successfully!"
-        else
-          echo "❌ Restore failed!"
-        fi
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
-      BACKUP: '{{.BACKUP}}'
-      
   release:
     desc: Create a new release with automated semantic versioning
     cmds:
@@ -305,83 +201,3 @@ tasks:
         echo "To push changes and tag, run: git push && git push --tags"
     vars:
       TYPE: '{{.TYPE | default ""}}'
-      
-  build-images:
-    desc: Build Docker images locally
-    cmds:
-      - docker build -t ghcr.io/yourusername/cat-weight-tracker-backend:latest ./backend
-      - docker build -t ghcr.io/yourusername/cat-weight-tracker-frontend:latest ./frontend
-      
-  push-images:
-    desc: Push Docker images to GitHub Container Registry
-    cmds:
-      - echo "Pushing images to GitHub Container Registry..."
-      - docker push ghcr.io/yourusername/cat-weight-tracker-backend:latest
-      - docker push ghcr.io/yourusername/cat-weight-tracker-frontend:latest
-      
-  k8s-apply:
-    desc: Apply Kubernetes manifests using kubectl
-    cmds:
-      - kubectl apply -k k8s/overlays/prod
-      
-  argocd-deploy:
-    desc: Deploy the application using ArgoCD
-    cmds:
-      - kubectl apply -f k8s/argocd-app.yaml
-
-  # MCP server tasks
-  mcp-pull-images:
-    desc: Pull required Docker images for MCP servers
-    cmds:
-      - docker pull mcp/atlassian:latest
-      - docker pull mcp/github-mcp-server:latest
-
-  mcp-start:
-    desc: Start MCP servers (jira, github, or all)
-    cmds:
-      - task: mcp-pull-images
-      - |
-        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "atlassian" ] || [ -z "{{.SERVER}}" ]; then
-          echo "Starting Atlassian MCP server..."
-          docker-compose -f docker-compose.atlassian.yml up -d
-          echo "Atlassian is starting up at http://localhost:9000"
-        fi
-        
-        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "github" ]; then
-          echo "Starting GitHub MCP server..."
-          docker-compose -f docker-compose.github.yml up -d
-          echo "GitHub MCP server is starting up at http://localhost:9001"
-        fi
-        
-        echo "MCP servers are starting. They may take a few minutes to be fully available."
-    vars:
-      SERVER: '{{.SERVER | default "all"}}'
-
-  mcp-stop:
-    desc: Stop MCP servers (jira, github, or all)
-    cmds:
-      - |
-        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "atlassian" ] || [ -z "{{.SERVER}}" ]; then
-          echo "Stopping Atlassian MCP server..."
-          docker-compose -f docker-compose.atlassian.yml down
-        fi
-        
-        if [ "{{.SERVER}}" = "all" ] || [ "{{.SERVER}}" = "github" ]; then
-          echo "Stopping GitHub MCP server..."
-          docker-compose -f docker-compose.github.yml down
-        fi
-        
-        echo "MCP servers have been stopped."
-        echo "Your data is preserved in Docker volumes."
-    vars:
-      SERVER: '{{.SERVER | default "all"}}'
-
-  mcp-status:
-    desc: Check status of MCP servers
-    cmds:
-      - |
-        echo "Checking MCP server status..."
-        echo "Atlassian server -"
-        docker ps --filter "name=atlassian-server" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"
-        echo "GitHub server -"
-        docker ps --filter "name=github-server" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"

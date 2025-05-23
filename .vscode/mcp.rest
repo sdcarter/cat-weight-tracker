@@ -7,12 +7,6 @@
 GET {{atlassianUrl}}/rest/api/2/serverInfo
 Content-Type: application/json
 
-### GitHub MCP API Examples
-
-# Get GitHub API info
-GET {{githubUrl}}/api/v3/meta
-Content-Type: application/json
-
 ### Local API Examples
 
 # Get all cats

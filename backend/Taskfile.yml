@@ -1,0 +1,45 @@
+version: '3'
+
+tasks:
+  test:
+    desc: Run backend tests
+    cmds:
+      - echo "Running backend tests..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend pytest {{.ARGS}}
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      ARGS: '{{.ARGS | default ""}}'
+
+  lint:
+    desc: Run backend linting
+    cmds:
+      - echo "Running backend linting..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend flake8
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  shell:
+    desc: Open a shell in the backend container
+    cmds:
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} exec backend sh
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - echo "Running database migrations..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  db:reset:
+    desc: Reset the database
+    cmds:
+      - echo "Resetting database..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} down -v
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} up -d db
+      - sleep 5
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
+    vars:
+      ENV: '{{.ENV | default "prod"}}'

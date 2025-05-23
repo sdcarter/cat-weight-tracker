@@ -1,0 +1,33 @@
+version: '3'
+
+tasks:
+  test:
+    desc: Run frontend tests
+    cmds:
+      - echo "Running frontend tests..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm frontend npm test -- --watchAll=false
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  lint:
+    desc: Run frontend linting
+    cmds:
+      - echo "Running frontend linting..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm frontend npm run lint
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  lint-fix:
+    desc: Fix frontend linting issues
+    cmds:
+      - echo "Running frontend linting with auto-fix..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm frontend npm run lint -- --fix
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  shell:
+    desc: Open a shell in the frontend container
+    cmds:
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} exec frontend sh
+    vars:
+      ENV: '{{.ENV | default "prod"}}'

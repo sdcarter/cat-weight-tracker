@@ -9,7 +9,7 @@ A web application for tracking your cat's weight over time.
 - Cat management (add, edit, delete)
 - Weight tracking with charts
 - Responsive design
-- Atlassian and GitHub MCP server integration for project management
+- Atlassian MCP server integration for project management
 
 ## Environment Variables
 
@@ -57,46 +57,75 @@ npm install
 npm start
 ```
 
-## MCP Integration
+## Task-based Workflow
 
-This project includes local Atlassian and GitHub MCP servers for managing issues and stories.
+This project uses [Task](https://taskfile.dev) for managing development workflows. Tasks are organized by component:
 
-### Managing MCP Servers
+### Main Tasks
 
 ```bash
-# Start all MCP servers
-task mcp-start
+# Start the application
+task launch [ENV=dev|prod]
 
-# Start specific MCP server
-task mcp-start SERVER=atlassian
-task mcp-start SERVER=github
+# Stop the application
+task stop [ENV=dev|prod]
 
-# Check MCP server status
-task mcp-status
+# Run all tests
+task test
 
-# Stop MCP servers
-task mcp-stop
-task mcp-stop SERVER=atlassian
-task mcp-stop SERVER=github
+# Run all linting
+task lint
 ```
 
-### MCP Server URLs
+### Component-specific Tasks
+
+```bash
+# Frontend tasks
+task frontend:test
+task frontend:lint
+task frontend:lint-fix
+task frontend:shell
+
+# Backend tasks
+task backend:test [ARGS="specific_test.py"]
+task backend:lint
+task backend:shell
+task backend:db:migrate
+task backend:db:reset
+
+# Database tasks
+task db:backup
+task db:restore BACKUP=./backups/filename.sql
+```
+
+## MCP Integration
+
+This project includes Atlassian MCP server for managing issues and stories.
+
+### Managing MCP Server
+
+```bash
+# Start MCP server
+task mcp:start
+
+# Check MCP server status
+task mcp:status
+
+# Stop MCP server
+task mcp:stop
+```
+
+### MCP Server URL
 
 - Atlassian MCP: http://localhost:9000
-- GitHub MCP: http://localhost:9001
 
 ### VS Code Integration
 
 Install the recommended extensions:
 - Atlassian Jira (atlascode)
-- GitHub Pull Requests (vscode-pull-request-github)
 - REST Client (rest-client)
 
-Use the `.vscode/mcp.rest` file to interact with the MCP servers via REST API.
-
-## Deployment
-
-The application can be deployed to Google Kubernetes Engine (GKE) using the GitHub Actions workflow.
+Use the `.vscode/mcp.rest` file to interact with the MCP server via REST API.
 
 ## License
 

@@ -19,13 +19,11 @@
     "$shared": {},
     "local": {
       "baseUrl": "http://localhost:4000",
-      "atlassianUrl": "http://localhost:9000",
-      "githubUrl": "http://localhost:9001"
+      "atlassianUrl": "http://localhost:9000"
     },
     "production": {
       "baseUrl": "https://your-production-url.com",
-      "atlassianUrl": "",
-      "githubUrl": ""
+      "atlassianUrl": ""
     }
   }
 }

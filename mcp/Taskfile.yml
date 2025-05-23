@@ -1,0 +1,72 @@
+version: '3'
+
+tasks:
+  pull-images:
+    desc: Pull required Docker images for MCP servers
+    cmds:
+      - docker pull ghcr.io/sooperset/mcp-atlassian:latest
+
+  start:
+    desc: Start Atlassian MCP server
+    cmds:
+      - task: pull-images
+      - echo "Starting Atlassian MCP server..."
+      - |
+        # Check if mcp.json exists, if not create it
+        if [ ! -f "../mcp.json" ]; then
+          echo "Creating default mcp.json file..."
+          cat > ../mcp.json << 'EOF'
+        {
+          "mcpServers": {
+            "mcp-atlassian": {
+              "command": "docker",
+              "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-e", "CONFLUENCE_URL",
+                "-e", "CONFLUENCE_USERNAME",
+                "-e", "CONFLUENCE_API_TOKEN",
+                "-e", "JIRA_URL",
+                "-e", "JIRA_USERNAME",
+                "-e", "JIRA_API_TOKEN",
+                "ghcr.io/sooperset/mcp-atlassian:latest"
+              ],
+              "env": {
+                "CONFLUENCE_URL": "https://your-company.atlassian.net/wiki",
+                "CONFLUENCE_USERNAME": "your.email@company.com",
+                "CONFLUENCE_API_TOKEN": "your_confluence_api_token",
+                "JIRA_URL": "https://your-company.atlassian.net",
+                "JIRA_USERNAME": "your.email@company.com",
+                "JIRA_API_TOKEN": "your_jira_api_token"
+              }
+            }
+          }
+        }
+        EOF
+        fi
+        
+        # Run the MCP server using the configuration
+        docker run -d --name atlassian-mcp -p 9000:8080 \
+          -v $(pwd)/../mcp.json:/app/mcp.json \
+          ghcr.io/sooperset/mcp-atlassian:latest
+        
+        echo "Atlassian MCP server is starting up at http://localhost:9000"
+        echo "Note - You'll need to update mcp.json with your Atlassian credentials"
+
+  stop:
+    desc: Stop Atlassian MCP server
+    cmds:
+      - echo "Stopping Atlassian MCP server..."
+      - docker stop atlassian-mcp || true
+      - docker rm atlassian-mcp || true
+      - echo "Atlassian MCP server has been stopped."
+      - echo "Your configuration is preserved in mcp.json."
+
+  status:
+    desc: Check status of Atlassian MCP server
+    cmds:
+      - |
+        echo "Checking MCP server status..."
+        echo "Atlassian server -"
+        docker ps --filter "name=atlassian-mcp" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"

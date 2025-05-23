@@ -12,18 +12,9 @@ default:
     - task --list
 
 tasks:
-  pull-images:
-    desc: Pull required Docker images
-    cmds:
-      - docker pull postgres:15
-      - docker pull node:18-alpine
-      - docker pull nginx:alpine
-      - docker pull python:3.11-slim
-
   launch:
     desc: Launch the application in specified environment (prod or dev)
     cmds:
-      - task: pull-images
       - echo "Starting Cat Weight Tracker in {{.ENV}} mode..."
       - |
         if [ "{{.ENV}}" = "dev" ]; then

@@ -1,15 +1,9 @@
 version: '3'
 
 tasks:
-  pull-images:
-    desc: Pull required Docker images for MCP servers
-    cmds:
-      - docker pull ghcr.io/sooperset/mcp-atlassian:latest
-
   start:
     desc: Start Atlassian MCP server
     cmds:
-      - task: pull-images
       - echo "Starting Atlassian MCP server..."
       - |
         # Check if mcp.json exists, if not create it

@@ -26,14 +26,7 @@ tasks:
                 "-e", "JIRA_API_TOKEN",
                 "ghcr.io/sooperset/mcp-atlassian:latest"
               ],
-              "env": {
-                "CONFLUENCE_URL": "https://your-company.atlassian.net/wiki",
-                "CONFLUENCE_USERNAME": "your.email@company.com",
-                "CONFLUENCE_API_TOKEN": "your_confluence_api_token",
-                "JIRA_URL": "https://your-company.atlassian.net",
-                "JIRA_USERNAME": "your.email@company.com",
-                "JIRA_API_TOKEN": "your_jira_api_token"
-              }
+              "env": {}
             }
           }
         }
@@ -43,10 +36,11 @@ tasks:
         # Run the MCP server using the configuration
         docker run -d --name atlassian-mcp -p 9000:8080 \
           -v $(pwd)/../mcp.json:/app/mcp.json \
+          --env-file $(pwd)/../.env \
           ghcr.io/sooperset/mcp-atlassian:latest
         
         echo "Atlassian MCP server is starting up at http://localhost:9000"
-        echo "Note - You'll need to update mcp.json with your Atlassian credentials"
+        echo "Note - You'll need to update .env with your Atlassian credentials"
 
   stop:
     desc: Stop Atlassian MCP server
@@ -55,7 +49,7 @@ tasks:
       - docker stop atlassian-mcp || true
       - docker rm atlassian-mcp || true
       - echo "Atlassian MCP server has been stopped."
-      - echo "Your configuration is preserved in mcp.json."
+      - echo "Your configuration is preserved in .env."
 
   status:
     desc: Check status of Atlassian MCP server

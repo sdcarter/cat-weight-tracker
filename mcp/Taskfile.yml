@@ -63,4 +63,11 @@ tasks:
       - |
         echo "Checking MCP server status..."
         echo "Atlassian server -"
-        docker ps --filter "name=atlassian-mcp" --format "{% raw %}{{.Names}}: {{.Status}}{% endraw %}"
+        docker ps --filter "name=atlassian-mcp" --format "{{.Names}}: {{.Status}}" || echo "No MCP server running"
+        
+  logs:
+    desc: Show logs for MCP server
+    cmds:
+      - docker logs {{.FOLLOW}} atlassian-mcp
+    vars:
+      FOLLOW: '{{if .FOLLOW}}-f{{end}}'

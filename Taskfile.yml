@@ -6,6 +6,11 @@ includes:
   mcp: ./mcp/Taskfile.yml
   db: ./db/Taskfile.yml
 
+default:
+  desc: Show available tasks
+  cmds:
+    - task --list
+
 tasks:
   pull-images:
     desc: Pull required Docker images

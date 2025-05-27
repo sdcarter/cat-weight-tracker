@@ -16,17 +16,30 @@ from app.database import get_db
 from app.models import User
 from app.auth import create_access_token, get_password_hash
 
-# Test database URL
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# Test database URL - use PostgreSQL in CI, SQLite locally
+if os.environ.get("CI"):
+    DB_USER = os.environ.get("DB_USER", "postgres")
+    DB_PASSWORD = os.environ.get("DB_PASSWORD", "postgres")
+    DB_HOST = os.environ.get("DB_HOST", "localhost")
+    DB_PORT = os.environ.get("DB_PORT", "5432")
+    DB_NAME = os.environ.get("DB_NAME", "cat_weight_tracker_test")
+    SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+else:
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
 @pytest.fixture(scope="function")
 def test_db():
-    # Create the SQLite in-memory database
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL,
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
+    # Create the database engine
+    if os.environ.get("CI"):
+        # PostgreSQL in CI
+        engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    else:
+        # SQLite locally
+        engine = create_engine(
+            SQLALCHEMY_DATABASE_URL,
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     
     # Create the tables
@@ -43,6 +56,16 @@ def test_db():
         is_active=True
     )
     db.add(test_user)
+    
+    # Create demo user (needed for some tests)
+    demo_user = User(
+        username="demo",
+        email="demo@example.com",
+        hashed_password=get_password_hash("password"),
+        is_active=True
+    )
+    db.add(demo_user)
+    
     db.commit()
     db.refresh(test_user)
     

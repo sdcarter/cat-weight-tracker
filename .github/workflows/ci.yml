@@ -50,6 +50,7 @@ jobs:
         cd backend
         pytest
       env:
+        CI: true
         DB_USER: postgres
         DB_PASSWORD: postgres
         DB_HOST: localhost

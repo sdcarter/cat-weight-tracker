@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import date
 from typing import List, Optional, Union
 
@@ -25,8 +25,8 @@ class UserPasswordChange(BaseModel):
 class User(UserBase):
     id: int
     is_active: bool
-
-    model_config = {"from_attributes": True}
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class Token(BaseModel):
     access_token: str
@@ -46,8 +46,8 @@ class CatCreate(CatBase):
 class Cat(CatBase):
     id: int
     user_id: int
-
-    model_config = {"from_attributes": True}
+    
+    model_config = ConfigDict(from_attributes=True)
 
 # Weight record schemas
 class WeightRecordBase(BaseModel):
@@ -62,20 +62,20 @@ class WeightRecord(WeightRecordBase):
     id: int
     cat_weight: float
     cat_id: int
-
-    model_config = {"from_attributes": True}
+    
+    model_config = ConfigDict(from_attributes=True)
 
 # Extended Cat schema with weight records
 class CatWithRecords(Cat):
     weight_records: List[WeightRecord] = []
-
-    model_config = {"from_attributes": True}
+    
+    model_config = ConfigDict(from_attributes=True)
 
 # Extended User schema with cats
 class UserWithCats(User):
     cats: List[Cat] = []
-
-    model_config = {"from_attributes": True}
+    
+    model_config = ConfigDict(from_attributes=True)
 
 # Plot data schema
 class PlotData(BaseModel):

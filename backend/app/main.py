@@ -18,13 +18,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
-
 # Define lifespan context manager for startup/shutdown events
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Create default user
+    # Startup: Create default user if needed
     db = next(get_db())
     crud.create_default_user(db)
     yield

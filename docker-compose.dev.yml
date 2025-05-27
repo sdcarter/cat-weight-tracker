@@ -50,6 +50,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    image: cat-weight-tracker-frontend-dev
     ports:
       - "3000:3000"
     depends_on:

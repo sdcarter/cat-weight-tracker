@@ -38,7 +38,7 @@ services:
     command: >
       bash -c "
         sleep 5 &&
-        alembic upgrade heads &&
+        alembic upgrade head &&
         uvicorn app.main:app --host 0.0.0.0 --port 4000
       "
     volumes:
@@ -58,7 +58,10 @@ services:
           memory: 512M
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: cat-weight-tracker-frontend
     ports:
       - "80:80"
     depends_on:

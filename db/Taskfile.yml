@@ -69,3 +69,29 @@ tasks:
     vars:
       ENV: '{{.ENV | default "prod"}}'
       BACKUP: '{{.BACKUP}}'
+      
+  reset:
+    desc: Reset the database to a clean state
+    cmds:
+      - |
+        echo "⚠️  WARNING - This will delete all data in the database!"
+        echo "Are you sure you want to reset the database? (y/n)"
+        read -r confirm
+        
+        if [ "$confirm" != "y" ]; then
+          echo "Reset cancelled."
+          exit 0
+        fi
+        
+        echo "Stopping all services..."
+        cd .. && docker-compose down
+        
+        echo "Removing database volume..."
+        docker volume rm cat-weight-tracker_postgres_data || true
+        
+        echo "Starting services with clean database..."
+        cd .. && docker-compose up -d
+        
+        echo "✅ Database reset completed successfully!"
+    vars:
+      ENV: '{{.ENV | default "prod"}}'

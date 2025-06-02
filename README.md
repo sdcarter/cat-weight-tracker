@@ -130,3 +130,25 @@ Use the `.vscode/mcp.rest` file to interact with the MCP server via REST API.
 ## License
 
 MIT
+
+## Amazon Q Integration
+
+This project includes Amazon Q integration to help developers work with the codebase more efficiently. The integration is configured in the `.amazonq` directory and includes:
+
+- **Saved Prompts**: Reusable prompts that can be referenced using `@prompt` syntax
+- **Package-level Rules**: Automatically applied to all Amazon Q interactions
+
+### Using Saved Prompts
+
+To use a saved prompt in your Amazon Q conversation, reference it with the `@prompt` syntax:
+
+```
+@cat-weight-tracker-assistant
+```
+
+Available prompts:
+- `cat-weight-tracker-assistant`: General assistant for the application
+- `backend-dev`: Specialized prompt for backend development
+- `frontend-dev`: Specialized prompt for frontend development
+
+See the [.amazonq/README.md](.amazonq/README.md) file for more details on using Amazon Q with this project.

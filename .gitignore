@@ -44,6 +44,9 @@ coverage.xml
 .env.test.local
 .env.production.local
 
+# Don't ignore .amazonq directory - we want to share these prompts and rules
+!.amazonq/
+
 # IDE
 .idea/
 .vscode/

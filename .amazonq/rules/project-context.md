@@ -3,12 +3,14 @@
 The Cat Weight Tracker is a full-stack application designed to help cat owners track their cats' weight over time. This context should be applied to all interactions with the codebase.
 
 ## Application Purpose
+
 - Track multiple cats' weights over time
 - Visualize weight trends with charts
 - Manage cat profiles (add, edit, delete)
 - User authentication and profile management
 
 ## Technical Stack
+
 - **Frontend**: React, Tailwind CSS
 - **Backend**: FastAPI, SQLAlchemy
 - **Database**: PostgreSQL
@@ -17,12 +19,14 @@ The Cat Weight Tracker is a full-stack application designed to help cat owners t
 - **Deployment**: Docker, Kubernetes
 
 ## Architecture
+
 - RESTful API design
 - Separation of concerns between models, schemas, and CRUD operations
 - Component-based frontend architecture
 - Context API for state management
 
 ## Development Priorities
+
 - Code quality and maintainability
 - Test coverage
 - Performance optimization

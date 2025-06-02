@@ -3,6 +3,7 @@
 When helping with the Cat Weight Tracker application, follow these code style guidelines:
 
 ## Backend (Python)
+
 - Follow PEP 8 style guidelines
 - Use type hints for all function parameters and return values
 - Use docstrings for all functions and classes
@@ -12,6 +13,7 @@ When helping with the Cat Weight Tracker application, follow these code style gu
 - Prefix private methods and variables with underscore (_)
 
 ## Frontend (JavaScript/React)
+
 - Use ES6+ syntax
 - Use functional components with hooks instead of class components
 - Use destructuring for props
@@ -22,12 +24,14 @@ When helping with the Cat Weight Tracker application, follow these code style gu
 - Follow the existing pattern for component structure
 
 ## Testing
+
 - Write descriptive test names that explain the expected behavior
 - Follow the Arrange-Act-Assert pattern
 - Mock external dependencies
 - Use meaningful test data
 
 ## Git Commits
+
 - Use conventional commit messages (feat, fix, docs, style, refactor, test, chore)
 - Keep commits focused on a single change
 - Write descriptive commit messages

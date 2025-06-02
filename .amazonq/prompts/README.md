@@ -5,7 +5,8 @@ This directory contains saved prompts for Amazon Q to ensure consistent interact
 ## How to Use
 
 1. When chatting with Amazon Q in your IDE, reference these prompts using the `@prompt` syntax:
-   ```
+
+   ```text
    @cat-weight-tracker-assistant
    ```
 

@@ -41,7 +41,7 @@ docker-compose up
 
 ### Local Development
 
-#### Backend
+#### Backend Setup
 
 ```bash
 cd backend
@@ -117,11 +117,12 @@ task mcp:stop
 
 ### MCP Server URL
 
-- Atlassian MCP: http://localhost:9000
+- Atlassian MCP: <http://localhost:9000>
 
 ### VS Code Integration
 
 Install the recommended extensions:
+
 - Atlassian Jira (atlascode)
 - REST Client (rest-client)
 
@@ -142,11 +143,12 @@ This project includes Amazon Q integration to help developers work with the code
 
 To use a saved prompt in your Amazon Q conversation, reference it with the `@prompt` syntax:
 
-```
+```text
 @cat-weight-tracker-assistant
 ```
 
 Available prompts:
+
 - `cat-weight-tracker-assistant`: General assistant for the application
 - `backend-dev`: Specialized prompt for backend development
 - `frontend-dev`: Specialized prompt for frontend development

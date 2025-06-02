@@ -11,13 +11,14 @@ This directory contains configuration files for Amazon Q integration with the Ca
 
 To use a saved prompt in your Amazon Q conversation, reference it with the `@prompt` syntax:
 
-```
+```text
 @cat-weight-tracker-assistant
 ```
 
 This will include the prompt's context in your conversation with Amazon Q.
 
 Available prompts:
+
 - `cat-weight-tracker-assistant`: General assistant for the Cat Weight Tracker application
 - `backend-dev`: Specialized prompt for backend development tasks
 - `frontend-dev`: Specialized prompt for frontend development tasks
@@ -27,6 +28,7 @@ Available prompts:
 Rules in the `rules/` directory are automatically applied to all Amazon Q interactions with this repository. They provide consistent context and guidelines without needing to explicitly reference them.
 
 Available rules:
+
 - `code-style`: Enforces coding style guidelines for the project
 - `project-context`: Provides essential project context for all interactions
 

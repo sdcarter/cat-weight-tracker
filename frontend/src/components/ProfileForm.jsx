@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -10,6 +11,7 @@ import axios from 'axios';
 const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api';
 
 const ProfileForm = () => {
+  const { t } = useTranslation();
   const { user, setUser } = useAuth();
   const [username, setUsername] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
@@ -34,17 +36,17 @@ const ProfileForm = () => {
       });
 
       setUser(response.data);
-      setSuccess('Profile updated successfully');
+      setSuccess(t('messages.profileUpdated'));
       toast({
-        title: 'Success',
-        description: 'Your profile has been updated.',
+        title: t('common.success'),
+        description: t('messages.profileUpdated'),
         variant: 'success'
       });
     } catch (error) {
-      setError(error.response?.data?.detail || 'Failed to update profile');
+      setError(error.response?.data?.detail || t('messages.profileUpdateFailed'));
       toast({
-        title: 'Error',
-        description: error.response?.data?.detail || 'Failed to update profile',
+        title: t('common.error'),
+        description: error.response?.data?.detail || t('messages.profileUpdateFailed'),
         variant: 'destructive'
       });
     } finally {
@@ -58,7 +60,7 @@ const ProfileForm = () => {
     setSuccess('');
 
     if (newPassword !== confirmPassword) {
-      setError("New passwords don't match");
+      setError(t('messages.passwordsDoNotMatch'));
       return;
     }
 
@@ -70,20 +72,20 @@ const ProfileForm = () => {
         new_password: newPassword
       });
 
-      setSuccess('Password changed successfully');
+      setSuccess(t('messages.passwordChanged'));
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       toast({
-        title: 'Success',
-        description: 'Your password has been changed.',
+        title: t('common.success'),
+        description: t('messages.passwordChanged'),
         variant: 'success'
       });
     } catch (error) {
-      setError(error.response?.data?.detail || 'Failed to change password');
+      setError(error.response?.data?.detail || t('messages.passwordChangeFailed'));
       toast({
-        title: 'Error',
-        description: error.response?.data?.detail || 'Failed to change password',
+        title: t('common.error'),
+        description: error.response?.data?.detail || t('messages.passwordChangeFailed'),
         variant: 'destructive'
       });
     } finally {
@@ -94,7 +96,7 @@ const ProfileForm = () => {
   return (
     <div className="space-y-6">
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Profile Settings</h2>
+        <h2 className="text-2xl font-bold mb-6">{t('profile.settings')}</h2>
         <form onSubmit={handleProfileUpdate} className="space-y-4">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -107,7 +109,7 @@ const ProfileForm = () => {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">{t('auth.username')}</Label>
             <Input
               id="username"
               type="text"
@@ -117,7 +119,7 @@ const ProfileForm = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
@@ -127,16 +129,16 @@ const ProfileForm = () => {
             />
           </div>
           <Button type="submit" className="w-full" disabled={isUpdating}>
-            {isUpdating ? 'Updating...' : 'Update Profile'}
+            {isUpdating ? t('common.updating') : t('profile.updateProfile')}
           </Button>
         </form>
       </Card>
 
       <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Change Password</h2>
+        <h2 className="text-2xl font-bold mb-6">{t('profile.changePassword')}</h2>
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+            <Label htmlFor="currentPassword">{t('auth.currentPassword')}</Label>
             <Input
               id="currentPassword"
               type="password"
@@ -146,7 +148,7 @@ const ProfileForm = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword">{t('auth.newPassword')}</Label>
             <Input
               id="newPassword"
               type="password"
@@ -156,7 +158,7 @@ const ProfileForm = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
             <Input
               id="confirmPassword"
               type="password"
@@ -166,7 +168,7 @@ const ProfileForm = () => {
             />
           </div>
           <Button type="submit" className="w-full" disabled={isChangingPassword}>
-            {isChangingPassword ? 'Changing Password...' : 'Change Password'}
+            {isChangingPassword ? t('common.changing') : t('profile.changePassword')}
           </Button>
         </form>
       </Card>

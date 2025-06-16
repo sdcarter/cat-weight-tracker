@@ -60,7 +60,9 @@
     "error": "Error",
     "welcome": "Welcome",
     "account": "Account",
-    "language": "Language"
+    "language": "Language",
+    "updating": "Updating...",
+    "changing": "Changing..."
   },
   "footer": {
     "copyright": "Cat Weight Tracker © {{year}}"
@@ -72,7 +74,10 @@
     "weightAdded": "Weight record added successfully",
     "weightDeleted": "Weight record deleted successfully",
     "profileUpdated": "Profile updated successfully",
+    "profileUpdateFailed": "Failed to update profile",
     "passwordChanged": "Password changed successfully",
+    "passwordChangeFailed": "Failed to change password",
+    "passwordsDoNotMatch": "Passwords don't match",
     "invalidWeight": "Invalid weight values",
     "nameTooLong": "Cat name too long",
     "invalidTargetWeight": "Invalid target weight",

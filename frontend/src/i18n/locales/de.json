@@ -60,7 +60,9 @@
     "error": "Fehler",
     "welcome": "Willkommen",
     "account": "Konto",
-    "language": "Sprache"
+    "language": "Sprache",
+    "updating": "Aktualisiere...",
+    "changing": "Ändere..."
   },
   "footer": {
     "copyright": "Katzengewicht-Tracker © {{year}}"
@@ -72,7 +74,10 @@
     "weightAdded": "Gewichtseintrag erfolgreich hinzugefügt",
     "weightDeleted": "Gewichtseintrag erfolgreich gelöscht",
     "profileUpdated": "Profil erfolgreich aktualisiert",
+    "profileUpdateFailed": "Fehler beim Aktualisieren des Profils",
     "passwordChanged": "Passwort erfolgreich geändert",
+    "passwordChangeFailed": "Fehler beim Ändern des Passworts",
+    "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
     "invalidWeight": "Ungültige Gewichtswerte",
     "nameTooLong": "Katzenname zu lang",
     "invalidTargetWeight": "Ungültiges Zielgewicht",

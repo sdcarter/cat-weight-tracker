@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -6,6 +7,7 @@ import { Label } from './ui/label';
 import { Card } from './ui/card';
 
 const RegisterForm = ({ onToggleForm, onSuccess }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +20,7 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
     
     // Form validation
     if (password !== confirmPassword) {
-      setFormError("Passwords don&apos;t match");
+      setFormError(t('messages.passwordsDoNotMatch'));
       return;
     }
     
@@ -32,7 +34,7 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
 
   return (
     <Card className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Register</h2>
+      <h2 className="text-2xl font-bold mb-6">{t('auth.register')}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {(formError || error) && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -40,7 +42,7 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
           </div>
         )}
         <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
+          <Label htmlFor="username">{t('auth.username')}</Label>
           <Input
             id="username"
             type="text"
@@ -50,7 +52,7 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t('auth.email')}</Label>
           <Input
             id="email"
             type="email"
@@ -60,7 +62,7 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t('auth.password')}</Label>
           <Input
             id="password"
             type="password"
@@ -70,7 +72,7 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
           <Input
             id="confirmPassword"
             type="password"
@@ -80,18 +82,18 @@ const RegisterForm = ({ onToggleForm, onSuccess }) => {
           />
         </div>
         <Button type="submit" className="w-full">
-          Register
+          {t('auth.register')}
         </Button>
       </form>
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600">
-          Already have an account?{' '}
+          {t('auth.haveAccount')}{' '}
           <button
             type="button"
             onClick={onToggleForm}
             className="text-primary hover:underline"
           >
-            Login
+            {t('auth.login')}
           </button>
         </p>
       </div>

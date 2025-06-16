@@ -24,17 +24,16 @@ def generate_weight_plot(db: Session, cat_id: int) -> Optional[Dict[str, Union[i
             logger.error("Invalid cat_id format")
             return None
             
-        # Get cat and its weight records using parameterized query (CWE-89)
-        from sqlalchemy.sql.expression import bindparam
-        cat = db.query(models.Cat).filter(models.Cat.id == bindparam('cat_id', cat_id)).first()
+        # Get cat and its weight records using ORM methods (CWE-89)
+        cat = db.query(models.Cat).filter(models.Cat.id == cat_id).first()
         if not cat:
             # Avoid logging sensitive data (CWE-117)
             logger.warning("Cat not found for plot generation")
             return None
         
-        # Get weight records sorted by date using parameterized query (CWE-89)
+        # Get weight records sorted by date using ORM methods (CWE-89)
         weight_records = db.query(models.WeightRecord).filter(
-            models.WeightRecord.cat_id == bindparam('record_cat_id', cat_id)
+            models.WeightRecord.cat_id == cat_id
         ).order_by(models.WeightRecord.date).all()
         
         if not weight_records:

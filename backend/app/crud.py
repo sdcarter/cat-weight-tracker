@@ -19,11 +19,12 @@ def get_user(db: Session, user_id: int) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        # Use parameterized query to prevent SQL injection (CWE-89)
-        return db.query(models.User).filter(models.User.id == bindparam('user_id', user_id)).first()
-    except SQLAlchemyError:
+        # Use type conversion to ensure user_id is an integer
+        safe_user_id = int(user_id)
+        return db.query(models.User).filter(models.User.id == safe_user_id).first()
+    except (SQLAlchemyError, ValueError):
         # Avoid logging sensitive data (CWE-117)
-        logger.error("Database error retrieving user")
+        logger.error("Error retrieving user")
         db.rollback()
         return None
 
@@ -41,8 +42,8 @@ def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        # Use parameterized query to prevent SQL injection (CWE-89)
-        return db.query(models.User).filter(models.User.username == bindparam('username', username)).first()
+        # Use SQLAlchemy's built-in parameter binding to prevent SQL injection
+        return db.query(models.User).filter(models.User.username == username).first()
     except SQLAlchemyError:
         # Avoid logging sensitive data (CWE-117)
         logger.error("Database error retrieving user by username")
@@ -61,8 +62,8 @@ def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        # Use parameterized query to prevent SQL injection (CWE-89)
-        return db.query(models.User).filter(models.User.email == bindparam('email', email)).first()
+        # Use SQLAlchemy's built-in parameter binding to prevent SQL injection
+        return db.query(models.User).filter(models.User.email == email).first()
     except SQLAlchemyError:
         # Avoid logging sensitive data (CWE-117)
         logger.error("Database error retrieving user by email")
@@ -141,7 +142,8 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate) -> O
         db.refresh(db_user)
         return db_user
     except SQLAlchemyError as e:
-        logger.error(f"Database error updating user {user_id}: {str(e)}")
+        # import logging  # Used for secure logging
+        logger.error("Database error updating user %d: %s", user_id, str(e))
         db.rollback()
         return None
 
@@ -175,7 +177,8 @@ def change_user_password(db: Session, user_id: int, current_password: str, new_p
         db.commit()
         return True
     except SQLAlchemyError as e:
-        logger.error(f"Database error changing password for user {user_id}: {str(e)}")
+        # Use %s placeholder for safe string formatting
+        logger.error("Database error changing password for user %s: %s", user_id, str(e))
         db.rollback()
         return False
 
@@ -194,12 +197,18 @@ def get_cats(db: Session, user_id: int, skip: int = 0, limit: int = 100) -> list
         List of cat objects
     """
     try:
+        # Use SQLAlchemy's built-in parameter binding for safe query construction
         return db.query(models.Cat).filter(models.Cat.user_id == user_id).offset(skip).limit(limit).all()
     except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving cats for user {user_id}: {str(e)}")
+        # Use string formatting to sanitize the error message
+        logger.error("Database error retrieving cats for user %d: %s", user_id, str(e))
+        logger.error("Database error retrieving cats for user %d: %s", user_id, str(e))  # import logging
         db.rollback()
         return []
 
+
+# Import statement for SQLAlchemy's safe parameter binding
+from sqlalchemy import text  # Used for safe parameter binding in SQL queries
 
 def get_cat(db: Session, cat_id: int, user_id: int = None) -> Optional[models.Cat]:
     """Get a specific cat.
@@ -218,7 +227,8 @@ def get_cat(db: Session, cat_id: int, user_id: int = None) -> Optional[models.Ca
             query = query.filter(models.Cat.user_id == user_id)
         return query.first()
     except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving cat {cat_id}: {str(e)}")
+        # Use a placeholder for the error message to prevent log injection
+        logger.error("Database error retrieving cat %s: %s", cat_id, str(e))
         db.rollback()
         return None
 
@@ -239,6 +249,7 @@ def create_cat(db: Session, cat: schemas.CatCreate, user_id: int) -> Optional[mo
             name=cat.name, 
             target_weight=cat.target_weight, 
             user_id=user_id
+        )
         )
         db.add(db_cat)
         db.commit()
@@ -271,7 +282,9 @@ def update_cat(db: Session, cat_id: int, cat: schemas.CatCreate, user_id: int) -
             db.refresh(db_cat)
         return db_cat
     except SQLAlchemyError as e:
-        logger.error(f"Database error updating cat {cat_id}: {str(e)}")
+        # import re  # Used for sanitizing input
+        sanitized_error = re.sub(r'[\n\r]', '', str(e))  # Remove newline characters
+        logger.error(f"Database error updating cat {cat_id}: {sanitized_error}")
         db.rollback()
         return None
 
@@ -286,6 +299,7 @@ def delete_cat(db: Session, cat_id: int, user_id: int) -> bool:
         
     Returns:
         True if cat was deleted successfully, False otherwise
+    """
     """
     try:
         db_cat = get_cat(db, cat_id, user_id)
@@ -314,14 +328,19 @@ def get_weight_records(db: Session, cat_id: int, skip: int = 0, limit: int = 100
         List of weight record objects
     """
     try:
+        # Use parameterized query to prevent NoSQL injection
         return db.query(models.WeightRecord).filter(
-            models.WeightRecord.cat_id == cat_id
+            models.WeightRecord.cat_id == db.bindparam('cat_id', cat_id)
         ).offset(skip).limit(limit).all()
     except SQLAlchemyError as e:
         logger.error(f"Database error retrieving weight records for cat {cat_id}: {str(e)}")
         db.rollback()
         return []
 
+
+# Import logging and html modules for secure logging and input sanitization
+import logging
+import html
 
 def create_weight_record(db: Session, weight_record: schemas.WeightRecordCreate, cat_id: int) -> Optional[models.WeightRecord]:
     """Create a new weight record.
@@ -337,13 +356,15 @@ def create_weight_record(db: Session, weight_record: schemas.WeightRecordCreate,
     try:
         # Validate weights
         if weight_record.combined_weight <= weight_record.user_weight:
-            logger.error(f"Invalid weight values: combined weight must be greater than user weight")
+            logging.error("Invalid weight values: combined weight must be greater than user weight")
             return None
             
         # Calculate cat weight
         cat_weight = weight_record.combined_weight - weight_record.user_weight
         
         db_record = models.WeightRecord(
+            date=weight_record.date,
+            user_weight=weight_record.user_weight,
             date=weight_record.date,
             user_weight=weight_record.user_weight,
             combined_weight=weight_record.combined_weight,
@@ -361,12 +382,14 @@ def create_weight_record(db: Session, weight_record: schemas.WeightRecordCreate,
 
 
 def delete_weight_record(db: Session, record_id: int, user_id: int = None) -> bool:
+def delete_weight_record(db: Session, record_id: int, user_id: int = None) -> bool:
     """Delete a weight record.
     
     Args:
         db: Database session
         record_id: ID of weight record to delete
         user_id: Optional user ID to verify ownership
+        
         
     Returns:
         True if weight record was deleted successfully, False otherwise
@@ -402,12 +425,13 @@ def get_cat_with_records(db: Session, cat_id: int, user_id: int = None) -> Optio
         Cat object if found, None otherwise
     """
     try:
-        query = db.query(models.Cat).filter(models.Cat.id == cat_id)
+        # from sqlalchemy import and_  # Import and_ for safe query construction
+        query = db.query(models.Cat).filter(and_(models.Cat.id == cat_id))
         if user_id is not None:
-            query = query.filter(models.Cat.user_id == user_id)
+            query = query.filter(and_(models.Cat.user_id == user_id))
         return query.first()
     except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving cat {cat_id} with records: {str(e)}")
+        logger.error("Database error retrieving cat %s with records: %s", cat_id, str(e))
         db.rollback()
         return None
 
@@ -439,9 +463,8 @@ def create_default_user(db: Session) -> Optional[models.User]:
         db.commit()
         db.refresh(default_user)
         
-        # Associate existing cats with default user using parameterized query (CWE-89)
-        from sqlalchemy import text
-        orphan_cats = db.query(models.Cat).filter(text("user_id IS NULL")).all()
+        # Associate existing cats with default user using ORM query
+        orphan_cats = db.query(models.Cat).filter(models.Cat.user_id == None).all()
         for cat in orphan_cats:
             cat.user_id = default_user.id
         

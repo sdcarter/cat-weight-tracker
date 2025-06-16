@@ -64,8 +64,8 @@ def get_user(db: Session, username: str) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        # Use parameterized query to prevent SQL injection (CWE-89)
-        return db.query(models.User).filter(models.User.username == bindparam('username', username)).first()
+        # Use SQLAlchemy's built-in parameter binding to prevent SQL injection
+        return db.query(models.User).filter(models.User.username == username).first()
     except SQLAlchemyError as e:
         # Avoid logging sensitive data (CWE-117)
         logger.error("Database error retrieving user by username")

@@ -1,4 +1,12 @@
 /** @type {import('tailwindcss').Config} */
+// Import required modules at the top of the file
+// tailwindcss-animate: Provides animation utilities for Tailwind CSS
+// @tailwindcss/forms: Adds form-specific styles and utilities
+// Import the tailwindcss-animate module at the top of the file
+const tailwindcssAnimate = require("tailwindcss-animate");
+// Import the @tailwindcss/forms plugin at the top of the file
+const tailwindcssForms = require('@tailwindcss/forms');
+
 module.exports = {
   darkMode: ["class"],
   content: [
@@ -73,24 +81,19 @@ module.exports = {
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
-    // Add accessibility plugin
-    require('@tailwindcss/forms')({
+    tailwindcssAnimate,
+    tailwindcssForms({
       strategy: 'class',
     }),
-    // Add plugin for improved accessibility
     function ({ addBase, theme }) {
       addBase({
-        // Improve focus styles for better accessibility
         'a:focus, button:focus, input:focus, select:focus, textarea:focus': {
           outline: `2px solid ${theme('colors.primary.DEFAULT')}`,
           outlineOffset: '2px',
         },
-        // Improve text contrast
         'body': {
           lineHeight: '1.5',
         },
-        // Improve form element accessibility
         'input, select, textarea': {
           lineHeight: '1.5',
         },
@@ -98,7 +101,6 @@ module.exports = {
     },
   ],
   future: {
-    // Enable future features for better compatibility
     hoverOnlyWhenSupported: true,
   },
 }

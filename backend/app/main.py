@@ -71,13 +71,16 @@ async def log_requests(request: Request, call_next):
         request_method = "INVALID"
     
     # Log the request with sanitized values
-    logger.info(f"Request: {request_method} {request_path}")
+    logger.info("Request: %s %s", request_method, request_path)  # Use %s placeholders instead of f-string
     
     response = await call_next(request)
     
     # Log the response time with sanitized values
     process_time = time.time() - start_time
-    logger.info(f"Response: {request_method} {request_path} completed in {process_time:.3f}s with status {response.status_code}")
+    logger.info("Response: %s %s completed in %.3fs with status %d",
+                request_method, request_path, process_time, response.status_code)
+        request_method, request_path, process_time, response.status_code
+    ))
     
     return response
 

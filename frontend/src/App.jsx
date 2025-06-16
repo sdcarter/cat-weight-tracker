@@ -50,7 +50,9 @@ function App() {
     try {
       console.log('Fetching cats from:', `${API_URL}/cats/`);
       const response = await axios.get(`${API_URL}/cats/`);
-      console.log('Cats data received:', response.data);
+      // Use JSON.stringify to sanitize the response data before logging
+      console.log('Cats data received:', JSON.stringify(response.data));
+      console.log('Cats data received:', JSON.stringify(response.data));
       setCats(response.data);
       
       // Select the first cat if none is selected

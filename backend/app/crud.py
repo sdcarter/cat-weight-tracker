@@ -250,13 +250,12 @@ def create_cat(db: Session, cat: schemas.CatCreate, user_id: int) -> Optional[mo
             target_weight=cat.target_weight, 
             user_id=user_id
         )
-        )
         db.add(db_cat)
         db.commit()
         db.refresh(db_cat)
         return db_cat
     except SQLAlchemyError as e:
-        logger.error(f"Database error creating cat for user {user_id}: {str(e)}")
+        logger.error("Database error creating cat for user %d: %s", user_id, str(e))
         db.rollback()
         return None
 
@@ -282,9 +281,9 @@ def update_cat(db: Session, cat_id: int, cat: schemas.CatCreate, user_id: int) -
             db.refresh(db_cat)
         return db_cat
     except SQLAlchemyError as e:
-        # import re  # Used for sanitizing input
+        import re  # Used for sanitizing input
         sanitized_error = re.sub(r'[\n\r]', '', str(e))  # Remove newline characters
-        logger.error(f"Database error updating cat {cat_id}: {sanitized_error}")
+        logger.error("Database error updating cat %d: %s", cat_id, sanitized_error)
         db.rollback()
         return None
 
@@ -300,7 +299,6 @@ def delete_cat(db: Session, cat_id: int, user_id: int) -> bool:
     Returns:
         True if cat was deleted successfully, False otherwise
     """
-    """
     try:
         db_cat = get_cat(db, cat_id, user_id)
         if db_cat:
@@ -309,7 +307,7 @@ def delete_cat(db: Session, cat_id: int, user_id: int) -> bool:
             return True
         return False
     except SQLAlchemyError as e:
-        logger.error(f"Database error deleting cat {cat_id}: {str(e)}")
+        logger.error("Database error deleting cat %d: %s", cat_id, str(e))
         db.rollback()
         return False
 
@@ -330,10 +328,10 @@ def get_weight_records(db: Session, cat_id: int, skip: int = 0, limit: int = 100
     try:
         # Use parameterized query to prevent NoSQL injection
         return db.query(models.WeightRecord).filter(
-            models.WeightRecord.cat_id == db.bindparam('cat_id', cat_id)
+            models.WeightRecord.cat_id == cat_id
         ).offset(skip).limit(limit).all()
     except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving weight records for cat {cat_id}: {str(e)}")
+        logger.error("Database error retrieving weight records for cat %d: %s", cat_id, str(e))
         db.rollback()
         return []
 
@@ -365,8 +363,6 @@ def create_weight_record(db: Session, weight_record: schemas.WeightRecordCreate,
         db_record = models.WeightRecord(
             date=weight_record.date,
             user_weight=weight_record.user_weight,
-            date=weight_record.date,
-            user_weight=weight_record.user_weight,
             combined_weight=weight_record.combined_weight,
             cat_weight=cat_weight,
             cat_id=cat_id
@@ -376,12 +372,11 @@ def create_weight_record(db: Session, weight_record: schemas.WeightRecordCreate,
         db.refresh(db_record)
         return db_record
     except SQLAlchemyError as e:
-        logger.error(f"Database error creating weight record for cat {cat_id}: {str(e)}")
+        logger.error("Database error creating weight record for cat %d: %s", cat_id, str(e))
         db.rollback()
         return None
 
 
-def delete_weight_record(db: Session, record_id: int, user_id: int = None) -> bool:
 def delete_weight_record(db: Session, record_id: int, user_id: int = None) -> bool:
     """Delete a weight record.
     
@@ -408,7 +403,7 @@ def delete_weight_record(db: Session, record_id: int, user_id: int = None) -> bo
             return True
         return False
     except SQLAlchemyError as e:
-        logger.error(f"Database error deleting weight record {record_id}: {str(e)}")
+        logger.error("Database error deleting weight record %d: %s", record_id, str(e))
         db.rollback()
         return False
 
@@ -425,10 +420,10 @@ def get_cat_with_records(db: Session, cat_id: int, user_id: int = None) -> Optio
         Cat object if found, None otherwise
     """
     try:
-        # from sqlalchemy import and_  # Import and_ for safe query construction
-        query = db.query(models.Cat).filter(and_(models.Cat.id == cat_id))
+        from sqlalchemy import and_  # Import and_ for safe query construction
+        query = db.query(models.Cat).filter(models.Cat.id == cat_id)
         if user_id is not None:
-            query = query.filter(and_(models.Cat.user_id == user_id))
+            query = query.filter(models.Cat.user_id == user_id)
         return query.first()
     except SQLAlchemyError as e:
         logger.error("Database error retrieving cat %s with records: %s", cat_id, str(e))

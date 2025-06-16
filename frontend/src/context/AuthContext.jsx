@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
-// API base URL - use environment-specific URL
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api';
+// API base URL - use environment variable or fallback
+const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api');
 
 const AuthContext = createContext();
 
@@ -14,10 +14,15 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [registrationEnabled, setRegistrationEnabled] = useState(false);
 
-  // Initialize auth state from localStorage
+  // Initialize auth state from sessionStorage (with localStorage fallback for existing users)
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (token) {
+      // If token was in localStorage, move it to sessionStorage
+      if (localStorage.getItem('token')) {
+        sessionStorage.setItem('token', localStorage.getItem('token'));
+        localStorage.removeItem('token');
+      }
       fetchUserData(token);
     } else {
       setLoading(false);
@@ -26,7 +31,7 @@ export const AuthProvider = ({ children }) => {
 
   // Configure axios to use the token for all requests
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
@@ -36,13 +41,19 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async (token) => {
     try {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       const response = await axios.get(`${API_URL}/auth/me`);
       setUser(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching user data:', error);
-      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
+      localStorage.removeItem('token'); // Clean up any old tokens
       delete axios.defaults.headers.common['Authorization'];
       setLoading(false);
     }
@@ -51,14 +62,27 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setError(null);
+      
+      // Validate inputs
+      if (!username || !password) {
+        setError('Username and password are required');
+        return false;
+      }
+      
       const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
       
-      const response = await axios.post(`${API_URL}/auth/login`, formData);
+      const response = await axios.post(`${API_URL}/auth/login`, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
       const { access_token } = response.data;
       
-      localStorage.setItem('token', access_token);
+      // Store token in sessionStorage instead of localStorage for better security
+      sessionStorage.setItem('token', access_token);
+      localStorage.removeItem('token'); // Remove from localStorage if it exists
       await fetchUserData(access_token);
       return true;
     } catch (error) {
@@ -71,6 +95,26 @@ export const AuthProvider = ({ children }) => {
   const register = async (username, email, password) => {
     try {
       setError(null);
+      
+      // Validate inputs
+      if (!username || !email || !password) {
+        setError('Username, email, and password are required');
+        return false;
+      }
+      
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError('Please enter a valid email address');
+        return false;
+      }
+      
+      // Password strength validation
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters long');
+        return false;
+      }
+      
       await axios.post(`${API_URL}/auth/register`, {
         username,
         email,
@@ -85,7 +129,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    localStorage.removeItem('token'); // Clean up any old tokens
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
   };

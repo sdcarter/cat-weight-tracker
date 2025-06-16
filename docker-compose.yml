@@ -30,11 +30,11 @@ services:
       db:
         condition: service_healthy
     environment:
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=cat_weight_tracker
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/cat_weight_tracker
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+      - REGISTRATION_ENABLED=${REGISTRATION_ENABLED}
     command: >
       bash -c "
         sleep 5 &&

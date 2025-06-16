@@ -1,0 +1,85 @@
+{
+  "app": {
+    "title": "Katzengewicht-Tracker",
+    "subtitle": "Überwachen Sie den Gewichtsverlauf Ihrer Katze"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "currentPassword": "Aktuelles Passwort",
+    "newPassword": "Neues Passwort",
+    "forgotPassword": "Passwort vergessen?",
+    "noAccount": "Noch kein Konto?",
+    "haveAccount": "Bereits ein Konto?",
+    "signUp": "Registrieren",
+    "signIn": "Anmelden",
+    "logout": "Abmelden",
+    "profile": "Profileinstellungen"
+  },
+  "cats": {
+    "yourCats": "Ihre Katzen",
+    "addCat": "Katze hinzufügen",
+    "editCat": "Katze bearbeiten",
+    "cancel": "Abbrechen",
+    "name": "Name",
+    "targetWeight": "Zielgewicht (kg)",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "deleteConfirm": "Sind Sie sicher, dass Sie diese Katze löschen möchten?",
+    "notFound": "Katze nicht gefunden"
+  },
+  "weights": {
+    "recordWeight": "Gewicht erfassen",
+    "weightHistory": "Gewichtsverlauf",
+    "weightRecords": "Gewichtsaufzeichnungen",
+    "date": "Datum",
+    "userWeight": "Ihr Gewicht (kg)",
+    "combinedWeight": "Kombiniertes Gewicht (kg)",
+    "catWeight": "Katzengewicht (kg)",
+    "actions": "Aktionen",
+    "add": "Gewicht hinzufügen",
+    "delete": "Löschen",
+    "deleteConfirm": "Sind Sie sicher, dass Sie diesen Gewichtseintrag löschen möchten?",
+    "selectCat": "Wählen Sie eine Katze aus, um das Gewicht zu erfassen",
+    "viewHistory": "Wählen Sie eine Katze aus, um den Gewichtsverlauf anzuzeigen"
+  },
+  "profile": {
+    "settings": "Profileinstellungen",
+    "updateProfile": "Profil aktualisieren",
+    "changePassword": "Passwort ändern",
+    "save": "Änderungen speichern"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "pleaseWait": "Bitte warten",
+    "success": "Erfolg",
+    "error": "Fehler",
+    "welcome": "Willkommen",
+    "account": "Konto",
+    "language": "Sprache"
+  },
+  "footer": {
+    "copyright": "Katzengewicht-Tracker © {{year}}"
+  },
+  "messages": {
+    "catAdded": "{{name}} erfolgreich hinzugefügt",
+    "catUpdated": "{{name}} erfolgreich aktualisiert",
+    "catDeleted": "Katze erfolgreich gelöscht",
+    "weightAdded": "Gewichtseintrag erfolgreich hinzugefügt",
+    "weightDeleted": "Gewichtseintrag erfolgreich gelöscht",
+    "profileUpdated": "Profil erfolgreich aktualisiert",
+    "passwordChanged": "Passwort erfolgreich geändert",
+    "invalidWeight": "Ungültige Gewichtswerte",
+    "nameTooLong": "Katzenname zu lang",
+    "invalidTargetWeight": "Ungültiges Zielgewicht",
+    "usernameTaken": "Benutzername bereits vergeben",
+    "emailTaken": "E-Mail bereits vergeben",
+    "incorrectPassword": "Aktuelles Passwort ist falsch",
+    "registrationSuccess": "Registrierung erfolgreich! Bitte melden Sie sich an.",
+    "registrationDisabled": "Die Registrierung ist derzeit deaktiviert. Bitte kontaktieren Sie den Administrator."
+  }
+}

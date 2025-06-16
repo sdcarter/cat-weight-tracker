@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Button } from './ui/button';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const UserMenu = () => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -11,8 +14,9 @@ const UserMenu = () => {
 
   return (
     <div className="flex items-center space-x-4">
+      <LanguageSwitcher />
       <div className="hidden md:block">
-        <span className="text-sm text-gray-700">Welcome, {user.username}</span>
+        <span className="text-sm text-gray-700">{t('common.welcome')}, {user.username}</span>
       </div>
       <div className="relative">
         <Button
@@ -26,7 +30,7 @@ const UserMenu = () => {
             }
           }}
         >
-          <span>Account</span>
+          <span>{t('common.account')}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1 h-4 w-4">
             <path d="m6 9 6 6 6-6"/>
           </svg>
@@ -38,7 +42,7 @@ const UserMenu = () => {
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               onClick={() => setIsOpen(false)}
             >
-              Profile Settings
+              {t('profile.settings')}
             </Link>
             <button
               onClick={() => {
@@ -47,7 +51,7 @@ const UserMenu = () => {
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Logout
+              {t('auth.logout')}
             </button>
           </div>
         )}

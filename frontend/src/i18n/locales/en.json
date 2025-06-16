@@ -58,7 +58,9 @@
     "pleaseWait": "Please wait",
     "success": "Success",
     "error": "Error",
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "account": "Account",
+    "language": "Language"
   },
   "footer": {
     "copyright": "Cat Weight Tracker © {{year}}"
@@ -76,6 +78,8 @@
     "invalidTargetWeight": "Invalid target weight",
     "usernameTaken": "Username already taken",
     "emailTaken": "Email already taken",
-    "incorrectPassword": "Current password is incorrect"
+    "incorrectPassword": "Current password is incorrect",
+    "registrationSuccess": "Registration successful! Please log in.",
+    "registrationDisabled": "Registration is currently disabled. Please contact the administrator."
   }
 }

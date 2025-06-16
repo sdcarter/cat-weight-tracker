@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -6,6 +7,7 @@ import { Label } from './ui/label';
 import { Card } from './ui/card';
 
 const LoginForm = ({ onToggleForm }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login, error } = useAuth();
@@ -17,7 +19,7 @@ const LoginForm = ({ onToggleForm }) => {
 
   return (
     <Card className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Login</h2>
+      <h2 className="text-2xl font-bold mb-6">{t('auth.login')}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -25,7 +27,7 @@ const LoginForm = ({ onToggleForm }) => {
           </div>
         )}
         <div className="space-y-2">
-          <Label htmlFor="username">Username</Label>
+          <Label htmlFor="username">{t('auth.username')}</Label>
           <Input
             id="username"
             type="text"
@@ -35,7 +37,7 @@ const LoginForm = ({ onToggleForm }) => {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t('auth.password')}</Label>
           <Input
             id="password"
             type="password"
@@ -45,19 +47,19 @@ const LoginForm = ({ onToggleForm }) => {
           />
         </div>
         <Button type="submit" className="w-full">
-          Login
+          {t('auth.login')}
         </Button>
       </form>
       {onToggleForm && (
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
-            Don&apos;t have an account?{' '}
+            {t('auth.noAccount')}{' '}
             <button
               type="button"
               onClick={onToggleForm}
               className="text-primary hover:underline"
             >
-              Register
+              {t('auth.register')}
             </button>
           </p>
         </div>

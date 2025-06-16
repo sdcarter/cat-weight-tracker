@@ -79,8 +79,6 @@ async def log_requests(request: Request, call_next):
     process_time = time.time() - start_time
     logger.info("Response: %s %s completed in %.3fs with status %d",
                 request_method, request_path, process_time, response.status_code)
-        request_method, request_path, process_time, response.status_code
-    ))
     
     return response
 

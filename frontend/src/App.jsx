@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import CatForm from './components/CatForm';
 import CatList from './components/CatList';
 import WeightForm from './components/WeightForm';
@@ -17,6 +18,7 @@ import { useAuth } from './context/AuthContext';
 const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api');
 
 function App() {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [cats, setCats] = useState([]);
   const [selectedCatId, setSelectedCatId] = useState(null);
@@ -91,9 +93,9 @@ function App() {
       setCats([...cats, response.data]);
       setSelectedCatId(response.data.id);
       setShowAddCat(false);
-      showToast('Success', `${response.data.name} added successfully`);
+      showToast(t('common.success'), t('messages.catAdded', { name: response.data.name }));
     } catch (error) {
-      showToast('Error', 'Failed to add cat');
+      showToast(t('common.error'), t('messages.catAdded'));
       console.error('Error adding cat:', error);
     }
   };
@@ -103,9 +105,9 @@ function App() {
       const response = await axios.put(`${API_URL}/cats/${editingCat.id}`, catData);
       setCats(cats.map(cat => cat.id === editingCat.id ? response.data : cat));
       setEditingCat(null);
-      showToast('Success', `${response.data.name} updated successfully`);
+      showToast(t('common.success'), t('messages.catUpdated', { name: response.data.name }));
     } catch (error) {
-      showToast('Error', 'Failed to update cat');
+      showToast(t('common.error'), t('messages.catUpdated'));
       console.error('Error updating cat:', error);
     }
   };
@@ -116,7 +118,7 @@ function App() {
       return;
     }
     
-    if (window.confirm('Are you sure you want to delete this cat?')) {
+    if (window.confirm(t('cats.deleteConfirm'))) {
       try {
         await axios.delete(`${API_URL}/cats/${catId}`);
         const updatedCats = cats.filter(cat => cat.id !== catId);
@@ -126,7 +128,7 @@ function App() {
           setSelectedCatId(updatedCats.length > 0 ? updatedCats[0].id : null);
         }
         
-        showToast('Success', 'Cat deleted successfully');
+        showToast(t('common.success'), t('messages.catDeleted'));
       } catch (error) {
         showToast('Error', error.response?.data?.detail || 'Failed to delete cat');
         console.error('Error deleting cat:', error);
@@ -139,9 +141,9 @@ function App() {
       await axios.post(`${API_URL}/cats/${selectedCatId}/weights/`, weightData);
       fetchWeights(selectedCatId);
       fetchPlotData(selectedCatId);
-      showToast('Success', 'Weight record added successfully');
+      showToast(t('common.success'), t('messages.weightAdded'));
     } catch (error) {
-      showToast('Error', 'Failed to add weight record');
+      showToast(t('common.error'), t('messages.weightAdded'));
       console.error('Error adding weight:', error);
     }
   };
@@ -152,12 +154,12 @@ function App() {
       return;
     }
     
-    if (window.confirm('Are you sure you want to delete this weight record?')) {
+    if (window.confirm(t('weights.deleteConfirm'))) {
       try {
         await axios.delete(`${API_URL}/weights/${weightId}`);
         fetchWeights(selectedCatId);
         fetchPlotData(selectedCatId);
-        showToast('Success', 'Weight record deleted successfully');
+        showToast(t('common.success'), t('messages.weightDeleted'));
       } catch (error) {
         showToast('Error', error.response?.data?.detail || 'Failed to delete weight record');
         console.error('Error deleting weight:', error);
@@ -175,8 +177,8 @@ function App() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Loading...</h2>
-          <p className="text-muted-foreground">Please wait</p>
+          <h2 className="text-2xl font-bold mb-2">{t('common.loading')}</h2>
+          <p className="text-muted-foreground">{t('common.pleaseWait')}</p>
         </div>
       </div>
     );
@@ -189,8 +191,8 @@ function App() {
       <header className="bg-primary text-primary-foreground py-6">
         <div className="container flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Cat Weight Tracker</h1>
-            <p className="text-sm opacity-90">Monitor your cat&apos;s weight progress</p>
+            <h1 className="text-3xl font-bold">{t('app.title')}</h1>
+            <p className="text-sm opacity-90">{t('app.subtitle')}</p>
           </div>
           <UserMenu />
         </div>
@@ -203,9 +205,9 @@ function App() {
               {/* Cat Management Section */}
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-2xl font-bold">Your Cats</h2>
+                  <h2 className="text-2xl font-bold">{t('cats.yourCats')}</h2>
                   <Button onClick={() => setShowAddCat(!showAddCat)}>
-                    {showAddCat ? 'Cancel' : 'Add Cat'}
+                    {showAddCat ? t('cats.cancel') : t('cats.addCat')}
                   </Button>
                 </div>
 
@@ -215,7 +217,7 @@ function App() {
 
                 {editingCat && (
                   <div className="mt-4">
-                    <h3 className="text-lg font-medium mb-2">Edit Cat</h3>
+                    <h3 className="text-lg font-medium mb-2">{t('cats.editCat')}</h3>
                     <CatForm 
                       onSubmit={handleUpdateCat} 
                       initialData={editingCat} 
@@ -225,7 +227,7 @@ function App() {
                       className="mt-2" 
                       onClick={() => setEditingCat(null)}
                     >
-                      Cancel
+                      {t('cats.cancel')}
                     </Button>
                   </div>
                 )}
@@ -241,33 +243,33 @@ function App() {
 
               {/* Weight Recording Section */}
               <div className="space-y-6 pt-4 border-t border-border">
-                <h2 className="text-2xl font-bold">Record Weight</h2>
+                <h2 className="text-2xl font-bold">{t('weights.recordWeight')}</h2>
                 {selectedCatId ? (
                   <WeightForm 
                     onSubmit={handleAddWeight}
                   />
                 ) : (
-                  <p className="text-muted-foreground">Select a cat to record weight</p>
+                  <p className="text-muted-foreground">{t('weights.selectCat')}</p>
                 )}
               </div>
             </div>
 
             {/* Right Column - Weight History and Chart */}
             <div className="lg:col-span-8 space-y-6">
-              <h2 className="text-2xl font-bold">Weight History</h2>
+              <h2 className="text-2xl font-bold">{t('weights.weightHistory')}</h2>
               {selectedCatId ? (
                 <>
                   <div className="h-96">
                     <WeightChart plotData={plotData} />
                   </div>
-                  <h3 className="text-xl font-bold mt-8">Weight Records</h3>
+                  <h3 className="text-xl font-bold mt-8">{t('weights.weightRecords')}</h3>
                   <WeightTable 
                     weights={weights} 
                     onDelete={handleDeleteWeight} 
                   />
                 </>
               ) : (
-                <p className="text-muted-foreground">Select a cat to view weight history</p>
+                <p className="text-muted-foreground">{t('weights.viewHistory')}</p>
               )}
             </div>
           </div>
@@ -275,7 +277,7 @@ function App() {
 
         <footer className="bg-muted py-6">
           <div className="container text-center text-sm text-muted-foreground">
-            <p>Cat Weight Tracker &copy; {new Date().getFullYear()}</p>
+            <p>{t('footer.copyright', { year: new Date().getFullYear() })}</p>
           </div>
         </footer>
       </div>

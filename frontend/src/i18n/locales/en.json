@@ -25,12 +25,17 @@
     "addCat": "Add Cat",
     "editCat": "Edit Cat",
     "cancel": "Cancel",
-    "name": "Name",
+    "name": "Cat Name",
+    "enterName": "Enter cat name",
     "targetWeight": "Target Weight (kg)",
+    "enterTargetWeight": "Enter target weight",
     "delete": "Delete",
     "edit": "Edit",
+    "update": "Update",
+    "add": "Add",
     "deleteConfirm": "Are you sure you want to delete this cat?",
-    "notFound": "Cat not found"
+    "notFound": "Cat not found",
+    "noCatsFound": "No cats found. Add a cat to get started."
   },
   "weights": {
     "recordWeight": "Record Weight",

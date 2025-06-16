@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/card';
 import { Button } from './ui/button';
 
 const CatList = ({ cats, onSelect, onEdit, onDelete, selectedCatId }) => {
+  const { t } = useTranslation();
   if (!cats || cats.length === 0) {
-    return <p className="text-muted-foreground text-center py-4">No cats found. Add a cat to get started.</p>;
+    return <p className="text-muted-foreground text-center py-4">{t('cats.noCatsFound')}</p>;
   }
 
   return (
@@ -19,7 +21,7 @@ const CatList = ({ cats, onSelect, onEdit, onDelete, selectedCatId }) => {
             <CardTitle>{cat.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm">Target Weight: <span className="font-medium">{cat.target_weight} kg</span></p>
+            <p className="text-sm">{t('cats.targetWeight')}: <span className="font-medium">{cat.target_weight} kg</span></p>
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button 
@@ -30,7 +32,7 @@ const CatList = ({ cats, onSelect, onEdit, onDelete, selectedCatId }) => {
                 onEdit(cat);
               }}
             >
-              Edit
+              {t('cats.edit')}
             </Button>
             <Button 
               variant="destructive" 
@@ -40,7 +42,7 @@ const CatList = ({ cats, onSelect, onEdit, onDelete, selectedCatId }) => {
                 onDelete(cat.id);
               }}
             >
-              Delete
+              {t('cats.delete')}
             </Button>
           </CardFooter>
         </Card>

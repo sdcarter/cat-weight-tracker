@@ -25,12 +25,17 @@
     "addCat": "Katze hinzufügen",
     "editCat": "Katze bearbeiten",
     "cancel": "Abbrechen",
-    "name": "Name",
+    "name": "Katzenname",
+    "enterName": "Katzennamen eingeben",
     "targetWeight": "Zielgewicht (kg)",
+    "enterTargetWeight": "Zielgewicht eingeben",
     "delete": "Löschen",
     "edit": "Bearbeiten",
+    "update": "Aktualisieren",
+    "add": "Hinzufügen",
     "deleteConfirm": "Sind Sie sicher, dass Sie diese Katze löschen möchten?",
-    "notFound": "Katze nicht gefunden"
+    "notFound": "Katze nicht gefunden",
+    "noCatsFound": "Keine Katzen gefunden. Fügen Sie eine Katze hinzu, um zu beginnen."
   },
   "weights": {
     "recordWeight": "Gewicht erfassen",

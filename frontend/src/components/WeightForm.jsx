@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -6,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/card'
 import { format } from 'date-fns';
 
 const WeightForm = ({ onSubmit }) => {
+  const { t } = useTranslation();
   const today = format(new Date(), 'yyyy-MM-dd');
   
   const [formData, setFormData] = useState({
@@ -46,12 +48,12 @@ const WeightForm = ({ onSubmit }) => {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Record Weight</CardTitle>
+        <CardTitle>{t('weights.recordWeight')}</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
+            <Label htmlFor="date">{t('weights.date')}</Label>
             <Input
               id="date"
               name="date"
@@ -62,7 +64,7 @@ const WeightForm = ({ onSubmit }) => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="user_weight">Your Weight (kg)</Label>
+            <Label htmlFor="user_weight">{t('weights.userWeight')}</Label>
             <Input
               id="user_weight"
               name="user_weight"
@@ -72,11 +74,11 @@ const WeightForm = ({ onSubmit }) => {
               value={formData.user_weight}
               onChange={handleChange}
               required
-              placeholder="Enter your weight"
+              placeholder={t('weights.enterYourWeight')}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="combined_weight">Combined Weight (kg)</Label>
+            <Label htmlFor="combined_weight">{t('weights.combinedWeight')}</Label>
             <Input
               id="combined_weight"
               name="combined_weight"
@@ -86,19 +88,19 @@ const WeightForm = ({ onSubmit }) => {
               value={formData.combined_weight}
               onChange={handleChange}
               required
-              placeholder="Enter combined weight (you + cat)"
+              placeholder={t('weights.enterCombinedWeight')}
             />
           </div>
           {calculatedCatWeight && (
             <div className="p-3 bg-secondary rounded-md">
               <p className="text-sm font-medium">
-                Calculated Cat Weight: <span className="font-bold">{calculatedCatWeight} kg</span>
+                {t('weights.calculatedCatWeight')}: <span className="font-bold">{calculatedCatWeight} kg</span>
               </p>
             </div>
           )}
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button type="submit">Record Weight</Button>
+          <Button type="submit">{t('weights.recordWeight')}</Button>
         </CardFooter>
       </form>
     </Card>

@@ -1,16 +1,18 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Plot from 'react-plotly.js';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 
 const WeightChart = ({ plotData }) => {
+  const { t } = useTranslation();
   if (!plotData || !plotData.dates || plotData.dates.length === 0) {
     return (
       <Card className="h-full">
         <CardHeader>
-          <CardTitle>Weight Trend</CardTitle>
+          <CardTitle>{t('weights.weightTrend')}</CardTitle>
         </CardHeader>
         <CardContent className="h-64 flex items-center justify-center">
-          <p className="text-muted-foreground">No data available for chart</p>
+          <p className="text-muted-foreground">{t('weights.noChartData')}</p>
         </CardContent>
       </Card>
     );
@@ -23,7 +25,7 @@ const WeightChart = ({ plotData }) => {
       type: 'scatter',
       mode: 'lines+markers',
       marker: { color: 'rgb(75, 192, 192)' },
-      name: 'Weight',
+      name: t('weights.weight'),
     },
     {
       x: plotData.dates,
@@ -31,7 +33,7 @@ const WeightChart = ({ plotData }) => {
       type: 'scatter',
       mode: 'lines',
       line: { dash: 'dash', color: 'rgba(255, 99, 132, 0.8)' },
-      name: 'Target Weight',
+      name: t('cats.targetWeight'),
     },
   ];
 
@@ -39,11 +41,11 @@ const WeightChart = ({ plotData }) => {
     autosize: true,
     margin: { l: 60, r: 30, t: 30, b: 60 },
     xaxis: {
-      title: 'Date',
+      title: t('weights.date'),
       tickangle: -45,
     },
     yaxis: {
-      title: 'Weight (kg)',
+      title: t('weights.weightInKg'),
     },
     legend: {
       orientation: 'h',
@@ -62,7 +64,7 @@ const WeightChart = ({ plotData }) => {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Weight Trend for {plotData.name}</CardTitle>
+        <CardTitle>{t('weights.weightTrendFor', { name: plotData.name })}</CardTitle>
       </CardHeader>
       <CardContent className="h-80">
         <Plot

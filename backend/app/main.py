@@ -58,16 +58,26 @@ async def log_requests(request: Request, call_next):
     
     # Simple IP-based request counting (basic rate limiting)
     client_ip = request.client.host
-    request_path = request.url.path
     
-    # Log the request
-    logger.info(f"Request: {request.method} {request_path} from {client_ip}")
+    # Sanitize path for logging (CWE-117)
+    request_path = request.url.path
+    # Limit path length to prevent log injection
+    if len(request_path) > 100:
+        request_path = request_path[:97] + "..."
+    
+    # Sanitize method for logging (CWE-117)
+    request_method = request.method
+    if not request_method.isalpha() or len(request_method) > 10:
+        request_method = "INVALID"
+    
+    # Log the request with sanitized values
+    logger.info(f"Request: {request_method} {request_path}")
     
     response = await call_next(request)
     
-    # Log the response time
+    # Log the response time with sanitized values
     process_time = time.time() - start_time
-    logger.info(f"Response: {request.method} {request_path} completed in {process_time:.3f}s with status {response.status_code}")
+    logger.info(f"Response: {request_method} {request_path} completed in {process_time:.3f}s with status {response.status_code}")
     
     return response
 

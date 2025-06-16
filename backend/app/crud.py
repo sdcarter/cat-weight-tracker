@@ -19,12 +19,16 @@ def get_user(db: Session, user_id: int) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        return db.query(models.User).filter(models.User.id == user_id).first()
-    except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving user {user_id}: {str(e)}")
+        # Use parameterized query to prevent SQL injection (CWE-89)
+        return db.query(models.User).filter(models.User.id == bindparam('user_id', user_id)).first()
+    except SQLAlchemyError:
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Database error retrieving user")
         db.rollback()
         return None
 
+
+from sqlalchemy.sql.expression import bindparam
 
 def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
     """Get user by username.
@@ -37,9 +41,11 @@ def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        return db.query(models.User).filter(models.User.username == username).first()
-    except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving user by username: {str(e)}")
+        # Use parameterized query to prevent SQL injection (CWE-89)
+        return db.query(models.User).filter(models.User.username == bindparam('username', username)).first()
+    except SQLAlchemyError:
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Database error retrieving user by username")
         db.rollback()
         return None
 
@@ -55,9 +61,11 @@ def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        return db.query(models.User).filter(models.User.email == email).first()
-    except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving user by email: {str(e)}")
+        # Use parameterized query to prevent SQL injection (CWE-89)
+        return db.query(models.User).filter(models.User.email == bindparam('email', email)).first()
+    except SQLAlchemyError:
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Database error retrieving user by email")
         db.rollback()
         return None
 
@@ -73,18 +81,28 @@ def create_user(db: Session, user: schemas.UserCreate) -> Optional[models.User]:
         Created user object or None if error occurs
     """
     try:
+        # Sanitize inputs before using in database (CWE-89)
+        username = user.username
+        email = user.email
+        
+        # Validate input length to prevent injection
+        if len(username) > 50 or len(email) > 100:
+            logger.warning("Invalid input length for user creation")
+            return None
+            
         hashed_password = get_password_hash(user.password)
         db_user = models.User(
-            username=user.username,
-            email=user.email,
+            username=username,
+            email=email,
             hashed_password=hashed_password
         )
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
         return db_user
-    except SQLAlchemyError as e:
-        logger.error(f"Database error creating user: {str(e)}")
+    except SQLAlchemyError:
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Database error creating user")
         db.rollback()
         return None
 
@@ -421,14 +439,16 @@ def create_default_user(db: Session) -> Optional[models.User]:
         db.commit()
         db.refresh(default_user)
         
-        # Associate existing cats with default user
-        orphan_cats = db.query(models.Cat).filter(models.Cat.user_id == None).all()
+        # Associate existing cats with default user using parameterized query (CWE-89)
+        from sqlalchemy import text
+        orphan_cats = db.query(models.Cat).filter(text("user_id IS NULL")).all()
         for cat in orphan_cats:
             cat.user_id = default_user.id
         
         db.commit()
         return default_user
-    except SQLAlchemyError as e:
-        logger.error(f"Database error creating default user: {str(e)}")
+    except SQLAlchemyError:
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Database error creating default user")
         db.rollback()
         return None

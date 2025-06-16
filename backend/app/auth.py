@@ -51,6 +51,8 @@ def get_password_hash(password: str) -> str:
     """
     return pwd_context.hash(password)
 
+from sqlalchemy.sql.expression import bindparam
+
 def get_user(db: Session, username: str) -> Optional[models.User]:
     """Get a user by username.
     
@@ -62,9 +64,11 @@ def get_user(db: Session, username: str) -> Optional[models.User]:
         User object if found, None otherwise
     """
     try:
-        return db.query(models.User).filter(models.User.username == username).first()
+        # Use parameterized query to prevent SQL injection (CWE-89)
+        return db.query(models.User).filter(models.User.username == bindparam('username', username)).first()
     except SQLAlchemyError as e:
-        logger.error(f"Database error retrieving user by username: {str(e)}")
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Database error retrieving user by username")
         db.rollback()
         return None
 
@@ -140,6 +144,11 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         raise credentials_exception
         
     try:
+        # Validate and sanitize token before decoding (CWE-93)
+        if not isinstance(token, str) or len(token) > 1000:
+            logger.warning("Invalid token format")
+            raise credentials_exception
+            
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
@@ -153,13 +162,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
             raise credentials_exception
             
         token_data = schemas.TokenData(username=username)
-    except JWTError as e:
-        logger.error(f"JWT error: {str(e)}")
+    except JWTError:
+        # Avoid logging error details (CWE-117)
+        logger.error("JWT validation error")
         raise credentials_exception
     
     user = get_user(db, username=token_data.username)
     if user is None:
-        logger.warning(f"User from token not found: {token_data.username}")
+        # Avoid logging sensitive data (CWE-117)
+        logger.warning("User from token not found")
         raise credentials_exception
     return user
 
@@ -176,6 +187,7 @@ async def get_current_active_user(current_user: models.User = Depends(get_curren
         HTTPException: If user is inactive
     """
     if not current_user.is_active:
-        logger.warning(f"Inactive user attempted access: {current_user.username}")
+        # Avoid logging sensitive data (CWE-117)
+        logger.warning("Inactive user attempted access")
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

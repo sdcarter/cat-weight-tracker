@@ -20,18 +20,21 @@ def generate_weight_plot(db: Session, cat_id: int) -> Optional[Dict[str, Union[i
     try:
         # Input validation
         if not isinstance(cat_id, int) or cat_id <= 0:
-            logger.error(f"Invalid cat_id: {cat_id}")
+            # Avoid logging sensitive data (CWE-117)
+            logger.error("Invalid cat_id format")
             return None
             
-        # Get cat and its weight records
-        cat = db.query(models.Cat).filter(models.Cat.id == cat_id).first()
+        # Get cat and its weight records using parameterized query (CWE-89)
+        from sqlalchemy.sql.expression import bindparam
+        cat = db.query(models.Cat).filter(models.Cat.id == bindparam('cat_id', cat_id)).first()
         if not cat:
-            logger.warning(f"Cat not found for plot generation: {cat_id}")
+            # Avoid logging sensitive data (CWE-117)
+            logger.warning("Cat not found for plot generation")
             return None
         
-        # Get weight records sorted by date
+        # Get weight records sorted by date using parameterized query (CWE-89)
         weight_records = db.query(models.WeightRecord).filter(
-            models.WeightRecord.cat_id == cat_id
+            models.WeightRecord.cat_id == bindparam('record_cat_id', cat_id)
         ).order_by(models.WeightRecord.date).all()
         
         if not weight_records:
@@ -58,10 +61,12 @@ def generate_weight_plot(db: Session, cat_id: int) -> Optional[Dict[str, Union[i
             "weights": weights,
             "target_weight": cat.target_weight
         }
-    except SQLAlchemyError as e:
-        logger.error(f"Database error generating plot for cat {cat_id}: {str(e)}")
+    except SQLAlchemyError:
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Database error generating plot")
         db.rollback()
         return None
-    except Exception as e:
-        logger.error(f"Error generating plot for cat {cat_id}: {str(e)}")
+    except Exception:
+        # Avoid logging sensitive data (CWE-117)
+        logger.error("Error generating plot")
         return None

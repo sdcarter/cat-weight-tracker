@@ -1,11 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-// Import required modules at the top of the file
-// tailwindcss-animate: Provides animation utilities for Tailwind CSS
-// @tailwindcss/forms: Adds form-specific styles and utilities
-// Import the tailwindcss-animate module at the top of the file
-const tailwindcssAnimate = require("tailwindcss-animate");
-// Import the @tailwindcss/forms plugin at the top of the file
-const tailwindcssForms = require('@tailwindcss/forms');
 
 module.exports = {
   darkMode: ["class"],
@@ -81,10 +74,7 @@ module.exports = {
     },
   },
   plugins: [
-    tailwindcssAnimate,
-    tailwindcssForms({
-      strategy: 'class',
-    }),
+    require("tailwindcss-animate"),
     function ({ addBase, theme }) {
       addBase({
         'a:focus, button:focus, input:focus, select:focus, textarea:focus': {

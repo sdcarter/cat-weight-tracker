@@ -43,7 +43,9 @@ const ProfilePage = () => {
 
       <footer className="bg-muted py-6">
         <div className="container text-center text-sm text-muted-foreground">
-          <p>Cat Weight Tracker &copy; {new Date().getFullYear()}</p>
+          {/* // import { useTranslation } from 'react-i18next'; */}
+          {/* // const { t } = useTranslation(); */}
+          <p>{t('footer.copyright', { year: new Date().getFullYear() })}</p>
         </div>
       </footer>
     </div>

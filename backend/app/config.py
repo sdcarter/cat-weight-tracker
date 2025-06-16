@@ -1,39 +1,27 @@
-from pydantic_settings import BaseSettings
-from typing import Optional
 import os
-# Import the specific function from secrets module
 from secrets import token_hex
 
-class Settings(BaseSettings):
-    # Database settings
-    DATABASE_URL: str = 'postgresql://postgres:postgres@db:5432/cat_weight_tracker'
+class Settings:
+    """Application settings."""
     
-    # JWT settings
-    SECRET_KEY: str = token_hex(32)
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    
-    # Feature flags
-    REGISTRATION_ENABLED: bool = False
-    
-    # Override with environment variables if they exist and are not empty
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        # Override with environment variables if they exist and are not empty
-        if os.environ.get('DATABASE_URL'):
-            self.DATABASE_URL = os.environ.get('DATABASE_URL')
-        if os.environ.get('SECRET_KEY'):
-            self.SECRET_KEY = os.environ.get('SECRET_KEY')
-        if os.environ.get('ALGORITHM'):
-            self.ALGORITHM = os.environ.get('ALGORITHM')
-        if os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES') and os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES').strip():
-            self.ACCESS_TOKEN_EXPIRE_MINUTES = int(os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES'))
-        if os.environ.get('REGISTRATION_ENABLED'):
-            self.REGISTRATION_ENABLED = os.environ.get('REGISTRATION_ENABLED').lower() == 'true'
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    def __init__(self):
+        # Database settings
+        self.DATABASE_URL = os.environ.get('DATABASE_URL') or 'postgresql://postgres:postgres@db:5432/cat_weight_tracker'
+        
+        # JWT settings
+        self.SECRET_KEY = os.environ.get('SECRET_KEY') or token_hex(32)
+        self.ALGORITHM = os.environ.get('ALGORITHM') or 'HS256'
+        
+        # Handle integer conversion safely
+        try:
+            expire_minutes = os.environ.get('ACCESS_TOKEN_EXPIRE_MINUTES')
+            self.ACCESS_TOKEN_EXPIRE_MINUTES = int(expire_minutes) if expire_minutes and expire_minutes.strip() else 30
+        except (ValueError, TypeError):
+            self.ACCESS_TOKEN_EXPIRE_MINUTES = 30
+        
+        # Handle boolean conversion safely
+        registration_enabled = os.environ.get('REGISTRATION_ENABLED', '').lower()
+        self.REGISTRATION_ENABLED = registration_enabled == 'true'
 
-# Load environment variables
+# Create a global instance
 settings = Settings()

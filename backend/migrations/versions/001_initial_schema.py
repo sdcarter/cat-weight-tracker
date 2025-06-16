@@ -7,6 +7,7 @@ Create Date: 2025-05-27 00:00:00.000000
 """
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.engine.reflection import Inspector
 
 
 # revision identifiers, used by Alembic.
@@ -20,10 +21,13 @@ def upgrade():
     # Create users table
     op.create_table('users',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('username', sa.String(), nullable=False),
-        sa.Column('email', sa.String(), nullable=False),
-        sa.Column('hashed_password', sa.String(), nullable=False),
+        sa.Column('username', sa.String(50), nullable=False),
+        sa.Column('email', sa.String(100), nullable=False),
+        sa.Column('hashed_password', sa.String(255), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False, server_default='true'),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+        sa.Column('updated_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), 
+                  onupdate=sa.text('CURRENT_TIMESTAMP'), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_id'), 'users', ['id'], unique=False)
@@ -33,11 +37,15 @@ def upgrade():
     # Create cats table
     op.create_table('cats',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(), nullable=True),
-        sa.Column('target_weight', sa.Float(), nullable=True),
+        sa.Column('name', sa.String(50), nullable=False),
+        sa.Column('target_weight', sa.Float(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+        sa.Column('updated_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), 
+                  onupdate=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('id'),
+        sa.CheckConstraint('target_weight > 0', name='check_positive_target_weight')
     )
     op.create_index(op.f('ix_cats_id'), 'cats', ['id'], unique=False)
     op.create_index(op.f('ix_cats_name'), 'cats', ['name'], unique=False)
@@ -45,15 +53,19 @@ def upgrade():
     # Create weight_records table
     op.create_table('weight_records',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('date', sa.Date(), nullable=True),
-        sa.Column('user_weight', sa.Float(), nullable=True),
-        sa.Column('combined_weight', sa.Float(), nullable=True),
-        sa.Column('cat_weight', sa.Float(), nullable=True),
-        sa.Column('cat_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['cat_id'], ['cats.id'], ),
-        sa.PrimaryKeyConstraint('id')
+        sa.Column('date', sa.Date(), nullable=False),
+        sa.Column('user_weight', sa.Float(), nullable=False),
+        sa.Column('combined_weight', sa.Float(), nullable=False),
+        sa.Column('cat_weight', sa.Float(), nullable=False),
+        sa.Column('cat_id', sa.Integer(), nullable=False),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+        sa.ForeignKeyConstraint(['cat_id'], ['cats.id'], ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('id'),
+        sa.CheckConstraint('user_weight > 0', name='check_positive_user_weight'),
+        sa.CheckConstraint('combined_weight > user_weight', name='check_combined_weight_greater')
     )
     op.create_index(op.f('ix_weight_records_id'), 'weight_records', ['id'], unique=False)
+    op.create_index(op.f('ix_weight_records_date'), 'weight_records', ['date'], unique=False)
 
 
 def downgrade():

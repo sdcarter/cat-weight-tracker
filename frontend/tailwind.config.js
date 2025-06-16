@@ -72,5 +72,33 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    // Add accessibility plugin
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
+    // Add plugin for improved accessibility
+    function ({ addBase, theme }) {
+      addBase({
+        // Improve focus styles for better accessibility
+        'a:focus, button:focus, input:focus, select:focus, textarea:focus': {
+          outline: `2px solid ${theme('colors.primary.DEFAULT')}`,
+          outlineOffset: '2px',
+        },
+        // Improve text contrast
+        'body': {
+          lineHeight: '1.5',
+        },
+        // Improve form element accessibility
+        'input, select, textarea': {
+          lineHeight: '1.5',
+        },
+      });
+    },
+  ],
+  future: {
+    // Enable future features for better compatibility
+    hoverOnlyWhenSupported: true,
+  },
 }

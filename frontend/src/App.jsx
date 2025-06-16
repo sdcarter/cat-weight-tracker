@@ -13,8 +13,8 @@ import { ToastProvider, Toast, ToastTitle, ToastDescription, ToastViewport } fro
 import { Button } from './components/ui/button';
 import { useAuth } from './context/AuthContext';
 
-// API base URL - use environment-specific URL
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api';
+// API base URL - use environment variable or fallback
+const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api');
 
 function App() {
   const { user, loading } = useAuth();
@@ -109,6 +109,11 @@ function App() {
   };
 
   const handleDeleteCat = async (catId) => {
+    if (!catId || typeof catId !== 'number') {
+      showToast('Error', 'Invalid cat ID');
+      return;
+    }
+    
     if (window.confirm('Are you sure you want to delete this cat?')) {
       try {
         await axios.delete(`${API_URL}/cats/${catId}`);
@@ -121,7 +126,7 @@ function App() {
         
         showToast('Success', 'Cat deleted successfully');
       } catch (error) {
-        showToast('Error', 'Failed to delete cat');
+        showToast('Error', error.response?.data?.detail || 'Failed to delete cat');
         console.error('Error deleting cat:', error);
       }
     }
@@ -140,6 +145,11 @@ function App() {
   };
 
   const handleDeleteWeight = async (weightId) => {
+    if (!weightId || typeof weightId !== 'number') {
+      showToast('Error', 'Invalid weight record ID');
+      return;
+    }
+    
     if (window.confirm('Are you sure you want to delete this weight record?')) {
       try {
         await axios.delete(`${API_URL}/weights/${weightId}`);
@@ -147,7 +157,7 @@ function App() {
         fetchPlotData(selectedCatId);
         showToast('Success', 'Weight record deleted successfully');
       } catch (error) {
-        showToast('Error', 'Failed to delete weight record');
+        showToast('Error', error.response?.data?.detail || 'Failed to delete weight record');
         console.error('Error deleting weight:', error);
       }
     }

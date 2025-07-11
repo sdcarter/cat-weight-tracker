@@ -1,35 +1,33 @@
 version: '3'
 
-vars:
-  FRONTEND_DIR: '{{.FRONTEND_DIR | default "."}}'
-  ENV: '{{.ENV | default "prod"}}'
-
 tasks:
   test:
     desc: Run frontend tests
+    dir: ../frontend
     cmds:
       - echo "Running frontend tests..."
-      - |
-        docker build -f {{.FRONTEND_DIR}}/Dockerfile.test -t cat-weight-tracker-frontend-test {{.FRONTEND_DIR}}
-        docker run --rm cat-weight-tracker-frontend-test npm test
+      - docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+      - docker run --rm cat-weight-tracker-frontend-test npm test
 
   lint:
     desc: Run frontend linting
+    dir: ../frontend
     cmds:
       - echo "Running frontend linting..."
-      - |
-        docker build -f {{.FRONTEND_DIR}}/Dockerfile.test -t cat-weight-tracker-frontend-test {{.FRONTEND_DIR}}
-        docker run --rm cat-weight-tracker-frontend-test npm run lint
+      - docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+      - docker run --rm cat-weight-tracker-frontend-test npm run lint
 
   lint-fix:
     desc: Fix frontend linting issues
+    dir: ../frontend
     cmds:
       - echo "Running frontend linting with auto-fix..."
-      - |
-        docker build -f {{.FRONTEND_DIR}}/Dockerfile.test -t cat-weight-tracker-frontend-test {{.FRONTEND_DIR}}
-        docker run --rm cat-weight-tracker-frontend-test npm run lint:fix
+      - docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+      - docker run --rm cat-weight-tracker-frontend-test npm run lint:fix
 
   shell:
     desc: Open a shell in the frontend container
     cmds:
       - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} exec frontend sh
+    vars:
+      ENV: '{{.ENV | default "prod"}}'

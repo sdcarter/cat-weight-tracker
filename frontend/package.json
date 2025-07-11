@@ -21,7 +21,6 @@
     "react-i18next": "^15.5.3",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.20.0",
-
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -80,7 +79,5 @@
     "transformIgnorePatterns": [
       "node_modules/(?!axios)/"
     ]
-  },
-,
-
+  }
 }

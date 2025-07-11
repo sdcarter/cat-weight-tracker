@@ -1,0 +1,25 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Language detection overrides
+*.py linguist-language=Python
+*.tsx linguist-language=TypeScript
+*.jsx linguist-language=JavaScript
+*.ts linguist-language=TypeScript
+*.js linguist-language=JavaScript
+*.css linguist-language=CSS
+*.html linguist-language=HTML
+*.md linguist-language=Markdown
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+*.json linguist-language=JSON
+*.sql linguist-language=SQL
+Dockerfile* linguist-language=Dockerfile
+*.sh linguist-language=Shell
+
+# Documentation
+*.md linguist-documentation=false
+.github/copilot/*.md linguist-documentation=false
+
+# Generated files
+migrations/versions/* linguist-generated=true

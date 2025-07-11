@@ -1,0 +1,25 @@
+{
+  "project": {
+    "name": "Cat Weight Tracker",
+    "description": "A web application for tracking your cat's weight over time with visualization features",
+    "repository": "https://github.com/yourusername/cat-weight-tracker"
+  },
+  "technical_stack": {
+    "frontend": ["React", "TypeScript", "Vite", "Tailwind CSS"],
+    "backend": ["FastAPI", "SQLAlchemy", "Python"],
+    "database": ["PostgreSQL"],
+    "deployment": ["Docker", "Kubernetes"]
+  },
+  "code_style": {
+    "python": {
+      "line_length": 100,
+      "indentation": 4,
+      "style_guide": "PEP 8"
+    },
+    "typescript": {
+      "line_length": 100,
+      "indentation": 2,
+      "style_guide": "ESLint"
+    }
+  }
+}

@@ -75,6 +75,6 @@
     "@svgr/plugin-svgo": "^8.1.0",
     "resolve-url-loader": "^5.0.0",
     "webpack-dev-server": "^5.2.2",
-    "brace-expansion": "^4.0.1"
+    "brace-expansion": "^2.0.1"
   }
 }

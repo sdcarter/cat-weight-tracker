@@ -33,4 +33,10 @@ The Cat Weight Tracker is a full-stack application designed to help cat owners t
 - Security best practices
 - Accessibility
 
+## Development Practices
+
+- Everything is done via docker container
+- Do not perform pip, npm, pgsql or other commands locally
+- Perform all operations inside of a development container
+
 When suggesting changes or additions to the codebase, consider how they align with the existing architecture and development priorities.

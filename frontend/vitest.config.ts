@@ -9,7 +9,9 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/setupTests.js'],
     css: true,
-    globals: true,
+    deps: {
+      inline: ['@testing-library/react']
+    },
   },
   resolve: {
     alias: {

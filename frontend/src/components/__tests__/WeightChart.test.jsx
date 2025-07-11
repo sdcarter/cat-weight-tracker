@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { describe, test, expect, vi } from 'vitest';
 import WeightChart from '../WeightChart';
-import { vi } from 'vitest';
 
 // Mock the Plot component from react-plotly.js
 vi.mock('react-plotly.js', () => ({

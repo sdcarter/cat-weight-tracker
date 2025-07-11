@@ -1,1 +1,38 @@
-import '@testing-library/jest-dom';\nimport { vi } from 'vitest';\n\n// Mock window.matchMedia\nObject.defineProperty(window, 'matchMedia', {\n  writable: true,\n  value: vi.fn().mockImplementation(query => ({\n    matches: false,\n    media: query,\n    onchange: null,\n    addListener: vi.fn(),\n    removeListener: vi.fn(),\n    addEventListener: vi.fn(),\n    removeEventListener: vi.fn(),\n    dispatchEvent: vi.fn(),\n  })),\n});\n\n// Mock window.scrollTo\nwindow.scrollTo = vi.fn();\n\n// Define global self for plotly\nglobal.self = global;
+import '@testing-library/jest-dom';
+import { vi, beforeAll, afterEach } from 'vitest';
+
+// Setup global variables for JSDOM
+beforeAll(() => {
+  // Define global self for plotly
+  global.self = global;
+  
+  // Mock window.matchMedia
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(query => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+  
+  // Mock window.scrollTo
+  window.scrollTo = vi.fn();
+  
+  // Mock ResizeObserver
+  global.ResizeObserver = vi.fn().mockImplementation(() => ({
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+  }));
+});
+
+// Clean up after each test
+afterEach(() => {
+  vi.restoreAllMocks();
+});

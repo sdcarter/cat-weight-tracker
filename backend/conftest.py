@@ -17,11 +17,11 @@ pytest.filterwarnings(
     category=PendingDeprecationWarning,
     module="starlette.formparsers")
 pytest.filterwarnings(
-    "ignore", 
-    category=DeprecationWarning, 
+    "ignore",
+    category=DeprecationWarning,
     module="passlib.utils")
 pytest.filterwarnings(
-    "ignore", 
+    "ignore",
     category=DeprecationWarning,
     message="Support for class-based `config` is deprecated")
 

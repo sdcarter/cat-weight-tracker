@@ -13,7 +13,6 @@ COPY . .
 # Add flake8 configuration
 COPY .flake8 .
 
-# Make scripts executable
-RUN chmod +x fix_lint.sh fix_specific_issues.py
+# No scripts to make executable
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "4000"]

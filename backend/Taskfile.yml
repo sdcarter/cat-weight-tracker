@@ -17,6 +17,14 @@ tasks:
       - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend flake8
     vars:
       ENV: '{{.ENV | default "prod"}}'
+      
+  lint-fix:
+    desc: Fix backend linting issues
+    cmds:
+      - echo "Fixing backend linting issues..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend ./fix_lint.sh
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
 
   shell:
     desc: Open a shell in the backend container

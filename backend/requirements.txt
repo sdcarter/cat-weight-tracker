@@ -27,6 +27,8 @@ python-multipart==0.0.18
 flake8==7.0.0
 pytest==8.0.2
 httpx==0.27.0
+autopep8==2.0.4
+isort==5.13.2
 
 # Monitoring and logging
 structlog==24.1.0

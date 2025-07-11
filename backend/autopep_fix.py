@@ -4,7 +4,6 @@ Simple script to fix critical linting issues using autopep8 and manual fixes.
 """
 import os
 import subprocess
-import re
 
 # Fix critical issues in auth.py
 with open("app/auth.py", "r") as f:
@@ -12,10 +11,20 @@ with open("app/auth.py", "r") as f:
 
 # Fix unused exception variable and undefined name 'e'
 content = content.replace("except SQLAlchemyError as e:", "except SQLAlchemyError:")
-content = content.replace("logger.error(f\"Error authenticating user: {str(e)}\")", 
-                         "logger.error(\"Error authenticating user\")")
-content = content.replace("logger.error(f\"Error creating access token: {str(e)}\")", 
-                         "logger.error(\"Error creating access token\")")
+content = content.replace(
+    "logger.error(f\"Error authenticating user: {str(e)}\")",
+    "logger.error(\"Error authenticating user\")"
+)
+content = content.replace(
+    "logger.error(f\"Error creating access token: {str(e)}\")",
+    "logger.error(\"Error creating access token\")"
+)
+
+# Fix long line in auth.py
+content = content.replace(
+    "async def get_current_active_user(current_user: models.User = Depends(get_current_user)) -> models.User:",
+    "async def get_current_active_user(\n    current_user: models.User = Depends(get_current_user)\n) -> models.User:"
+)
 
 with open("app/auth.py", "w") as f:
     f.write(content)
@@ -33,6 +42,18 @@ elif "Response, " in content:
 with open("app/main.py", "w") as f:
     f.write(content)
 
+# Fix long lines in conftest.py
+with open("conftest.py", "r") as f:
+    content = f.read()
+
+content = content.replace(
+    'pytest.filterwarnings("ignore:.*:DeprecationWarning"',
+    'pytest.filterwarnings(\n    "ignore:.*:DeprecationWarning"'
+)
+
+with open("conftest.py", "w") as f:
+    f.write(content)
+
 # Run autopep8 on core files
 files = [
     "app/auth.py",
@@ -43,7 +64,8 @@ files = [
     "app/database.py",
     "app/models.py",
     "app/plots.py",
-    "conftest.py"
+    "conftest.py",
+    "autopep_fix.py"  # Fix this script too
 ]
 
 for file in files:

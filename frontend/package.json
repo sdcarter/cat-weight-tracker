@@ -21,15 +21,17 @@
     "react-i18next": "^15.5.3",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.20.0",
-    "react-scripts": "^5.0.1",
+
     "tailwind-merge": "^2.0.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "scripts": {
-    "start": "react-scripts --max_old_space_size=4096 start",
-    "build": "react-scripts --max_old_space_size=4096 build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "vite",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },
@@ -55,6 +57,9 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.1",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.54.0",
     "eslint-plugin-react": "^7.33.2",
@@ -62,7 +67,9 @@
     "jest": "^29.7.0",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
-    "webpack-dev-server": "^5.2.1"
+    "typescript": "^5.8.3",
+    "vite": "^5.2.6",
+    "vitest": "^1.4.0"
   },
   "jest": {
     "transformIgnorePatterns": [
@@ -76,5 +83,6 @@
     "@svgr/plugin-svgo": "^8.1.0",
     "resolve-url-loader": "^5.0.0",
     "brace-expansion": "^2.0.2"
-  }
+  },
+
 }

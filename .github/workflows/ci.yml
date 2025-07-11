@@ -78,7 +78,7 @@ jobs:
         cd frontend
         npm run lint
         
-    - name: Test with Jest
+    - name: Test with Vitest
       run: |
         cd frontend
-        npm test -- --watchAll=false
+        npm test

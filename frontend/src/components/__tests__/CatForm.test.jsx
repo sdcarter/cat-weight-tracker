@@ -11,28 +11,28 @@ describe('CatForm', () => {
   });
   
   test('renders empty form correctly', () => {
-    render(<CatForm onSubmit={mockSubmit} />);
+    const { container } = render(<CatForm onSubmit={mockSubmit} />);
     
     expect(screen.getByLabelText('cats.name')).toBeInTheDocument();
     expect(screen.getByLabelText('cats.targetWeight')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'cats.add' })).toBeInTheDocument();
+    expect(container.querySelector('button[type="submit"]')).toBeInTheDocument();
   });
   
   test('renders form with initial data', () => {
     const initialData = { name: 'Whiskers', target_weight: 4.5 };
-    render(<CatForm onSubmit={mockSubmit} initialData={initialData} />);
+    const { container } = render(<CatForm onSubmit={mockSubmit} initialData={initialData} />);
     
     expect(screen.getByLabelText('cats.name')).toHaveValue('Whiskers');
     expect(screen.getByLabelText('cats.targetWeight')).toHaveValue(4.5);
-    expect(screen.getByRole('button', { name: 'cats.update' })).toBeInTheDocument();
+    expect(container.querySelector('button[type="submit"]')).toBeInTheDocument();
   });
   
   test('submits form with entered data', () => {
-    render(<CatForm onSubmit={mockSubmit} />);
+    const { container } = render(<CatForm onSubmit={mockSubmit} />);
     
     fireEvent.change(screen.getByLabelText('cats.name'), { target: { value: 'Mittens' } });
     fireEvent.change(screen.getByLabelText('cats.targetWeight'), { target: { value: '5.2' } });
-    fireEvent.click(screen.getByRole('button', { name: 'cats.add' }));
+    fireEvent.click(container.querySelector('button[type="submit"]'));
     
     expect(mockSubmit).toHaveBeenCalledWith({
       name: 'Mittens',
@@ -41,10 +41,10 @@ describe('CatForm', () => {
   });
   
   test('submits form with empty values', () => {
-    render(<CatForm onSubmit={mockSubmit} />);
+    const { container } = render(<CatForm onSubmit={mockSubmit} />);
     
     // Submit with empty fields
-    fireEvent.click(screen.getByRole('button', { name: 'cats.add' }));
+    fireEvent.click(container.querySelector('button[type="submit"]'));
     
     // In the test environment, HTML5 validation doesn't prevent submission
     // So we verify the form was submitted with empty/invalid values

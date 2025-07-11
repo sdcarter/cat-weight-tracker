@@ -13,8 +13,8 @@ vi.mock('plotly.js-basic-dist', () => ({}));
 
 describe('WeightChart', () => {
   test('renders no data message when plotData is null', () => {
-    render(<WeightChart plotData={null} />);
-    expect(screen.getByText('weights.noChartData')).toBeInTheDocument();
+    const { container } = render(<WeightChart plotData={null} />);
+    expect(container.querySelector('.text-muted-foreground')).toHaveTextContent('weights.noChartData');
   });
   
   test('renders no data message when plotData has empty dates', () => {
@@ -24,8 +24,8 @@ describe('WeightChart', () => {
       weights: [],
       target_weight: 4.5
     };
-    render(<WeightChart plotData={emptyPlotData} />);
-    expect(screen.getByText('weights.noChartData')).toBeInTheDocument();
+    const { container } = render(<WeightChart plotData={emptyPlotData} />);
+    expect(container.querySelector('.text-muted-foreground')).toHaveTextContent('weights.noChartData');
   });
   
   test('renders chart when plotData is provided', () => {
@@ -35,9 +35,9 @@ describe('WeightChart', () => {
       weights: [4.8, 4.6],
       target_weight: 4.5
     };
-    render(<WeightChart plotData={plotData} />);
+    const { container } = render(<WeightChart plotData={plotData} />);
     
-    expect(screen.getByText('weights.weightTrendFor')).toBeInTheDocument();
+    expect(container.querySelector('h3')).toHaveTextContent('weights.weightTrendFor');
     expect(screen.getByTestId('mock-plot')).toBeInTheDocument();
   });
 });

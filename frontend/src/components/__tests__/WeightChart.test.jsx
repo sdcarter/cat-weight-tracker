@@ -3,6 +3,16 @@ import { render, screen } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import WeightChart from '../WeightChart';
 
+// Mock i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    i18n: {
+      changeLanguage: vi.fn(),
+    },
+  }),
+}));
+
 // Mock the Plot component from react-plotly.js
 vi.mock('react-plotly.js', () => ({
   default: () => <div data-testid="mock-plot" />
@@ -14,7 +24,9 @@ vi.mock('plotly.js-basic-dist', () => ({}));
 describe('WeightChart', () => {
   test('renders no data message when plotData is null', () => {
     const { container } = render(<WeightChart plotData={null} />);
-    expect(container.querySelector('.text-muted-foreground')).toHaveTextContent('weights.noChartData');
+    const noDataElement = container.querySelector('.text-muted-foreground');
+    expect(noDataElement).toBeTruthy();
+    expect(noDataElement.textContent).toBe('weights.noChartData');
   });
   
   test('renders no data message when plotData has empty dates', () => {
@@ -25,7 +37,9 @@ describe('WeightChart', () => {
       target_weight: 4.5
     };
     const { container } = render(<WeightChart plotData={emptyPlotData} />);
-    expect(container.querySelector('.text-muted-foreground')).toHaveTextContent('weights.noChartData');
+    const noDataElement = container.querySelector('.text-muted-foreground');
+    expect(noDataElement).toBeTruthy();
+    expect(noDataElement.textContent).toBe('weights.noChartData');
   });
   
   test('renders chart when plotData is provided', () => {
@@ -37,7 +51,11 @@ describe('WeightChart', () => {
     };
     const { container } = render(<WeightChart plotData={plotData} />);
     
-    expect(container.querySelector('h3')).toHaveTextContent('weights.weightTrendFor');
-    expect(screen.getByTestId('mock-plot')).toBeInTheDocument();
+    const titleElement = container.querySelector('h3');
+    expect(titleElement).toBeTruthy();
+    expect(titleElement.textContent).toBe('weights.weightTrendFor');
+    
+    const plotElement = screen.getByTestId('mock-plot');
+    expect(plotElement).toBeTruthy();
   });
 });

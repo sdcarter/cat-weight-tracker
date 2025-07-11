@@ -1,6 +1,5 @@
-# from warnings import pytest.pytest.pytest.pytest.pytest.pytest.filterwarnings
-# Import specific function from warnings module to filter out specific warnings
 import os
+import warnings
 
 import pytest
 from fastapi.testclient import TestClient
@@ -11,19 +10,23 @@ from sqlalchemy.pool import StaticPool
 from app.database import Base, get_db
 from app.main import app
 
-# Filter out deprecation warnings
-pytest.filterwarnings(
+# Filter out deprecation warnings using warnings module instead
+warnings.filterwarnings(
     "ignore",
     category=PendingDeprecationWarning,
     module="starlette.formparsers")
-pytest.filterwarnings(
+warnings.filterwarnings(
     "ignore",
     category=DeprecationWarning,
     module="passlib.utils")
-pytest.filterwarnings(
+warnings.filterwarnings(
     "ignore",
     category=DeprecationWarning,
     message="Support for class-based `config` is deprecated")
+warnings.filterwarnings(
+    "ignore",
+    category=DeprecationWarning,
+    message="The 'app' shortcut is now deprecated")
 
 # Create test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"

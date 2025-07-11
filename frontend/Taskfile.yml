@@ -3,31 +3,35 @@ version: '3'
 tasks:
   test:
     desc: Run frontend tests
-    dir: ../frontend
     cmds:
       - echo "Running frontend tests..."
-      - docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
-      - docker run --rm cat-weight-tracker-frontend-test npm test
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm test
+    vars:
+      ENV: '{{.ENV | default "dev"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
 
   lint:
     desc: Run frontend linting
-    dir: ../frontend
     cmds:
       - echo "Running frontend linting..."
-      - docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
-      - docker run --rm cat-weight-tracker-frontend-test npm run lint
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm run lint
+    vars:
+      ENV: '{{.ENV | default "dev"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
 
   lint-fix:
     desc: Fix frontend linting issues
-    dir: ../frontend
     cmds:
       - echo "Running frontend linting with auto-fix..."
-      - docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
-      - docker run --rm cat-weight-tracker-frontend-test npm run lint:fix
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm run lint:fix
+    vars:
+      ENV: '{{.ENV | default "dev"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
 
   shell:
     desc: Open a shell in the frontend container
     cmds:
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} exec frontend sh
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml exec frontend sh
     vars:
-      ENV: '{{.ENV | default "prod"}}'
+      ENV: '{{.ENV | default "dev"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'

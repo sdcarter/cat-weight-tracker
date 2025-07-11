@@ -5,7 +5,9 @@ tasks:
     desc: Run frontend tests
     cmds:
       - echo "Running frontend tests..."
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm frontend npm test -- --watchAll=false
+      - |
+        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+        docker run --rm cat-weight-tracker-frontend-test npm test
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
@@ -13,7 +15,9 @@ tasks:
     desc: Run frontend linting
     cmds:
       - echo "Running frontend linting..."
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm frontend npm run lint
+      - |
+        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+        docker run --rm cat-weight-tracker-frontend-test npm run lint
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
@@ -21,7 +25,9 @@ tasks:
     desc: Fix frontend linting issues
     cmds:
       - echo "Running frontend linting with auto-fix..."
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm frontend npm run lint -- --fix
+      - |
+        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+        docker run --rm cat-weight-tracker-frontend-test npm run lint:fix
     vars:
       ENV: '{{.ENV | default "prod"}}'
 

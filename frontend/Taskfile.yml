@@ -6,8 +6,12 @@ tasks:
     cmds:
       - echo "Running frontend tests..."
       - |
-        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+        cd "{{.FRONTEND_DIR}}" && \
+        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test . && \
         docker run --rm cat-weight-tracker-frontend-test npm test
+    vars:
+      FRONTEND_DIR: '{{.FRONTEND_DIR | default "../frontend"}}'
+      DIR: '{{.DIR | default "$(pwd)"}}'
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
@@ -16,8 +20,12 @@ tasks:
     cmds:
       - echo "Running frontend linting..."
       - |
-        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+        cd "{{.FRONTEND_DIR}}" && \
+        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test . && \
         docker run --rm cat-weight-tracker-frontend-test npm run lint
+    vars:
+      FRONTEND_DIR: '{{.FRONTEND_DIR | default "../frontend"}}'
+      DIR: '{{.DIR | default "$(pwd)"}}'
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
@@ -26,8 +34,12 @@ tasks:
     cmds:
       - echo "Running frontend linting with auto-fix..."
       - |
-        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test .
+        cd "{{.FRONTEND_DIR}}" && \
+        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test . && \
         docker run --rm cat-weight-tracker-frontend-test npm run lint:fix
+    vars:
+      FRONTEND_DIR: '{{.FRONTEND_DIR | default "../frontend"}}'
+      DIR: '{{.DIR | default "$(pwd)"}}'
     vars:
       ENV: '{{.ENV | default "prod"}}'
 

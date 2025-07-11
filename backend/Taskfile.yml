@@ -22,7 +22,7 @@ tasks:
     desc: Fix backend linting issues
     cmds:
       - echo "Fixing backend linting issues..."
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend python fix_core_issues.py
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend python fix_critical.py
     vars:
       ENV: '{{.ENV | default "prod"}}'
 

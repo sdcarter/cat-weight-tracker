@@ -1,9 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 import CatForm from '../CatForm';
 
 describe('CatForm', () => {
-  const mockSubmit = jest.fn();
+  const mockSubmit = vi.fn();
   
   beforeEach(() => {
     mockSubmit.mockClear();

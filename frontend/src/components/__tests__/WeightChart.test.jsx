@@ -1,12 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import WeightChart from '../WeightChart';
+import { vi } from 'vitest';
 
 // Mock the Plot component from react-plotly.js
-jest.mock('react-plotly.js', () => ({
-  __esModule: true,
+vi.mock('react-plotly.js', () => ({
   default: () => <div data-testid="mock-plot" />
 }));
+
+// Mock plotly.js
+vi.mock('plotly.js-basic-dist', () => ({}));
 
 describe('WeightChart', () => {
   test('renders no data message when plotData is null', () => {

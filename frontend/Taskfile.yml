@@ -35,3 +35,13 @@ tasks:
     vars:
       ENV: '{{.ENV | default "dev"}}'
       ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
+      
+  rebuild:
+    desc: Rebuild and restart the frontend container
+    cmds:
+      - echo "Rebuilding frontend container..."
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml build frontend
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml up -d frontend
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'

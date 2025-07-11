@@ -3,7 +3,7 @@
 
 # Install only production dependencies first
 echo "Installing production dependencies..."
-npm ci --only=production --no-fund --no-audit
+npm install --only=production --no-fund --no-audit
 
 # Then install dev dependencies one by one to avoid memory spikes
 echo "Installing dev dependencies one by one..."

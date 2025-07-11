@@ -38,7 +38,7 @@ jobs:
         cd backend
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-cov
+        pip install pytest pytest-cov pytest-timeout
         
     - name: Lint with flake8
       run: |
@@ -48,7 +48,7 @@ jobs:
     - name: Test with pytest
       run: |
         cd backend
-        pytest
+        pytest -v --timeout=30
       env:
         CI: true
         DB_USER: postgres
@@ -66,7 +66,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'
+        node-version: '22'
         
     - name: Install dependencies
       run: |

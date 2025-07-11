@@ -1,51 +1,35 @@
 version: '3'
 
+vars:
+  FRONTEND_DIR: '{{.FRONTEND_DIR | default "."}}'
+  ENV: '{{.ENV | default "prod"}}'
+
 tasks:
   test:
     desc: Run frontend tests
     cmds:
       - echo "Running frontend tests..."
       - |
-        cd "{{.FRONTEND_DIR}}" && \
-        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test . && \
+        docker build -f {{.FRONTEND_DIR}}/Dockerfile.test -t cat-weight-tracker-frontend-test {{.FRONTEND_DIR}}
         docker run --rm cat-weight-tracker-frontend-test npm test
-    vars:
-      FRONTEND_DIR: '{{.FRONTEND_DIR | default "../frontend"}}'
-      DIR: '{{.DIR | default "$(pwd)"}}'
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
 
   lint:
     desc: Run frontend linting
     cmds:
       - echo "Running frontend linting..."
       - |
-        cd "{{.FRONTEND_DIR}}" && \
-        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test . && \
+        docker build -f {{.FRONTEND_DIR}}/Dockerfile.test -t cat-weight-tracker-frontend-test {{.FRONTEND_DIR}}
         docker run --rm cat-weight-tracker-frontend-test npm run lint
-    vars:
-      FRONTEND_DIR: '{{.FRONTEND_DIR | default "../frontend"}}'
-      DIR: '{{.DIR | default "$(pwd)"}}'
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
 
   lint-fix:
     desc: Fix frontend linting issues
     cmds:
       - echo "Running frontend linting with auto-fix..."
       - |
-        cd "{{.FRONTEND_DIR}}" && \
-        docker build -f Dockerfile.test -t cat-weight-tracker-frontend-test . && \
+        docker build -f {{.FRONTEND_DIR}}/Dockerfile.test -t cat-weight-tracker-frontend-test {{.FRONTEND_DIR}}
         docker run --rm cat-weight-tracker-frontend-test npm run lint:fix
-    vars:
-      FRONTEND_DIR: '{{.FRONTEND_DIR | default "../frontend"}}'
-      DIR: '{{.DIR | default "$(pwd)"}}'
-    vars:
-      ENV: '{{.ENV | default "prod"}}'
 
   shell:
     desc: Open a shell in the frontend container
     cmds:
       - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} exec frontend sh
-    vars:
-      ENV: '{{.ENV | default "prod"}}'

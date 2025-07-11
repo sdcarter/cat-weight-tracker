@@ -1,15 +1,18 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, APIRouter, Response, status
+from typing import List, Dict
+import logging
+import time
+from contextlib import asynccontextmanager
+from .database import get_db
+from datetime import timedelta
+
+from fastapi import (APIRouter, Depends, FastAPI, HTTPException, Request,
+                     status)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any
-from datetime import timedelta
-from contextlib import asynccontextmanager
-from . import crud, models, schemas, plots, auth
-from .database import engine, get_db
+
+from . import auth, crud, models, plots, schemas
 from .config import settings
-import time
-import logging
 
 # Configure logging
 logging.basicConfig(
@@ -19,6 +22,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Define lifespan context manager for startup/shutdown events
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Create default user if needed
@@ -36,9 +41,9 @@ api_router = APIRouter(prefix="/api")
 # Configure CORS - allow both development and production origins
 origins = [
     "http://localhost:3000",  # Development frontend
-    "http://localhost", 
-    "http://localhost:80", 
-    "http://frontend", 
+    "http://localhost",
+    "http://localhost:80",
+    "http://frontend",
     "http://frontend:80",
     "*"  # Allow all origins in production
 ]
@@ -52,34 +57,37 @@ app.add_middleware(
 )
 
 # Add middleware for request logging and basic rate limiting
+
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     start_time = time.time()
-    
+
     # Simple IP-based request counting (basic rate limiting)
-    client_ip = request.client.host
-    
+    # client_ip = request.client.host
+
     # Sanitize path for logging (CWE-117)
     request_path = request.url.path
     # Limit path length to prevent log injection
     if len(request_path) > 100:
         request_path = request_path[:97] + "..."
-    
+
     # Sanitize method for logging (CWE-117)
     request_method = request.method
     if not request_method.isalpha() or len(request_method) > 10:
         request_method = "INVALID"
-    
+
     # Log the request with sanitized values
-    logger.info("Request: %s %s", request_method, request_path)  # Use %s placeholders instead of f-string
-    
+    # Use %s placeholders instead of f-string
+    logger.info("Request: %s %s", request_method, request_path)
+
     response = await call_next(request)
-    
+
     # Log the response time with sanitized values
     process_time = time.time() - start_time
     logger.info("Response: %s %s completed in %.3fs with status %d",
                 request_method, request_path, process_time, response.status_code)
-    
+
     return response
 
 
@@ -99,20 +107,22 @@ def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Check if registration is enabled
     if not settings.REGISTRATION_ENABLED:
         raise HTTPException(status_code=403, detail="Registration is currently disabled")
-    
+
     db_user = crud.get_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    
+
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     return crud.create_user(db=db, user=user)
 
 
 @app.post("/auth/login", response_model=schemas.Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)):
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -134,8 +144,8 @@ def read_users_me(current_user: models.User = Depends(auth.get_current_active_us
 
 @app.get("/auth/users/me/cats", response_model=List[schemas.Cat])
 def read_own_cats(
-    skip: int = 0, 
-    limit: int = 100, 
+    skip: int = 0,
+    limit: int = 100,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -146,7 +156,7 @@ def read_own_cats(
 # Cat endpoints for root path
 @app.post("/cats/", response_model=schemas.Cat)
 def create_cat(
-    cat: schemas.CatCreate, 
+    cat: schemas.CatCreate,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -155,14 +165,14 @@ def create_cat(
         raise HTTPException(status_code=400, detail="Cat name too long")
     if cat.target_weight <= 0 or cat.target_weight > 30:
         raise HTTPException(status_code=400, detail="Invalid target weight")
-        
+
     return crud.create_cat(db=db, cat=cat, user_id=current_user.id)
 
 
 @app.get("/cats/", response_model=List[schemas.Cat])
 def read_cats(
-    skip: int = 0, 
-    limit: int = 100, 
+    skip: int = 0,
+    limit: int = 100,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -175,7 +185,7 @@ def read_cats(
 
 @app.get("/cats/{cat_id}", response_model=schemas.CatWithRecords)
 def read_cat(
-    cat_id: int, 
+    cat_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -187,8 +197,8 @@ def read_cat(
 
 @app.put("/cats/{cat_id}", response_model=schemas.Cat)
 def update_cat(
-    cat_id: int, 
-    cat: schemas.CatCreate, 
+    cat_id: int,
+    cat: schemas.CatCreate,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -197,7 +207,7 @@ def update_cat(
         raise HTTPException(status_code=400, detail="Cat name too long")
     if cat.target_weight <= 0 or cat.target_weight > 30:
         raise HTTPException(status_code=400, detail="Invalid target weight")
-        
+
     db_cat = crud.update_cat(db, cat_id=cat_id, cat=cat, user_id=current_user.id)
     if db_cat is None:
         raise HTTPException(status_code=404, detail="Cat not found")
@@ -206,7 +216,7 @@ def update_cat(
 
 @app.delete("/cats/{cat_id}")
 def delete_cat(
-    cat_id: int, 
+    cat_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -219,7 +229,7 @@ def delete_cat(
 # Cat endpoints for /api prefix
 @app.post("/api/cats/", response_model=schemas.Cat)
 def create_cat_api(
-    cat: schemas.CatCreate, 
+    cat: schemas.CatCreate,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -228,8 +238,8 @@ def create_cat_api(
 
 @app.get("/api/cats/", response_model=List[schemas.Cat])
 def read_cats_api(
-    skip: int = 0, 
-    limit: int = 100, 
+    skip: int = 0,
+    limit: int = 100,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -238,7 +248,7 @@ def read_cats_api(
 
 @app.get("/api/cats/{cat_id}", response_model=schemas.CatWithRecords)
 def read_cat_api(
-    cat_id: int, 
+    cat_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -247,8 +257,8 @@ def read_cat_api(
 
 @app.put("/api/cats/{cat_id}", response_model=schemas.Cat)
 def update_cat_api(
-    cat_id: int, 
-    cat: schemas.CatCreate, 
+    cat_id: int,
+    cat: schemas.CatCreate,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -257,7 +267,7 @@ def update_cat_api(
 
 @app.delete("/api/cats/{cat_id}")
 def delete_cat_api(
-    cat_id: int, 
+    cat_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -267,8 +277,8 @@ def delete_cat_api(
 # Weight record endpoints
 @app.post("/cats/{cat_id}/weights/", response_model=schemas.WeightRecord)
 def create_weight_record(
-    cat_id: int, 
-    weight_record: schemas.WeightRecordCreate, 
+    cat_id: int,
+    weight_record: schemas.WeightRecordCreate,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -276,8 +286,10 @@ def create_weight_record(
     if weight_record.user_weight <= 0 or weight_record.user_weight > 500:
         raise HTTPException(status_code=400, detail="Invalid user weight")
     if weight_record.combined_weight <= weight_record.user_weight:
-        raise HTTPException(status_code=400, detail="Combined weight must be greater than user weight")
-    
+        raise HTTPException(
+            status_code=400,
+            detail="Combined weight must be greater than user weight")
+
     db_cat = crud.get_cat(db, cat_id=cat_id, user_id=current_user.id)
     if db_cat is None:
         raise HTTPException(status_code=404, detail="Cat not found")
@@ -286,16 +298,16 @@ def create_weight_record(
 
 @app.get("/cats/{cat_id}/weights/", response_model=List[schemas.WeightRecord])
 def read_weight_records(
-    cat_id: int, 
-    skip: int = 0, 
-    limit: int = 100, 
+    cat_id: int,
+    skip: int = 0,
+    limit: int = 100,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
     # Limit the maximum number of records that can be fetched
     if limit > 100:
         limit = 100
-        
+
     db_cat = crud.get_cat(db, cat_id=cat_id, user_id=current_user.id)
     if db_cat is None:
         raise HTTPException(status_code=404, detail="Cat not found")
@@ -304,7 +316,7 @@ def read_weight_records(
 
 @app.delete("/weights/{record_id}")
 def delete_weight_record(
-    record_id: int, 
+    record_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -317,8 +329,8 @@ def delete_weight_record(
 # Weight record endpoints with /api prefix
 @app.post("/api/cats/{cat_id}/weights/", response_model=schemas.WeightRecord)
 def create_weight_record_api(
-    cat_id: int, 
-    weight_record: schemas.WeightRecordCreate, 
+    cat_id: int,
+    weight_record: schemas.WeightRecordCreate,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -327,9 +339,9 @@ def create_weight_record_api(
 
 @app.get("/api/cats/{cat_id}/weights/", response_model=List[schemas.WeightRecord])
 def read_weight_records_api(
-    cat_id: int, 
-    skip: int = 0, 
-    limit: int = 100, 
+    cat_id: int,
+    skip: int = 0,
+    limit: int = 100,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -338,7 +350,7 @@ def read_weight_records_api(
 
 @app.delete("/api/weights/{record_id}")
 def delete_weight_record_api(
-    record_id: int, 
+    record_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -348,25 +360,25 @@ def delete_weight_record_api(
 # Plot data endpoint
 @app.get("/cats/{cat_id}/plot", response_model=schemas.PlotData)
 def get_plot_data(
-    cat_id: int, 
+    cat_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
     db_cat = crud.get_cat(db, cat_id=cat_id, user_id=current_user.id)
     if db_cat is None:
         raise HTTPException(status_code=404, detail="Cat not found")
-    
+
     plot_data = plots.generate_weight_plot(db, cat_id)
     if plot_data is None:
         raise HTTPException(status_code=404, detail="Failed to generate plot data")
-    
+
     return plot_data
 
 
 # Plot data endpoint with /api prefix
 @app.get("/api/cats/{cat_id}/plot", response_model=schemas.PlotData)
 def get_plot_data_api(
-    cat_id: int, 
+    cat_id: int,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
@@ -379,15 +391,20 @@ def register_user_api(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return register_user(user, db)
 
 # Registration status endpoint
+
+
 @app.get("/auth/registration-status")
 def get_registration_status():
     return {"enabled": settings.REGISTRATION_ENABLED}
 
+
 @app.get("/api/auth/registration-status")
 def get_registration_status_api():
     return get_registration_status()
-    
+
 # User profile endpoints
+
+
 @app.put("/auth/me", response_model=schemas.User)
 def update_user_profile(
     user_update: schemas.UserUpdate,
@@ -397,10 +414,11 @@ def update_user_profile(
     updated_user = crud.update_user(db, current_user.id, user_update)
     if not updated_user:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail="Username or email already taken"
         )
     return updated_user
+
 
 @app.put("/auth/me/password")
 def change_password(
@@ -409,19 +427,21 @@ def change_password(
     db: Session = Depends(get_db)
 ):
     success = crud.change_user_password(
-        db, 
-        current_user.id, 
-        password_change.current_password, 
+        db,
+        current_user.id,
+        password_change.current_password,
         password_change.new_password
     )
     if not success:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail="Current password is incorrect"
         )
     return {"detail": "Password changed successfully"}
 
 # API prefix versions of user profile endpoints
+
+
 @app.put("/api/auth/me", response_model=schemas.User)
 def update_user_profile_api(
     user_update: schemas.UserUpdate,
@@ -429,6 +449,7 @@ def update_user_profile_api(
     db: Session = Depends(get_db)
 ):
     return update_user_profile(user_update, current_user, db)
+
 
 @app.put("/api/auth/me/password")
 def change_password_api(
@@ -440,7 +461,9 @@ def change_password_api(
 
 
 @app.post("/api/auth/login", response_model=schemas.Token)
-def login_for_access_token_api(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token_api(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)):
     return login_for_access_token(form_data, db)
 
 
@@ -451,8 +474,8 @@ def read_users_me_api(current_user: models.User = Depends(auth.get_current_activ
 
 @app.get("/api/auth/users/me/cats", response_model=List[schemas.Cat])
 def read_own_cats_api(
-    skip: int = 0, 
-    limit: int = 100, 
+    skip: int = 0,
+    limit: int = 100,
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):

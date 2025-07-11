@@ -8,6 +8,10 @@ RUN apk add --no-cache coreutils && \
     rm -rf /var/cache/apk/* && \
     npm -v && node -v
 
+# Install additional dependencies for jsdom
+RUN apk add --no-cache python3 make g++ \
+    && rm -rf /var/cache/apk/*
+
 # Don't run npm install in the Dockerfile
 # We'll handle it in an entrypoint script instead
 

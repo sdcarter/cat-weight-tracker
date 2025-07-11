@@ -1,21 +1,33 @@
-# from warnings import filterwarnings
+# from warnings import pytest.pytest.pytest.pytest.pytest.pytest.filterwarnings
 # Import specific function from warnings module to filter out specific warnings
-import pytest
 import os
+
+import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+
 from app.database import Base, get_db
 from app.main import app
-from fastapi.testclient import TestClient
 
 # Filter out deprecation warnings
-filterwarnings("ignore", category=PendingDeprecationWarning, module="starlette.formparsers")
-filterwarnings("ignore", category=DeprecationWarning, module="passlib.utils")
-filterwarnings("ignore", category=DeprecationWarning, message="Support for class-based `config` is deprecated")
+pytest.filterwarnings(
+    "ignore",
+    category=PendingDeprecationWarning,
+    module="starlette.formparsers")
+pytest.filterwarnings(
+    "ignore", 
+    category=DeprecationWarning, 
+    module="passlib.utils")
+pytest.filterwarnings(
+    "ignore", 
+    category=DeprecationWarning,
+    message="Support for class-based `config` is deprecated")
 
 # Create test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+
 
 @pytest.fixture(scope="session")
 def db_engine():
@@ -28,10 +40,11 @@ def db_engine():
     Base.metadata.create_all(bind=engine)
     yield engine
     Base.metadata.drop_all(bind=engine)
-    
+
     # Remove test database file
     if os.path.exists("./test.db"):
         os.remove("./test.db")
+
 
 @pytest.fixture(scope="function")
 def db_session(db_engine):
@@ -44,6 +57,7 @@ def db_session(db_engine):
         session.rollback()
         session.close()
 
+
 @pytest.fixture(scope="function")
 def client(db_session):
     """Create a FastAPI TestClient with the test database."""
@@ -52,7 +66,7 @@ def client(db_session):
             yield db_session
         finally:
             pass
-    
+
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client

@@ -22,7 +22,9 @@ tasks:
     desc: Fix backend linting issues
     cmds:
       - echo "Fixing backend linting issues..."
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend python autopep_fix.py
+      - |
+        docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend bash -c \
+          "autopep8 --in-place --aggressive --aggressive --max-line-length=100 app/*.py tests/*.py"
     vars:
       ENV: '{{.ENV | default "prod"}}'
 

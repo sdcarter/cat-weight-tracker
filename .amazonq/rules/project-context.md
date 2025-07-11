@@ -11,11 +11,11 @@ The Cat Weight Tracker is a full-stack application designed to help cat owners t
 
 ## Technical Stack
 
-- **Frontend**: React, Tailwind CSS
+- **Frontend**: React, Vite, TypeScript, Tailwind CSS
 - **Backend**: FastAPI, SQLAlchemy
 - **Database**: PostgreSQL
 - **Authentication**: JWT
-- **Testing**: Jest (frontend), pytest (backend)
+- **Testing**: Vitest (frontend), pytest (backend)
 - **Deployment**: Docker, Kubernetes
 
 ## Architecture
@@ -35,8 +35,11 @@ The Cat Weight Tracker is a full-stack application designed to help cat owners t
 
 ## Development Practices
 
-- Everything is done via docker container
-- Do not perform pip, npm, pgsql or other commands locally
-- Perform all operations inside of a development container
+- All development work is done via Docker containers
+- Never run pip, npm, pgsql or other package/dependency commands locally
+- Always perform operations inside the development container
+- Use Task-based workflows for common operations (task launch, task test, etc.)
+- Follow SEMVER style commits (feat:, fix:, docs:, style:, refactor:, test:, chore:)
+- Never use package overrides in package.json; always add direct dependencies
 
 When suggesting changes or additions to the codebase, consider how they align with the existing architecture and development priorities.

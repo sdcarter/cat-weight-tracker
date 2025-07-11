@@ -12,16 +12,19 @@ When helping with the Cat Weight Tracker application, follow these code style gu
 - Use PascalCase for class names
 - Prefix private methods and variables with underscore (_)
 
-## Frontend (JavaScript/React)
+## Frontend (TypeScript/React)
 
+- Use TypeScript for all new components and files
+- Use proper type annotations for props, state, and function returns
 - Use ES6+ syntax
 - Use functional components with hooks instead of class components
 - Use destructuring for props
 - Use named exports instead of default exports when possible
 - Use camelCase for variables and function names
-- Use PascalCase for component names
+- Use PascalCase for component names and interfaces
 - Use the existing UI component library in src/components/ui/
 - Follow the existing pattern for component structure
+- Avoid using `any` type; use proper typing or `unknown` when necessary
 
 ## Testing
 

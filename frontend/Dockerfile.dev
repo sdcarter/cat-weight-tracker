@@ -2,8 +2,11 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install md5sum utility and npm, then clean cache to reduce image size
-RUN apk add --no-cache coreutils npm && rm -rf /var/cache/apk/*
+# Install md5sum utility and ensure npm is available
+RUN apk add --no-cache coreutils && \
+    apk add --no-cache --update nodejs npm && \
+    rm -rf /var/cache/apk/* && \
+    npm -v && node -v
 
 # Don't run npm install in the Dockerfile
 # We'll handle it in an entrypoint script instead

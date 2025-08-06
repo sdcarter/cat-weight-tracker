@@ -25,7 +25,7 @@ describe('CatForm', () => {
 
     expect(screen.getByLabelText(/cat name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/target weight/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
 
   it('renders with initial data when editing', () => {
@@ -55,7 +55,7 @@ describe('CatForm', () => {
     const user = userEvent.setup();
     render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     expect(screen.getByText(/cat name is required/i)).toBeInTheDocument();
@@ -69,7 +69,7 @@ describe('CatForm', () => {
     const nameInput = screen.getByLabelText(/cat name/i);
     await user.type(nameInput, 'Test Cat');
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     expect(screen.getByText(/target weight is required/i)).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('CatForm', () => {
     await user.type(nameInput, 'Test Cat');
     await user.type(weightInput, '-5');
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     expect(screen.getByText(/must be a positive number/i)).toBeInTheDocument();
@@ -103,7 +103,7 @@ describe('CatForm', () => {
     await user.type(nameInput, 'Test Cat');
     await user.type(weightInput, 'not-a-number');
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     expect(screen.getByText(/must be a valid number/i)).toBeInTheDocument();
@@ -121,7 +121,7 @@ describe('CatForm', () => {
     await user.type(nameInput, 'a'.repeat(101));
     await user.type(weightInput, '5.0');
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     expect(screen.getByText(/name must be 100 characters or less/i)).toBeInTheDocument();
@@ -138,7 +138,7 @@ describe('CatForm', () => {
     await user.type(nameInput, 'Test Cat');
     await user.type(weightInput, '101');
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     expect(screen.getByText(/target weight must be 100 lbs or less/i)).toBeInTheDocument();
@@ -155,7 +155,7 @@ describe('CatForm', () => {
     await user.type(nameInput, 'Fluffy');
     await user.type(weightInput, '12.5');
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -202,7 +202,7 @@ describe('CatForm', () => {
     await user.type(nameInput, 'Test Cat');
     await user.type(weightInput, '5.0');
 
-    const submitButton = screen.getByRole('button', { name: /add/i });
+    const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
     await waitFor(() => {

@@ -9,7 +9,7 @@
     "@mui/icons-material": "^6.1.6",
     "@mui/x-charts": "^7.22.2",
     "@mui/x-date-pickers": "^7.22.2",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "date-fns": "^2.30.0",
     "i18next": "^25.3.2",
     "i18next-browser-languagedetector": "^8.2.0",

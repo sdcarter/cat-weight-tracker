@@ -16,7 +16,7 @@ vi.mock('react-i18next', () => ({
 describe('WeightChart', () => {
   test('renders chart component when plotData is null', () => {
     render(<WeightChart plotData={null} />);
-    
+
     // Check that the main elements are rendered
     expect(screen.getByText('Weight Progress Chart')).toBeTruthy();
     expect(screen.getByText('Chart visualization coming soon!')).toBeTruthy();
@@ -32,7 +32,7 @@ describe('WeightChart', () => {
       target_weight: 4.5,
     };
     render(<WeightChart plotData={emptyPlotData} />);
-    
+
     // Check that the main elements are rendered
     expect(screen.getByText('Weight Progress Chart')).toBeTruthy();
     expect(screen.getByText('Chart visualization coming soon!')).toBeTruthy();

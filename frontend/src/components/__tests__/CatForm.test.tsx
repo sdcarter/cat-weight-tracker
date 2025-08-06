@@ -103,14 +103,14 @@ describe('CatForm', () => {
     const weightInput = screen.getByLabelText(/target weight/i);
 
     await user.type(nameInput, 'Test Cat');
-    
+
     // Override the input's value property to simulate an invalid value
     // This bypasses the HTML number input restrictions
     Object.defineProperty(weightInput, 'value', {
       writable: true,
-      value: 'invalid'
+      value: 'invalid',
     });
-    
+
     // Trigger a change event to make React aware of the value change
     fireEvent.change(weightInput, { target: { value: 'invalid' } });
 

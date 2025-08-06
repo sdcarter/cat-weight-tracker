@@ -34,7 +34,7 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
       newErrors.user_weight = t('validation.required', 'This field is required');
     } else {
       const weight = Number.parseFloat(formData.user_weight);
-      if (isNaN(weight) || weight <= 0) {
+      if (Number.isNaN(weight) || weight <= 0) {
         newErrors.user_weight = t('validation.positiveNumber', 'Must be a positive number');
       }
     }
@@ -43,7 +43,7 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
       newErrors.combined_weight = t('validation.required', 'This field is required');
     } else {
       const weight = Number.parseFloat(formData.combined_weight);
-      if (isNaN(weight) || weight <= 0) {
+      if (Number.isNaN(weight) || weight <= 0) {
         newErrors.combined_weight = t('validation.positiveNumber', 'Must be a positive number');
       }
     }

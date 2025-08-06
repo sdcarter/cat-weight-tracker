@@ -59,9 +59,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const token = sessionStorage.getItem('token');
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
     } else {
-      delete axios.defaults.headers.common['Authorization'];
+      axios.defaults.headers.common.Authorization = undefined;
     }
   }, []);
 
@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
       
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       const response = await axios.get<User>(`${API_URL}/auth/me`);
       setUser(response.data);
       setLoading(false);
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Error fetching user data:', error);
       sessionStorage.removeItem('token');
       localStorage.removeItem('token'); // Clean up any old tokens
-      delete axios.defaults.headers.common['Authorization'];
+      axios.defaults.headers.common.Authorization = undefined;
       setLoading(false);
     }
   };
@@ -114,7 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: unknown) {
       console.error('Login error:', error);
       const errorMessage = error instanceof Error && 'response' in error 
-        ? (error as any).response?.data?.detail || 'Login failed'
+        ? (error as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Login failed'
         : 'Login failed';
       setError(errorMessage);
       return false;
@@ -153,7 +153,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: unknown) {
       console.error('Registration error:', error);
       const errorMessage = error instanceof Error && 'response' in error 
-        ? (error as any).response?.data?.detail || 'Registration failed'
+        ? (error as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Registration failed'
         : 'Registration failed';
       setError(errorMessage);
       return false;
@@ -163,7 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = (): void => {
     sessionStorage.removeItem('token');
     localStorage.removeItem('token'); // Clean up any old tokens
-    delete axios.defaults.headers.common['Authorization'];
+    axios.defaults.headers.common.Authorization = undefined;
     setUser(null);
   };
 

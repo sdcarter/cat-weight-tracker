@@ -60,9 +60,6 @@ global.console = {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class {
-  constructor() {
-    // Mock constructor - intentionally empty
-  }
   observe() {
     // Mock implementation - intentionally empty
   }

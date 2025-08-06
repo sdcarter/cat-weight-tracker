@@ -31,7 +31,7 @@ import type { Cat, WeightRecord, PlotData, ToastState, CatCreate, WeightRecordCr
 import { api, handleApiError } from './services/api';
 import { material3Theme } from './theme/material3Theme';
 
-function App(): JSX.Element {
+function App() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [cats, setCats] = useState<Cat[]>([]);

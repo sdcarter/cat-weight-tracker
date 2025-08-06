@@ -44,7 +44,7 @@ const CatForm: React.FC<CatFormProps> = ({
       newErrors.target_weight = t('validation.required', 'This field is required');
     } else {
       const weight = Number.parseFloat(formData.target_weight);
-      if (isNaN(weight)) {
+      if (Number.isNaN(weight)) {
         newErrors.target_weight = t('validation.number', 'Must be a valid number');
       } else if (weight <= 0) {
         newErrors.target_weight = t('validation.positive', 'Must be greater than 0');

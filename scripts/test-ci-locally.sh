@@ -1,12 +1,15 @@
 #!/bin/bash
 
-# Local CI Test Script - Matches GitHub Actions exactly
-# Run this locally to test what will happen in CI
+# Local CI Test Script - Tests what can be tested locally
+# GitHub Actions uses native Node/Python, but we test with containers for consistency
 
 set -e  # Exit on any error
 
-echo "🧪 Running Local CI Tests (GitHub Actions Parity)"
-echo "=================================================="
+echo "🧪 Running Local CI Tests (Container-based Development)"
+echo "======================================================"
+echo "ℹ️  Note: GitHub Actions uses native Node/Python for speed"
+echo "ℹ️  But we test with containers locally for consistency"
+echo ""
 
 # Colors for output
 RED='\033[0;31m'
@@ -30,6 +33,10 @@ print_warning() {
 
 print_error() {
     echo -e "${RED}❌ $1${NC}"
+}
+
+print_info() {
+    echo -e "${YELLOW}ℹ️  $1${NC}"
 }
 
 # Cleanup function
@@ -65,8 +72,9 @@ echo "DB_NAME=cat_weight_tracker_test" >> .env
 
 print_success "Environment configured"
 
-# Step 2: Frontend Quality Checks
-print_step "Running Frontend Quality Checks..."
+# Step 2: Container-based Frontend Tests (Local Advantage)
+print_step "Running Frontend Quality Checks (Container-based)..."
+print_info "GitHub Actions uses native Node.js, but containers provide better consistency"
 
 print_step "Building and starting services..."
 docker-compose -f docker-compose.dev.yml up -d --build
@@ -120,8 +128,9 @@ else
     exit 1
 fi
 
-# Step 3: Backend Quality Checks
-print_step "Running Backend Quality Checks..."
+# Step 3: Container-based Backend Tests (Local Advantage)
+print_step "Running Backend Quality Checks (Container-based)..."
+print_info "GitHub Actions uses native Python, but containers provide better consistency"
 
 print_step "Running backend linting..."
 if task backend:lint; then
@@ -147,56 +156,74 @@ else
     print_warning "Security audit had warnings (non-blocking)"
 fi
 
-# Step 5: Integration Tests
-print_step "Running Integration Tests..."
+# Step 5: Docker Integration Tests (Matches GitHub Actions)
+print_step "Running Docker Integration Tests..."
+print_info "This matches exactly what GitHub Actions does"
 
-print_step "Restarting services for integration tests..."
+print_step "Stopping dev services and starting production-like services..."
 task stop ENV=dev || true
-task launch ENV=dev
+sleep 5
+
+print_step "Starting production-like services..."
+docker-compose up -d --build
 sleep 30
 
 print_step "Testing service health..."
-timeout 60 bash -c 'until curl -f http://localhost:4000/; do sleep 2; done' || {
-    print_error "Backend service not responding"
+timeout 60 bash -c 'until curl -f http://localhost:80/api/; do sleep 2; done' || {
+    print_error "Backend API not responding"
     exit 1
 }
 
-timeout 60 bash -c 'until curl -f http://localhost:3000/; do sleep 2; done' || {
-    print_error "Frontend service not responding"
+timeout 60 bash -c 'until curl -f http://localhost:80/; do sleep 2; done' || {
+    print_error "Frontend not responding"
     exit 1
 }
 
-print_step "Running API integration tests..."
-if curl -f http://localhost:4000/auth/registration-status; then
-    print_success "API integration tests passed"
+print_step "Running integration tests..."
+if curl -f http://localhost:80/api/auth/registration-status; then
+    print_success "Integration tests passed"
 else
-    print_error "API integration tests failed"
+    print_error "Integration tests failed"
     exit 1
 fi
 
-# Step 6: Unified Tests (exactly like local)
-print_step "Running Unified Tests (Local Parity)..."
+print_step "Stopping production-like services..."
+docker-compose down
 
-print_step "Running all tests (exactly like local)..."
+# Step 6: Local Development Tests
+print_step "Running Local Development Tests..."
+print_info "Testing the commands you use daily"
+
+print_step "Starting dev environment again..."
+task launch ENV=dev
+sleep 30
+
+print_step "Running unified tests..."
 if task test ENV=dev; then
-    print_success "All tests passed"
+    print_success "All unified tests passed"
 else
-    print_error "Some tests failed"
+    print_error "Some unified tests failed"
     exit 1
 fi
 
-print_step "Running all linting (exactly like local)..."
+print_step "Running unified linting..."
 if task lint ENV=dev; then
-    print_success "All linting passed"
+    print_success "All unified linting passed"
 else
-    print_error "Linting failed"
+    print_error "Unified linting failed"
     exit 1
 fi
 
 # Final Success
 echo ""
-echo "🎉 All CI tests passed locally!"
-echo "✅ Your code should pass in GitHub Actions"
-echo "🚀 Safe to push to GitHub"
+echo "🎉 All local CI tests passed!"
 echo ""
-print_success "Local CI test completed successfully"
+print_info "Environment Comparison:"
+echo "  📦 Local: Container-based (more consistent)"
+echo "  🚀 GitHub Actions: Native Node/Python (faster)"
+echo "  🎯 Both: Same test commands and expectations"
+echo ""
+print_success "Your code should pass in GitHub Actions"
+print_success "Local container testing provides extra confidence"
+echo ""
+echo "🚀 Safe to push to GitHub!"

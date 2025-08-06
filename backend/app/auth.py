@@ -6,7 +6,8 @@ from typing import Optional, Union
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+import jwt
+from jwt import InvalidTokenError
 from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -176,7 +177,7 @@ async def get_current_user(
             raise credentials_exception
 
         token_data = schemas.TokenData(username=username)
-    except JWTError:
+    except InvalidTokenError:
         # Avoid logging error details (CWE-117)
         logger.error("JWT validation error")
         raise credentials_exception

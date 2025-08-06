@@ -18,12 +18,12 @@ email-validator==2.1.1
 plotly==5.19.0
 pandas==2.2.1
 
-# Security
-python-jose[cryptography]==3.4.0
+# Security - Using PyJWT with cryptography instead of python-jose for better security
+PyJWT==2.10.1  # Latest version, uses pyca/cryptography instead of ecdsa
+cryptography>=45.0.0  # Required for PyJWT cryptographic algorithms
 passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 python-multipart==0.0.18
-ecdsa>=0.19.1  # Security fix for GHSA-wj6h-64fc-37mp
 
 # Testing and linting
 flake8==7.0.0

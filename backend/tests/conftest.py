@@ -108,3 +108,17 @@ def client(test_db, test_token):
 
     # Remove the override after the test
     app.dependency_overrides = {}
+
+
+def create_test_user(db):
+    """Create a test user for testing purposes."""
+    test_user = User(
+        username="testuser",
+        email="test@example.com",
+        hashed_password=get_password_hash("testpassword"),
+        is_active=True
+    )
+    db.add(test_user)
+    db.commit()
+    db.refresh(test_user)
+    return test_user

@@ -1,44 +1,39 @@
 # Amazon Q Integration
 
-This directory contains configuration files for Amazon Q integration with the Cat Weight Tracker project. These files help ensure consistent AI assistance across the team.
+This directory contains Amazon Q configuration for the Cat Weight Tracker project, providing consistent AI assistance across the development team.
 
-## Directory Structure
+## 🚀 Quick Start
 
-- **prompts/**: Contains saved prompts that can be referenced using `@prompt` syntax
-- **rules/**: Contains package-level rules that are automatically applied to all Amazon Q interactions
-
-## Using Prompts
-
-To use a saved prompt in your Amazon Q conversation, reference it with the `@prompt` syntax:
+Use saved prompts in your Amazon Q conversations with the `@prompt` syntax:
 
 ```text
 @cat-weight-tracker-assistant
 ```
 
-This will include the prompt's context in your conversation with Amazon Q.
+## 📁 Available Prompts
 
-Available prompts:
+- **`@cat-weight-tracker-assistant`** - General project assistance
+- **`@backend-dev`** - FastAPI/Python development help
+- **`@frontend-dev`** - React/TypeScript development help
 
-- `cat-weight-tracker-assistant`: General assistant for the Cat Weight Tracker application
-- `backend-dev`: Specialized prompt for backend development tasks
-- `frontend-dev`: Specialized prompt for frontend development tasks
+## 🔧 How It Works
 
-## Rules
+- **`prompts/`** - Saved prompts for specific development tasks
+- **`rules/`** - Automatically applied context and guidelines
+- **Project files** - Additional context documents for comprehensive assistance
 
-Rules in the `rules/` directory are automatically applied to all Amazon Q interactions with this repository. They provide consistent context and guidelines without needing to explicitly reference them.
+## 💡 Best Practices
 
-Available rules:
+1. **Use specific prompts** for specialized tasks
+2. **Reference current code** when asking for modifications
+3. **Update prompts** as the project evolves
+4. **Share improvements** with the team by committing changes
 
-- `code-style`: Enforces coding style guidelines for the project
-- `project-context`: Provides essential project context for all interactions
+## 🎯 Getting the Most Value
 
-## Best Practices
+- Start conversations with the appropriate prompt
+- Provide specific context about what you're working on
+- Ask for code that follows the project's patterns and standards
+- Request explanations of complex implementations
 
-1. **Use specific prompts** for specialized tasks (backend development, frontend development)
-2. **Create new prompts** for recurring tasks or specific areas of the codebase
-3. **Update prompts and rules** as the project evolves
-4. **Reference the repository structure** in prompts to help Amazon Q understand the codebase
-
-## Adding to Version Control
-
-Make sure to commit the `.amazonq` directory to your repository so that all team members can benefit from the same prompts and rules.
+The configuration ensures Amazon Q understands the project structure, coding standards, and development patterns for more accurate and helpful responses.

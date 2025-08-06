@@ -1,23 +1,21 @@
 # Amazon Q Prompts
 
-This directory contains saved prompts for Amazon Q to ensure consistent interactions across the team.
+Saved prompts for consistent Amazon Q interactions across the development team.
 
-## How to Use
+## 🚀 Usage
 
-1. When chatting with Amazon Q in your IDE, reference these prompts using the `@prompt` syntax:
+Reference prompts in Amazon Q conversations using `@prompt` syntax:
 
-   ```text
-   @cat-weight-tracker-assistant
-   ```
+```text
+@cat-weight-tracker-assistant
+```
 
-2. This will automatically include the prompt's context in your conversation with Amazon Q.
+## 📋 Available Prompts
 
-## Available Prompts
+- **`@cat-weight-tracker-assistant`** - General project assistance
+- **`@backend-dev`** - FastAPI/Python development
+- **`@frontend-dev`** - React/TypeScript development
 
-- `cat-weight-tracker-assistant.md`: General assistant for the Cat Weight Tracker application
-- `backend-dev.md`: Specialized prompt for backend development tasks
-- `frontend-dev.md`: Specialized prompt for frontend development tasks
+## ➕ Adding New Prompts
 
-## Creating New Prompts
-
-Add new prompt files as Markdown (`.md`) files in this directory. The filename (without extension) will be the prompt name you reference with `@prompt`.
+Create new `.md` files in this directory. The filename becomes the prompt name for `@prompt` references.

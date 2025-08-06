@@ -1,40 +1,20 @@
-# GitHub Copilot Instructions - Cat Weight Tracker
+# GitHub Copilot Instructions
 
-## Project Context
-Modern React application with Material 3 design system, TypeScript, and Biome tooling for a cat weight tracking system.
+## 🎯 Project Overview
+Modern cat weight tracking application with React 18, Material 3 design, TypeScript, and FastAPI backend.
 
-## Technology Stack
+## 🛠️ Tech Stack
 
-### Frontend
-- **React 18** with TypeScript
-- **Material UI v6** (Material 3 Design System)
-- **Biome** for linting, formatting, and import organization
-- **Vite** for building and development
-- **Vitest** with React Testing Library for testing
+**Frontend**: React 18 + TypeScript + Material UI v6 + Biome + Vite + Vitest  
+**Backend**: FastAPI + Python 3.11 + PostgreSQL + SQLAlchemy + PyJWT
 
-### Backend
-- **FastAPI** with Python 3.11
-- **PostgreSQL** with SQLAlchemy ORM
-- **JWT** authentication
-- **Pydantic** for data validation
+## 🎨 Material 3 Patterns
 
-## Code Generation Guidelines
-
-### Material 3 Component Patterns
-
-When generating React components, always use Material 3 patterns:
-
+### Component Template
 ```typescript
-// Component template
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Card, 
-  CardContent, 
-  Typography, 
-  Button, 
-  Box 
-} from '@mui/material';
+import { Card, CardContent, Typography, Button, Box } from '@mui/material';
 
 const ComponentName: React.FC<Props> = ({ prop1, prop2 }) => {
   const { t } = useTranslation();
@@ -45,10 +25,7 @@ const ComponentName: React.FC<Props> = ({ prop1, prop2 }) => {
         <Typography variant="h6" gutterBottom>
           {t('component.title', 'Default Title')}
         </Typography>
-        <Button 
-          variant="contained" 
-          sx={{ borderRadius: 3 }}
-        >
+        <Button variant="contained" sx={{ borderRadius: 3 }}>
           {t('component.action', 'Action')}
         </Button>
       </CardContent>
@@ -57,82 +34,50 @@ const ComponentName: React.FC<Props> = ({ prop1, prop2 }) => {
 };
 ```
 
-### Styling Conventions
-
-Always use Material 3 design tokens:
-
+### Design Tokens
 ```typescript
-// Colors
+// Colors & spacing
 sx={{
   bgcolor: 'primary.main',
   color: 'primary.contrastText',
-  borderColor: 'outline.variant',
+  p: 3, m: 2, gap: 1.5,
+  borderRadius: 3, // 24px for cards/buttons
 }}
-
-// Spacing (8px base unit)
-sx={{ p: 3, m: 2, gap: 1.5 }}
-
-// Border radius
-sx={{ borderRadius: 3 }}  // Large: 24px for cards/buttons
-sx={{ borderRadius: 2 }}  // Medium: 16px for inputs
 ```
 
-### Form Patterns
-
-Generate forms using Material 3 components:
-
+### Form Pattern
 ```typescript
 <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
   <TextField
     label="Field Label"
     variant="outlined"
     fullWidth
-    sx={{
-      '& .MuiOutlinedInput-root': {
-        borderRadius: 2,
-      },
-    }}
+    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
   />
-  <Button
-    type="submit"
-    variant="contained"
-    sx={{ borderRadius: 3, alignSelf: 'flex-end' }}
-  >
+  <Button type="submit" variant="contained" sx={{ borderRadius: 3 }}>
     Submit
   </Button>
 </Box>
 ```
 
-### Dialog/Modal Patterns
-
+### Dialog Pattern
 ```typescript
-<Dialog 
-  open={open} 
-  onClose={onClose}
-  maxWidth="sm"
-  fullWidth
-  PaperProps={{ sx: { borderRadius: 4 } }}
->
+<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth
+  PaperProps={{ sx: { borderRadius: 4 } }}>
   <DialogTitle>
     <Typography variant="h5">Dialog Title</Typography>
   </DialogTitle>
-  <DialogContent>
-    {/* Content */}
-  </DialogContent>
+  <DialogContent>{/* Content */}</DialogContent>
   <DialogActions sx={{ p: 3 }}>
     <Button onClick={onClose}>Cancel</Button>
-    <Button variant="contained" sx={{ borderRadius: 3 }}>
-      Confirm
-    </Button>
+    <Button variant="contained" sx={{ borderRadius: 3 }}>Confirm</Button>
   </DialogActions>
 </Dialog>
 ```
 
-## TypeScript Patterns
+## 🔧 TypeScript Patterns
 
-### Interface Definitions
-Always define clear interfaces:
-
+### Interfaces & API Services
 ```typescript
 interface ComponentProps {
   id: number;
@@ -140,10 +85,7 @@ interface ComponentProps {
   optional?: boolean;
   onAction: (id: number) => void;
 }
-```
 
-### API Service Pattern
-```typescript
 class ApiService {
   private client = axios.create({
     baseURL: process.env.REACT_APP_API_URL || '/api',
@@ -169,14 +111,12 @@ const useResourceData = <T>(endpoint: string) => {
         setLoading(true);
         const result = await api.get<T>(endpoint);
         setData(result);
-        setError(null);
       } catch (err) {
         setError(handleApiError(err));
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [endpoint]);
 
@@ -184,27 +124,7 @@ const useResourceData = <T>(endpoint: string) => {
 };
 ```
 
-## Biome Compliance
-
-### Code Style
-- Use `const` for immutable values, `let` for mutable
-- Prefer arrow functions for consistency
-- Use template literals over string concatenation
-- Organize imports automatically (Biome handles this)
-
-### Error Handling
-```typescript
-try {
-  const result = await apiCall();
-  handleSuccess(result);
-} catch (error) {
-  const errorMessage = handleApiError(error);
-  showToast('Error', errorMessage);
-  console.error('API Error:', error);
-}
-```
-
-## Backend Patterns (FastAPI)
+## 🐍 FastAPI Patterns
 
 ### Route Definitions
 ```python
@@ -227,11 +147,11 @@ async def get_cat(cat_id: int, db: Session = Depends(get_db)):
     return cat
 ```
 
-## Testing Patterns
+## 🧪 Testing Patterns
 
 ### Component Tests
 ```typescript
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material';
 import { material3Theme } from '../theme/material3Theme';
 
@@ -256,13 +176,12 @@ def test_create_resource(client: TestClient, db: Session):
     response = client.post("/resource/", json=data)
     
     assert response.status_code == 201
-    result = response.json()
-    assert result["name"] == "Test"
+    assert response.json()["name"] == "Test"
 ```
 
-## Common Patterns to Generate
+## 🎨 Common UI Patterns
 
-### Loading States
+### Loading State
 ```typescript
 if (loading) {
   return (
@@ -273,7 +192,7 @@ if (loading) {
 }
 ```
 
-### Error States
+### Error State
 ```typescript
 if (error) {
   return (
@@ -284,109 +203,63 @@ if (error) {
 }
 ```
 
-### Empty States
+### Empty State
 ```typescript
 <Box sx={{ textAlign: 'center', py: 6 }}>
   <EmptyIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-  <Typography variant="h6" color="text.secondary">
-    No items found
-  </Typography>
+  <Typography variant="h6" color="text.secondary">No items found</Typography>
   <Typography variant="body2" color="text.disabled">
     Add your first item to get started
   </Typography>
 </Box>
 ```
 
-### Data Tables
-```typescript
-<TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-  <Table>
-    <TableHead>
-      <TableRow>
-        <TableCell>Column 1</TableCell>
-        <TableCell>Column 2</TableCell>
-        <TableCell align="center">Actions</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {data.map((row) => (
-        <TableRow key={row.id} hover>
-          <TableCell>{row.name}</TableCell>
-          <TableCell>{row.value}</TableCell>
-          <TableCell align="center">
-            <IconButton onClick={() => handleEdit(row.id)}>
-              <EditIcon />
-            </IconButton>
-          </TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-</TableContainer>
-```
-
-## Internationalization
-
-Always use i18next for text:
-
+## 🌍 Internationalization
+Always use i18next:
 ```typescript
 const { t } = useTranslation();
 
 // In JSX
-<Typography variant="h6">
-  {t('cats.title', 'My Cats')}
-</Typography>
+<Typography>{t('cats.title', 'My Cats')}</Typography>
 
 // In functions
 const errorMessage = t('errors.fetchFailed', 'Failed to fetch data');
 ```
 
-## Performance Considerations
-
-### Lazy Loading
+## ⚡ Performance
 ```typescript
+// Lazy loading
 const HeavyComponent = lazy(() => import('./HeavyComponent'));
 
-// Usage
-<Suspense fallback={<CircularProgress />}>
-  <HeavyComponent />
-</Suspense>
-```
-
-### Memoization
-```typescript
+// Memoization
 const ExpensiveComponent = memo(({ data }: Props) => {
   const processedData = useMemo(() => 
-    data.map(item => processItem(item)),
-    [data]
+    data.map(item => processItem(item)), [data]
   );
-
   return <div>{/* Component content */}</div>;
 });
 ```
 
-## File Organization
-
+## 📁 File Structure
 ```
 src/
-├── components/          # Reusable UI components
-├── pages/              # Route components
-├── services/           # API services
-├── hooks/              # Custom hooks
-├── types/              # TypeScript definitions
-├── theme/              # Material 3 theme
-├── context/            # React contexts
-└── utils/              # Utility functions
+├── components/     # Reusable UI components
+├── pages/         # Route components  
+├── services/      # API services
+├── hooks/         # Custom hooks
+├── types/         # TypeScript definitions
+├── theme/         # Material 3 theme
+└── utils/         # Utility functions
 ```
 
-When generating code, always consider:
-1. Material 3 design consistency
-2. TypeScript type safety
-3. Biome linting compliance
-4. Internationalization support
-5. Error handling
-6. Loading states
-7. Accessibility
-8. Performance optimization
+## ✅ Code Generation Checklist
+When generating code, ensure:
+- ✅ Material 3 design consistency
+- ✅ TypeScript type safety
+- ✅ Biome linting compliance
+- ✅ Internationalization support
+- ✅ Error handling & loading states
+- ✅ Accessibility (ARIA labels, semantic HTML)
+- ✅ Performance optimization (memoization, lazy loading)
 
 Generate code that follows these patterns and maintains consistency with the existing codebase.

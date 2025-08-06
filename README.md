@@ -1,36 +1,24 @@
 # Cat Weight Tracker
 
-A web application for tracking your cat's weight over time.
+A modern web application for tracking your cat's weight over time with beautiful charts and user management.
 
-## Features
+## ✨ Features
 
-- User authentication (login/register)
-- User profile management
-- Cat management (add, edit, delete)
-- Weight tracking with charts
-- Responsive design
-- Atlassian MCP server integration for project management
+- 🔐 **User Authentication** - Secure login/register system
+- 👤 **Profile Management** - Update user information and preferences
+- 🐱 **Cat Management** - Add, edit, and manage multiple cats
+- 📊 **Weight Tracking** - Visual charts showing weight trends over time
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
+- 🌍 **Internationalization** - Multi-language support
 
-## Environment Variables
-
-### Backend
-
-- `DATABASE_URL`: PostgreSQL connection string
-- `SECRET_KEY`: Secret key for JWT token generation
-- `ALGORITHM`: Algorithm for JWT token (default: HS256)
-- `ACCESS_TOKEN_EXPIRE_MINUTES`: JWT token expiration time in minutes
-- `REGISTRATION_ENABLED`: Feature flag to enable/disable user registration (true/false)
-
-## Development
+## 🚀 Quick Start
 
 ### Prerequisites
-
 - Docker and Docker Compose
-- Node.js and npm (for local frontend development)
-- Python 3.9+ (for local backend development)
+- Node.js 22+ and npm (for local development)
+- Python 3.11+ (for local development)
 
-### Running with Docker Compose
-
+### Run with Docker (Recommended)
 ```bash
 # Development mode
 docker-compose -f docker-compose.dev.yml up
@@ -40,117 +28,116 @@ docker-compose up
 ```
 
 ### Local Development
-
-#### Backend Setup
-
 ```bash
+# Backend
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 4000
-```
 
-#### Frontend
-
-```bash
+# Frontend
 cd frontend
 npm install
 npm start
 ```
 
-## Task-based Workflow
+## 🛠️ Development Workflow
 
-This project uses [Task](https://taskfile.dev) for managing development workflows. Tasks are organized by component:
-
-### Main Tasks
+This project uses [Task](https://taskfile.dev) for streamlined development:
 
 ```bash
-# Start the application
+# Start application
 task launch [ENV=dev|prod]
-
-# Stop the application
-task stop [ENV=dev|prod]
 
 # Run all tests
 task test
 
 # Run all linting
 task lint
+
+# Comprehensive CI testing
+task ci-test
 ```
 
-### Component-specific Tasks
-
+### Component-Specific Commands
 ```bash
-# Frontend tasks
+# Frontend
 task frontend:test
 task frontend:lint
-task frontend:lint-fix
-task frontend:shell
+task frontend:type-check
 
-# Backend tasks
-task backend:test [ARGS="specific_test.py"]
+# Backend
+task backend:test
 task backend:lint
-task backend:shell
 task backend:db:migrate
-task backend:db:reset
 
-# Database tasks
+# Database
 task db:backup
 task db:restore BACKUP=./backups/filename.sql
 ```
 
-## MCP Integration
+## 🔧 Configuration
 
-This project includes Atlassian MCP server for managing issues and stories.
+### Environment Variables
+- `DATABASE_URL` - PostgreSQL connection string
+- `SECRET_KEY` - JWT token secret key
+- `ALGORITHM` - JWT algorithm (default: HS256)
+- `ACCESS_TOKEN_EXPIRE_MINUTES` - Token expiration time
+- `REGISTRATION_ENABLED` - Enable/disable user registration
 
-### Managing MCP Server
+## 🤖 AI Integration
+
+### Amazon Q
+Configured with project-specific prompts and rules in `.amazonq/`:
+- Use `@cat-weight-tracker-assistant` for general help
+- Use `@backend-dev` for backend development
+- Use `@frontend-dev` for frontend development
+
+### GitHub Copilot
+Optimized instructions in `.github/copilot-instructions.md` for:
+- Material 3 design patterns
+- TypeScript best practices
+- Testing patterns
+- Code consistency
+
+## 🧪 Testing
+
+Comprehensive testing strategy with local and CI alignment:
 
 ```bash
-# Start MCP server
-task mcp:start
+# High-confidence local testing
+task ci-test
 
-# Check MCP server status
-task mcp:status
-
-# Stop MCP server
-task mcp:stop
+# Quick development testing
+task test
+task lint
 ```
 
-### MCP Server URL
+See [TESTING.md](TESTING.md) for detailed testing strategy.
 
-- Atlassian MCP: <http://localhost:9000>
+## 📁 Project Structure
 
-### VS Code Integration
-
-Install the recommended extensions:
-
-- Atlassian Jira (atlascode)
-- REST Client (rest-client)
-
-Use the `.vscode/mcp.rest` file to interact with the MCP server via REST API.
-
-## License
-
-MIT
-
-## Amazon Q Integration
-
-This project includes Amazon Q integration to help developers work with the codebase more efficiently. The integration is configured in the `.amazonq` directory and includes:
-
-- **Saved Prompts**: Reusable prompts that can be referenced using `@prompt` syntax
-- **Package-level Rules**: Automatically applied to all Amazon Q interactions
-
-### Using Saved Prompts
-
-To use a saved prompt in your Amazon Q conversation, reference it with the `@prompt` syntax:
-
-```text
-@cat-weight-tracker-assistant
+```
+├── backend/           # FastAPI Python backend
+├── frontend/          # React TypeScript frontend
+├── .amazonq/          # Amazon Q integration
+├── .github/           # GitHub Actions & Copilot config
+├── scripts/           # Development scripts
+├── k8s/              # Kubernetes manifests
+└── db/               # Database scripts
 ```
 
-Available prompts:
+## 🔒 Security
 
-- `cat-weight-tracker-assistant`: General assistant for the application
-- `backend-dev`: Specialized prompt for backend development
-- `frontend-dev`: Specialized prompt for frontend development
+- JWT authentication with PyJWT and cryptography
+- Password hashing with bcrypt
+- SQL injection protection with SQLAlchemy
+- CORS configuration for API security
+- Regular dependency updates and vulnerability scanning
 
-See the [.amazonq/README.md](.amazonq/README.md) file for more details on using Amazon Q with this project.
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+---
+
+**Built with ❤️ for cat lovers everywhere** 🐾

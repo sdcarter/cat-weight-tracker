@@ -1,34 +1,63 @@
 # Cat Weight Tracker Assistant
 
-You are an AI assistant helping with the Cat Weight Tracker application. This application allows users to track the weight of their cats over time, visualize weight trends, and manage cat profiles.
+You are an AI assistant for the Cat Weight Tracker application - a modern web app for tracking cat weight with beautiful visualizations and user management.
 
-## Project Structure
+## 🛠️ Tech Stack
 
-- **Frontend**: React application with components for cat management, weight tracking, and visualization
-- **Backend**: FastAPI application with PostgreSQL database for data storage
-- **Authentication**: JWT-based authentication system
+**Frontend**: React 18 + TypeScript + Material UI v6 (Material 3) + Biome + Vite  
+**Backend**: FastAPI + Python 3.11 + PostgreSQL + SQLAlchemy + PyJWT  
+**Testing**: Vitest + React Testing Library + pytest  
 
-## Key Features
+## ✨ Key Features
 
-- Cat profile management (add, edit, delete cats)
-- Weight entry tracking with timestamps
-- Weight trend visualization with charts
-- User authentication and profile management
+- 🔐 JWT authentication with secure user management
+- 🐱 Cat profile management (CRUD operations)
+- 📊 Weight tracking with interactive charts (Plotly)
+- 📱 Responsive Material 3 design
+- 🌍 Internationalization support
+- 🧪 Comprehensive testing (16/16 tests passing)
 
-## Common Tasks
+## 🎯 Common Tasks
 
-- Adding new features to the frontend React components
-- Extending the backend API endpoints
-- Modifying database models and schemas
-- Writing tests for both frontend and backend
-- Debugging authentication issues
-- Optimizing database queries
+### Frontend Development
+- React components with Material 3 design patterns
+- TypeScript interfaces and type safety
+- Form validation and error handling
+- Chart integration with Plotly
+- Responsive design implementation
 
-## Development Guidelines
+### Backend Development
+- FastAPI route development with proper validation
+- SQLAlchemy model design and relationships
+- JWT authentication and authorization
+- Database migrations with Alembic
+- API testing with pytest
 
-- Follow the existing code style and patterns
-- Write tests for new features
-- Update documentation when making significant changes
-- Use the existing UI component library for frontend changes
+### Full-Stack Integration
+- API service layer design
+- Error handling across frontend/backend
+- Authentication flow implementation
+- Data visualization pipeline
 
-When helping with this project, consider the full-stack nature of the application and how changes might affect both frontend and backend components.
+## 📋 Development Guidelines
+
+- **Design**: Follow Material 3 patterns with consistent spacing and colors
+- **Code Quality**: Use Biome for linting/formatting, maintain TypeScript strict mode
+- **Testing**: Write comprehensive tests for new features (current: 100% pass rate)
+- **Security**: Implement proper JWT handling and input validation
+- **Performance**: Use React memoization and lazy loading where appropriate
+
+## 🚀 Development Workflow
+
+```bash
+# Quick testing
+task test
+
+# High-confidence testing
+task ci-test
+
+# Development server
+task launch
+```
+
+When helping with this project, consider the modern tech stack, Material 3 design system, and the importance of maintaining the current high test coverage and code quality standards.

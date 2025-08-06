@@ -3,6 +3,7 @@ import uuid
 from sqlalchemy.orm import Session
 
 from app import crud, schemas
+from conftest import create_test_user
 
 
 class TestAuthentication:
@@ -206,7 +207,7 @@ class TestPasswordValidation:
         ("ValidPass1", True),  # Minimum valid
         ("A1" + "a" * 6, True),  # Exactly 8 chars with requirements
     ])
-    def test_password_validation(self, test_db: Session, password: str, should_pass: bool):
+    def test_password_validation(self, client, test_db: Session, password: str, should_pass: bool):
         """Test various password validation scenarios."""
         user_data = {
             "username": f"user_{len(password)}",
@@ -236,7 +237,7 @@ class TestUsernameValidation:
         ("user name", False),  # Space not allowed
         ("user.name", False),  # Dot not allowed
     ])
-    def test_username_validation(self, test_db: Session, username: str, should_pass: bool):
+    def test_username_validation(self, client, test_db: Session, username: str, should_pass: bool):
         """Test various username validation scenarios."""
         user_data = {
             "username": username,

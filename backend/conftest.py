@@ -80,3 +80,25 @@ def client(db_session):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+def create_test_user(db):
+    """Create a test user for testing purposes."""
+    from app import crud, schemas
+    from app.auth import get_password_hash
+    
+    user_data = schemas.UserCreate(
+        username="testuser",
+        email="test@example.com", 
+        password="TestPassword123"
+    )
+    
+    try:
+        return crud.create_user(db=db, user=user_data)
+    except Exception as e:
+        # If user already exists, try to get it
+        from app.models import User
+        existing_user = db.query(User).filter_by(username="testuser").first()
+        if existing_user:
+            return existing_user
+        raise e

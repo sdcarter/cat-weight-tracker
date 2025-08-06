@@ -1,6 +1,7 @@
 # Web framework and server
-fastapi==0.110.0
-uvicorn[standard]==0.27.1
+fastapi==0.116.1  # Latest version includes security fixes
+uvicorn[standard]==0.32.1
+starlette>=0.47.2  # Security fix for GHSA-f96h-pmfr-66vw and GHSA-2c2j-9gv5-cj73
 
 # Database
 sqlalchemy==2.0.28
@@ -22,6 +23,7 @@ python-jose[cryptography]==3.4.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 python-multipart==0.0.18
+ecdsa>=0.20.0  # Security fix for GHSA-wj6h-64fc-37mp
 
 # Testing and linting
 flake8==7.0.0
@@ -33,3 +35,6 @@ isort==5.13.2
 
 # Monitoring and logging
 structlog==24.1.0
+
+# Build tools - security fix for setuptools
+setuptools>=78.1.1  # Security fix for PYSEC-2022-43012 and PYSEC-2025-49

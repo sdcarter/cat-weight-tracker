@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -12,7 +13,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import { CatFormProps, FormErrors } from '../types/api';
+import type { CatFormProps, FormErrors } from '../types/api';
 
 const CatForm: React.FC<CatFormProps> = ({ 
   open, 
@@ -42,7 +43,7 @@ const CatForm: React.FC<CatFormProps> = ({
     if (!formData.target_weight) {
       newErrors.target_weight = t('validation.required', 'This field is required');
     } else {
-      const weight = parseFloat(formData.target_weight);
+      const weight = Number.parseFloat(formData.target_weight);
       if (isNaN(weight)) {
         newErrors.target_weight = t('validation.number', 'Must be a valid number');
       } else if (weight <= 0) {
@@ -84,7 +85,7 @@ const CatForm: React.FC<CatFormProps> = ({
     try {
       await onSubmit({
         name: formData.name.trim(),
-        target_weight: parseFloat(formData.target_weight),
+        target_weight: Number.parseFloat(formData.target_weight),
       });
       
       // Reset form

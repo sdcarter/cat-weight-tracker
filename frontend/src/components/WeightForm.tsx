@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -10,7 +11,7 @@ import {
   Grid,
 } from '@mui/material';
 import { Scale as ScaleIcon } from '@mui/icons-material';
-import { WeightFormProps, FormErrors } from '../types/api';
+import type { WeightFormProps, FormErrors } from '../types/api';
 
 const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
   const { t } = useTranslation();
@@ -32,7 +33,7 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
     if (!formData.user_weight) {
       newErrors.user_weight = t('validation.required', 'This field is required');
     } else {
-      const weight = parseFloat(formData.user_weight);
+      const weight = Number.parseFloat(formData.user_weight);
       if (isNaN(weight) || weight <= 0) {
         newErrors.user_weight = t('validation.positiveNumber', 'Must be a positive number');
       }
@@ -41,7 +42,7 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
     if (!formData.combined_weight) {
       newErrors.combined_weight = t('validation.required', 'This field is required');
     } else {
-      const weight = parseFloat(formData.combined_weight);
+      const weight = Number.parseFloat(formData.combined_weight);
       if (isNaN(weight) || weight <= 0) {
         newErrors.combined_weight = t('validation.positiveNumber', 'Must be a positive number');
       }
@@ -79,8 +80,8 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
     try {
       await onSubmit({
         date: formData.date,
-        user_weight: parseFloat(formData.user_weight),
-        combined_weight: parseFloat(formData.combined_weight),
+        user_weight: Number.parseFloat(formData.user_weight),
+        combined_weight: Number.parseFloat(formData.combined_weight),
       });
       
       // Reset form

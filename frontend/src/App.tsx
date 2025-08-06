@@ -27,7 +27,7 @@ import AuthScreen from './components/AuthScreen';
 import ProfilePage from './pages/ProfilePage';
 import UserMenu from './components/UserMenu';
 import { useAuth } from './context/AuthContext';
-import { Cat, WeightRecord, PlotData, ToastState, CatCreate, WeightRecordCreate } from './types/api';
+import type { Cat, WeightRecord, PlotData, ToastState, CatCreate, WeightRecordCreate } from './types/api';
 import { api, handleApiError } from './services/api';
 import { material3Theme } from './theme/material3Theme';
 

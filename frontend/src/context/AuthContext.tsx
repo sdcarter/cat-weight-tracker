@@ -1,6 +1,7 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import type React from 'react';
+import { createContext, useState, useContext, useEffect, type ReactNode } from 'react'
 import axios from 'axios';
-import { User, UserCreate, UserLogin, UserUpdate, UserPasswordChange, Token } from '../types/api';
+import { type User, UserCreate, UserLogin, UserUpdate, UserPasswordChange, type Token } from '../types/api';
 
 // API base URL - use environment variable or fallback
 const API_URL = process.env.REACT_APP_API_URL || '/api';

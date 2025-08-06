@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -15,7 +16,7 @@ import {
   Lock as LockIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
-import { FormErrors } from '../types/api';
+import type { FormErrors } from '../types/api';
 
 const LoginForm: React.FC = () => {
   const { t } = useTranslation();

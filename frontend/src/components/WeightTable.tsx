@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Table,
@@ -14,7 +14,7 @@ import {
   Chip,
 } from '@mui/material';
 import { Delete as DeleteIcon, Timeline as TimelineIcon } from '@mui/icons-material';
-import { WeightTableProps } from '../types/api';
+import type { WeightTableProps } from '../types/api';
 
 const WeightTable: React.FC<WeightTableProps> = ({ weights, onDeleteWeight }) => {
   const { t } = useTranslation();

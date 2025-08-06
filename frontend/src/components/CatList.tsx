@@ -19,7 +19,7 @@ import {
   MoreVert as MoreVertIcon,
   Pets as PetsIcon,
 } from '@mui/icons-material';
-import { CatListProps } from '../types/api';
+import type { CatListProps } from '../types/api';
 
 const CatList: React.FC<CatListProps> = ({ 
   cats, 

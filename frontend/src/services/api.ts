@@ -1,5 +1,5 @@
-import axios, { AxiosResponse, AxiosError } from 'axios';
-import { 
+import axios, { type AxiosResponse, type AxiosError } from 'axios';
+import type { 
   User, 
   Cat, 
   WeightRecord, 

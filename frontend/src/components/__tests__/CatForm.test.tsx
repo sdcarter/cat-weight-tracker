@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CatForm from '../CatForm';
-import { Cat } from '../../types/api';
+import type { Cat } from '../../types/api';
 
 // Mock react-i18next
 vi.mock('react-i18next', () => ({

@@ -36,6 +36,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
+coverage/
 
 # Environment variables
 .env

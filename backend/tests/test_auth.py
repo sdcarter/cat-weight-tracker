@@ -1,0 +1,255 @@
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+
+from app.main import app
+from app import crud, schemas
+from tests.conftest import create_test_user
+
+client = TestClient(app)
+
+
+class TestAuthentication:
+    """Test authentication endpoints and functionality."""
+
+    def test_register_user_success(self, db: Session):
+        """Test successful user registration."""
+        user_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "TestPassword123"
+        }
+        
+        response = client.post("/auth/register", json=user_data)
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["username"] == user_data["username"]
+        assert data["email"] == user_data["email"]
+        assert data["is_active"] is True
+        assert "id" in data
+
+    def test_register_user_duplicate_username(self, db: Session):
+        """Test registration with duplicate username."""
+        # Create first user
+        user1_data = {
+            "username": "testuser",
+            "email": "test1@example.com",
+            "password": "TestPassword123"
+        }
+        client.post("/auth/register", json=user1_data)
+        
+        # Try to create second user with same username
+        user2_data = {
+            "username": "testuser",
+            "email": "test2@example.com",
+            "password": "TestPassword123"
+        }
+        
+        response = client.post("/auth/register", json=user2_data)
+        
+        assert response.status_code == 409
+        assert "Username already exists" in response.json()["detail"]
+
+    def test_register_user_duplicate_email(self, db: Session):
+        """Test registration with duplicate email."""
+        # Create first user
+        user1_data = {
+            "username": "testuser1",
+            "email": "test@example.com",
+            "password": "TestPassword123"
+        }
+        client.post("/auth/register", json=user1_data)
+        
+        # Try to create second user with same email
+        user2_data = {
+            "username": "testuser2",
+            "email": "test@example.com",
+            "password": "TestPassword123"
+        }
+        
+        response = client.post("/auth/register", json=user2_data)
+        
+        assert response.status_code == 409
+        assert "Email already registered" in response.json()["detail"]
+
+    def test_register_user_invalid_password(self, db: Session):
+        """Test registration with invalid password."""
+        user_data = {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "weak"  # Too short, no uppercase, no digit
+        }
+        
+        response = client.post("/auth/register", json=user_data)
+        
+        assert response.status_code == 422
+        assert "validation error" in response.json()["detail"].lower()
+
+    def test_register_user_invalid_email(self, db: Session):
+        """Test registration with invalid email."""
+        user_data = {
+            "username": "testuser",
+            "email": "invalid-email",
+            "password": "TestPassword123"
+        }
+        
+        response = client.post("/auth/register", json=user_data)
+        
+        assert response.status_code == 422
+
+    def test_login_success(self, db: Session):
+        """Test successful login."""
+        # Create user first
+        user_data = schemas.UserCreate(
+            username="testuser",
+            email="test@example.com",
+            password="TestPassword123"
+        )
+        crud.create_user(db=db, user=user_data)
+        
+        # Login
+        login_data = {
+            "username": "testuser",
+            "password": "TestPassword123"
+        }
+        
+        response = client.post("/auth/login", data=login_data)
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert "access_token" in data
+        assert data["token_type"] == "bearer"
+
+    def test_login_invalid_credentials(self, db: Session):
+        """Test login with invalid credentials."""
+        login_data = {
+            "username": "nonexistent",
+            "password": "wrongpassword"
+        }
+        
+        response = client.post("/auth/login", data=login_data)
+        
+        assert response.status_code == 401
+        assert "Invalid credentials" in response.json()["detail"]
+
+    def test_login_inactive_user(self, db: Session):
+        """Test login with inactive user."""
+        # Create inactive user
+        user_data = schemas.UserCreate(
+            username="inactiveuser",
+            email="inactive@example.com",
+            password="TestPassword123"
+        )
+        user = crud.create_user(db=db, user=user_data)
+        
+        # Deactivate user
+        user.is_active = False
+        db.commit()
+        
+        # Try to login
+        login_data = {
+            "username": "inactiveuser",
+            "password": "TestPassword123"
+        }
+        
+        response = client.post("/auth/login", data=login_data)
+        
+        assert response.status_code == 401
+        assert "Account is disabled" in response.json()["detail"]
+
+    def test_get_current_user_success(self, db: Session):
+        """Test getting current user with valid token."""
+        user = create_test_user(db)
+        
+        # Get token
+        login_data = {
+            "username": user.username,
+            "password": "testpassword"
+        }
+        login_response = client.post("/auth/login", data=login_data)
+        token = login_response.json()["access_token"]
+        
+        # Get current user
+        response = client.get(
+            "/auth/me",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["username"] == user.username
+        assert data["email"] == user.email
+
+    def test_get_current_user_invalid_token(self, db: Session):
+        """Test getting current user with invalid token."""
+        response = client.get(
+            "/auth/me",
+            headers={"Authorization": "Bearer invalid_token"}
+        )
+        
+        assert response.status_code == 401
+
+    def test_get_current_user_no_token(self, db: Session):
+        """Test getting current user without token."""
+        response = client.get("/auth/me")
+        
+        assert response.status_code == 401
+
+
+class TestPasswordValidation:
+    """Test password validation rules."""
+
+    @pytest.mark.parametrize("password,should_pass", [
+        ("TestPassword123", True),  # Valid password
+        ("short", False),  # Too short
+        ("nouppercase123", False),  # No uppercase
+        ("NOLOWERCASE123", False),  # No lowercase
+        ("NoDigitsHere", False),  # No digits
+        ("ValidPass1", True),  # Minimum valid
+        ("A1" + "a" * 6, True),  # Exactly 8 chars with requirements
+    ])
+    def test_password_validation(self, db: Session, password: str, should_pass: bool):
+        """Test various password validation scenarios."""
+        user_data = {
+            "username": f"user_{len(password)}",
+            "email": f"test_{len(password)}@example.com",
+            "password": password
+        }
+        
+        response = client.post("/auth/register", json=user_data)
+        
+        if should_pass:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 422
+
+
+class TestUsernameValidation:
+    """Test username validation rules."""
+
+    @pytest.mark.parametrize("username,should_pass", [
+        ("validuser", True),  # Valid username
+        ("user123", True),  # With numbers
+        ("user_name", True),  # With underscore
+        ("user-name", True),  # With hyphen
+        ("ab", False),  # Too short
+        ("a" * 51, False),  # Too long
+        ("user@name", False),  # Invalid character
+        ("user name", False),  # Space not allowed
+        ("user.name", False),  # Dot not allowed
+    ])
+    def test_username_validation(self, db: Session, username: str, should_pass: bool):
+        """Test various username validation scenarios."""
+        user_data = {
+            "username": username,
+            "email": f"test_{len(username)}@example.com",
+            "password": "TestPassword123"
+        }
+        
+        response = client.post("/auth/register", json=user_data)
+        
+        if should_pass:
+            assert response.status_code == 200
+        else:
+            assert response.status_code == 422

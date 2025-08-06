@@ -2,7 +2,7 @@
   "project": {
     "name": "Cat Weight Tracker",
     "description": "A web application for tracking your cat's weight over time with visualization features",
-    "repository": "https://github.com/yourusername/cat-weight-tracker"
+    "repository": "https://github.com/steve-carter/cat-weight-tracker"
   },
   "technical_stack": {
     "frontend": ["React", "TypeScript", "Vite", "Tailwind CSS"],

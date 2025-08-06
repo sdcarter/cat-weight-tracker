@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 // API base URL - use environment variable or fallback
-const API_URL = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '/api');
+const API_URL = process.env.REACT_APP_API_URL || '/api';
 
 const AuthContext = createContext();
 

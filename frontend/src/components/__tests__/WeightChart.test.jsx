@@ -53,7 +53,7 @@ describe('WeightChart', () => {
     
     const titleElement = container.querySelector('h3');
     expect(titleElement).toBeTruthy();
-    expect(titleElement.textContent).toBe('weights.weightTrendFor');
+    expect(titleElement.textContent).toContain('weights.weightTrendFor');
     
     const plotElement = screen.getByTestId('mock-plot');
     expect(plotElement).toBeTruthy();

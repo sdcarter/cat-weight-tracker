@@ -6,7 +6,7 @@ Create Date: 2025-05-27 00:00:00.000000
 
 """
 from alembic import op
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, text
+import sqlalchemy as sa
 from sqlalchemy.engine.reflection import Inspector
 
 
@@ -20,13 +20,13 @@ depends_on = None
 def upgrade():
     # Create users table
     op.create_table('users',
-        Column('id', Integer(), nullable=False),
-        Column('username', String(50), nullable=False),
-        Column('email', String(100), nullable=False),
-        Column('hashed_password', String(255), nullable=False),
-        Column('is_active', Boolean(), nullable=False, server_default='true'),
-        Column('created_at', DateTime(), server_default=text('CURRENT_TIMESTAMP'), nullable=False),
-        Column('updated_at', DateTime(), server_default=text('CURRENT_TIMESTAMP'), 
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('username', sa.String(50), nullable=False),
+        sa.Column('email', sa.String(100), nullable=False),
+        sa.Column('hashed_password', sa.String(255), nullable=False),
+        sa.Column('is_active', sa.Boolean(), nullable=False, server_default='true'),
+        sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+        sa.Column('updated_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), 
                   onupdate=sa.text('CURRENT_TIMESTAMP'), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )

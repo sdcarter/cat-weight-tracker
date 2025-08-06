@@ -7,8 +7,8 @@ import fs from 'fs';
 export default defineConfig({
   plugins: [react()],
   esbuild: {
-    loader: 'jsx',
-    include: /\.jsx$|\.js$/,
+    loader: 'tsx',
+    include: /\.(tsx?|jsx?)$/,
   },
   resolve: {
     alias: {

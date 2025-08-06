@@ -1,5 +1,6 @@
 from typing import List, Dict
 import logging
+import os
 import time
 from contextlib import asynccontextmanager
 from .database import get_db
@@ -7,9 +8,12 @@ from datetime import timedelta
 
 from fastapi import (APIRouter, Depends, FastAPI, HTTPException, Request,
                      status)
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from pydantic import ValidationError
 
 from . import auth, crud, models, plots, schemas
 from .config import settings
@@ -35,18 +39,62 @@ async def lifespan(app: FastAPI):
 # Create FastAPI app with lifespan
 app = FastAPI(title="Cat Weight Tracker API", lifespan=lifespan)
 
+# Global exception handlers
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handle validation errors with user-friendly messages."""
+    errors = []
+    for error in exc.errors():
+        field = " -> ".join(str(loc) for loc in error["loc"])
+        message = error["msg"]
+        errors.append(f"{field}: {message}")
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Validation error",
+            "errors": errors
+        }
+    )
+
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    """Handle value errors from validation."""
+    return JSONResponse(
+        status_code=400,
+        content={"detail": str(exc)}
+    )
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle unexpected errors."""
+    logger.error(f"Unexpected error: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An unexpected error occurred. Please try again later."}
+    )
+
 # Create API router for /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Configure CORS - allow both development and production origins
-origins = [
-    "http://localhost:3000",  # Development frontend
-    "http://localhost",
-    "http://localhost:80",
-    "http://frontend",
-    "http://frontend:80",
-    "*"  # Allow all origins in production
-]
+# Configure CORS - secure origins configuration
+def get_cors_origins():
+    """Get CORS origins based on environment."""
+    base_origins = [
+        "http://localhost:3000",  # Development frontend
+        "http://localhost",
+        "http://localhost:80",
+        "http://frontend",
+        "http://frontend:80",
+    ]
+    
+    # Add production origins from environment variable
+    production_origins = os.environ.get("CORS_ORIGINS", "").split(",")
+    production_origins = [origin.strip() for origin in production_origins if origin.strip()]
+    
+    return base_origins + production_origins
+
+origins = get_cors_origins()
 
 app.add_middleware(
     CORSMiddleware,
@@ -56,37 +104,76 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add middleware for request logging and basic rate limiting
+# Add middleware for request logging and rate limiting
+from collections import defaultdict
+from datetime import datetime, timedelta
 
+# Simple in-memory rate limiting (use Redis in production)
+request_counts = defaultdict(list)
+MAX_REQUESTS_PER_MINUTE = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "0"))  # 0 = disabled
+MAX_REQUEST_SIZE = 10 * 1024 * 1024  # 10MB
+RATE_LIMITING_ENABLED = MAX_REQUESTS_PER_MINUTE > 0
 
 @app.middleware("http")
-async def log_requests(request: Request, call_next):
+async def security_middleware(request: Request, call_next):
     start_time = time.time()
+    
+    # Get client IP for logging and rate limiting
+    client_ip = request.client.host if request.client else "unknown"
+    
+    # Check request size
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > MAX_REQUEST_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="Request too large"
+        )
+    
+    # Simple rate limiting by IP (only if enabled)
+    if RATE_LIMITING_ENABLED:
+        now = datetime.now()
+        
+        # Clean old requests (older than 1 minute)
+        cutoff_time = now - timedelta(minutes=1)
+        request_counts[client_ip] = [
+            req_time for req_time in request_counts[client_ip] 
+            if req_time > cutoff_time
+        ]
+        
+        # Check rate limit
+        if len(request_counts[client_ip]) >= MAX_REQUESTS_PER_MINUTE:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests. Please try again later."
+            )
+        
+        # Add current request
+        request_counts[client_ip].append(now)
 
-    # Simple IP-based request counting (basic rate limiting)
-    # client_ip = request.client.host
-
-    # Sanitize path for logging (CWE-117)
+    # Sanitize path for logging (prevent log injection)
     request_path = request.url.path
-    # Limit path length to prevent log injection
     if len(request_path) > 100:
         request_path = request_path[:97] + "..."
-
-    # Sanitize method for logging (CWE-117)
+    
+    # Sanitize method for logging
     request_method = request.method
     if not request_method.isalpha() or len(request_method) > 10:
         request_method = "INVALID"
 
-    # Log the request with sanitized values
-    # Use %s placeholders instead of f-string
-    logger.info("Request: %s %s", request_method, request_path)
+    logger.info("Request: %s %s from %s", request_method, request_path, client_ip)
 
     response = await call_next(request)
 
-    # Log the response time with sanitized values
+    # Log response time
     process_time = time.time() - start_time
     logger.info("Response: %s %s completed in %.3fs with status %d",
                 request_method, request_path, process_time, response.status_code)
+    
+    # Add security headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
     return response
 
@@ -104,37 +191,79 @@ def health_check() -> Dict[str, str]:
 # Authentication endpoints
 @app.post("/auth/register", response_model=schemas.User)
 def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    # Check if registration is enabled
-    if not settings.REGISTRATION_ENABLED:
-        raise HTTPException(status_code=403, detail="Registration is currently disabled")
+    """Register a new user with enhanced validation."""
+    try:
+        # Check if registration is enabled
+        if not settings.REGISTRATION_ENABLED:
+            raise HTTPException(
+                status_code=403, 
+                detail="Registration is currently disabled"
+            )
 
-    db_user = crud.get_user_by_username(db, username=user.username)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        # Check for existing username
+        db_user = crud.get_user_by_username(db, username=user.username)
+        if db_user:
+            raise HTTPException(
+                status_code=409, 
+                detail="Username already exists. Please choose a different username."
+            )
 
-    db_user = crud.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        # Check for existing email
+        db_user = crud.get_user_by_email(db, email=user.email)
+        if db_user:
+            raise HTTPException(
+                status_code=409, 
+                detail="Email already registered. Please use a different email or try logging in."
+            )
 
-    return crud.create_user(db=db, user=user)
+        return crud.create_user(db=db, user=user)
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error during user registration: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred during registration. Please try again."
+        )
 
 
 @app.post("/auth/login", response_model=schemas.Token)
 def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends(),
         db: Session = Depends(get_db)):
-    user = auth.authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
+    """Authenticate user and return access token."""
+    try:
+        user = auth.authenticate_user(db, form_data.username, form_data.password)
+        if not user:
+            # Use generic message to prevent username enumeration
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials. Please check your username and password.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Account is disabled. Please contact support.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = auth.create_access_token(
+            data={"sub": user.username}, expires_delta=access_token_expires
         )
-    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = auth.create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+        return {"access_token": access_token, "token_type": "bearer"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error during login: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred during login. Please try again."
+        )
 
 
 @app.get("/auth/me", response_model=schemas.User)

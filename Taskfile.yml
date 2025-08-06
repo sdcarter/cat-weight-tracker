@@ -88,6 +88,55 @@ tasks:
       ENV: '{{.ENV | default "prod"}}'
       SERVICE: '{{.SERVICE | default "backend"}}'
 
+  # Add these new tasks after the existing ones
+  
+  clean:
+    desc: Clean up Docker containers, images, and volumes
+    cmds:
+      - echo "Cleaning up Docker resources..."
+      - docker-compose down --remove-orphans
+      - docker-compose -f docker-compose.dev.yml down --remove-orphans
+      - docker system prune -f
+      - echo "✅ Cleanup complete"
+
+  status:
+    desc: Show status of all services
+    cmds:
+      - echo "=== Docker Containers ==="
+      - docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+      - echo ""
+      - echo "=== Service Health ==="
+      - |
+        if curl -s http://localhost:4000/ > /dev/null 2>&1; then
+          echo "✅ Backend API: http://localhost:4000 (healthy)"
+        else
+          echo "❌ Backend API: http://localhost:4000 (not responding)"
+        fi
+      - |
+        if curl -s http://localhost:3000/ > /dev/null 2>&1; then
+          echo "✅ Frontend: http://localhost:3000 (healthy)"
+        elif curl -s http://localhost/ > /dev/null 2>&1; then
+          echo "✅ Frontend: http://localhost (healthy)"
+        else
+          echo "❌ Frontend: not responding"
+        fi
+
+  deps:
+    desc: Update dependencies in containers
+    cmds:
+      - echo "Updating dependencies..."
+      - task: frontend:deps:update
+      - task: backend:deps:update
+      - echo "✅ Dependencies updated"
+
+  security:
+    desc: Run security audits
+    cmds:
+      - echo "Running security audits..."
+      - task: frontend:security
+      - task: backend:security
+      - echo "✅ Security audit complete"
+
   release:
     desc: Create a new release with automated semantic versioning
     cmds:

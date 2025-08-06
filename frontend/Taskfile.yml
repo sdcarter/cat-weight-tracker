@@ -29,19 +29,37 @@ tasks:
       ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
 
   shell:
-    desc: Open a shell in the frontend container
+    desc: Open shell in frontend container
     cmds:
       - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml exec frontend sh
     vars:
       ENV: '{{.ENV | default "dev"}}'
       ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
-      
-  rebuild:
-    desc: Rebuild and restart the frontend container
+
+  deps:update:
+    desc: Update frontend dependencies
     cmds:
-      - echo "Rebuilding frontend container..."
-      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml build frontend
-      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml up -d frontend
+      - echo "Updating frontend dependencies..."
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm update
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm audit fix
     vars:
-      ENV: '{{.ENV | default "prod"}}'
+      ENV: '{{.ENV | default "dev"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
+
+  security:
+    desc: Run frontend security audit
+    cmds:
+      - echo "Running frontend security audit..."
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm audit
+    vars:
+      ENV: '{{.ENV | default "dev"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
+
+  build:
+    desc: Build frontend for production
+    cmds:
+      - echo "Building frontend..."
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm run build
+    vars:
+      ENV: '{{.ENV | default "dev"}}'
       ROOT_DIR: '{{.ROOT_DIR | default ".."}}'

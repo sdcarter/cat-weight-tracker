@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import CatForm from '../CatForm';
 
@@ -60,18 +60,17 @@ describe('CatForm', () => {
     });
   });
   
-  test('submits form with empty values', () => {
-    const { container } = render(<CatForm onSubmit={mockSubmit} />);
+  test('validates empty form submission', async () => {
+    render(<CatForm onSubmit={mockSubmit} />);
     
-    // Submit with empty fields
-    const form = container.querySelector('form');
-    fireEvent.submit(form);
+    // Try to submit with empty fields
+    const submitButton = screen.getByRole('button', { name: /save/i });
+    fireEvent.click(submitButton);
     
-    // In the test environment, HTML5 validation doesn't prevent submission
-    // So we verify the form was submitted with empty/invalid values
-    expect(mockSubmit).toHaveBeenCalledWith({
-      name: '',
-      target_weight: NaN
+    // The form should show validation errors and not call onSubmit
+    await waitFor(() => {
+      expect(screen.getByText(/this field is required/i)).toBeInTheDocument();
     });
+    expect(mockSubmit).not.toHaveBeenCalled();
   });
 });

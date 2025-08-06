@@ -17,21 +17,37 @@ tasks:
       - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend flake8
     vars:
       ENV: '{{.ENV | default "prod"}}'
-      
+
   lint-fix:
     desc: Fix backend linting issues
     cmds:
       - echo "Fixing backend linting issues..."
-      - |
-        docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend bash -c \
-          "autopep8 --in-place --aggressive --aggressive --max-line-length=100 app/*.py tests/*.py"
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend autopep8 --in-place --aggressive --max-line-length=100 app/*.py tests/*.py
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+      
+  shell:
+    desc: Open shell in backend container
+    cmds:
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} exec backend sh
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
-  shell:
-    desc: Open a shell in the backend container
+  deps:update:
+    desc: Update backend dependencies
     cmds:
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} exec backend sh
+      - echo "Updating backend dependencies..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend pip install --upgrade pip
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend pip list --outdated
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  security:
+    desc: Run backend security audit
+    cmds:
+      - echo "Running backend security audit..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend pip install pip-audit
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend pip-audit
     vars:
       ENV: '{{.ENV | default "prod"}}'
 
@@ -44,12 +60,23 @@ tasks:
       ENV: '{{.ENV | default "prod"}}'
 
   db:reset:
-    desc: Reset the database
+    desc: Reset database (WARNING - This will delete all data!)
     cmds:
-      - echo "Resetting database..."
+      - echo "WARNING - This will delete all data!"
+      - echo "Press Ctrl+C to cancel, or any key to continue..."
+      - bash -c "read -n 1"
       - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} down -v
       - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} up -d db
       - sleep 5
       - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend alembic upgrade head
+      - echo "Database reset complete"
+    vars:
+      ENV: '{{.ENV | default "prod"}}'
+
+  db:seed:
+    desc: Seed database with sample data
+    cmds:
+      - echo "Seeding database..."
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend python -c "from app.init_db import init_db; init_db()"
     vars:
       ENV: '{{.ENV | default "prod"}}'

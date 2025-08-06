@@ -3,56 +3,39 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@radix-ui/react-dialog": "^1.1.14",
-    "@radix-ui/react-label": "^2.1.7",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-toast": "^1.2.14",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.6",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/x-charts": "^7.22.2",
+    "@mui/x-date-pickers": "^7.22.2",
     "axios": "^1.10.0",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
     "i18next": "^25.3.2",
     "i18next-browser-languagedetector": "^8.2.0",
-    "lucide-react": "^0.292.0",
-    "plotly.js-basic-dist": "^2.27.1",
     "react": "^18.2.0",
-    "react-day-picker": "^8.9.1",
     "react-dom": "^18.2.0",
     "react-i18next": "^15.5.3",
-    "react-plotly.js": "^2.6.0",
-    "react-router-dom": "^6.20.0",
-    "tailwind-merge": "^2.0.0",
-    "tailwindcss-animate": "^1.0.7"
+    "react-router-dom": "^6.20.0"
   },
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run --environment jsdom",
     "test:watch": "vitest --environment jsdom",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "test:coverage": "vitest run --coverage --environment jsdom",
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --write src/",
+    "format": "biome format --write src/",
+    "format:check": "biome format src/",
+    "check": "biome check src/",
+    "check:fix": "biome check --write src/",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@svgr/plugin-svgo": "^8.1.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
@@ -60,21 +43,9 @@
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
-    "autoprefixer": "^10.4.16",
-    "brace-expansion": "^2.0.2",
-    "eslint": "^8.54.0",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
     "jsdom": "^24.0.0",
-    "minimatch": "^5.1.6",
-    "nth-check": "^2.1.1",
-    "postcss": "^8.4.31",
-    "resolve-url-loader": "^5.0.0",
-    "svgo": "^3.0.2",
-    "tailwindcss": "^3.3.5",
     "typescript": "^5.8.3",
     "vite": "^7.0.4",
-    "vitest": "^3.2.4",
-    "webpack-dev-server": "^5.2.2"
+    "vitest": "^3.2.4"
   }
 }

@@ -1,18 +1,18 @@
+import { Close as CloseIcon } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  TextField,
+  Typography,
+} from '@mui/material';
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-  Typography,
-  IconButton,
-} from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
 import type { CatFormProps, FormErrors } from '../types/api';
 
 const CatForm: React.FC<CatFormProps> = ({ open, onSubmit, initialData = null, onClose }) => {

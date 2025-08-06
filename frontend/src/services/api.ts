@@ -1,18 +1,18 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import type {
-  User,
+  ApiError,
   Cat,
-  WeightRecord,
-  PlotData,
-  Token,
-  UserCreate,
-  UserLogin,
-  UserUpdate,
-  UserPasswordChange,
   CatCreate,
   CatUpdate,
+  PlotData,
+  Token,
+  User,
+  UserCreate,
+  UserLogin,
+  UserPasswordChange,
+  UserUpdate,
+  WeightRecord,
   WeightRecordCreate,
-  ApiError,
 } from '../types/api';
 
 // API Configuration

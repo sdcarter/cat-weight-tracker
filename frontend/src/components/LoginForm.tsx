@@ -1,13 +1,13 @@
+import {
+  Lock as LockIcon,
+  Person as PersonIcon,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
+import { Alert, Box, Button, IconButton, InputAdornment, TextField } from '@mui/material';
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, TextField, Button, Alert, InputAdornment, IconButton } from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  Person as PersonIcon,
-  Lock as LockIcon,
-} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import type { FormErrors } from '../types/api';
 

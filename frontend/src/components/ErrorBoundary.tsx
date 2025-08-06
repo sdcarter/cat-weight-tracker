@@ -1,6 +1,6 @@
+import { BugReport as BugReportIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import { Alert, Box, Button, Paper, Typography } from '@mui/material';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { Box, Typography, Button, Paper, Alert } from '@mui/material';
-import { Refresh as RefreshIcon, BugReport as BugReportIcon } from '@mui/icons-material';
 
 interface Props {
   children: ReactNode;

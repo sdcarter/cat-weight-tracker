@@ -1,6 +1,6 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import { describe, test, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import CatForm from '../CatForm';
 
 // Mock the i18next hook directly in the test file

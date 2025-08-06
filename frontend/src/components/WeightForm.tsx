@@ -1,9 +1,9 @@
+import { Scale as ScaleIcon } from '@mui/icons-material';
+import { Box, Button, Card, CardContent, Grid, TextField, Typography } from '@mui/material';
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, TextField, Button, Typography, Card, CardContent, Grid } from '@mui/material';
-import { Scale as ScaleIcon } from '@mui/icons-material';
-import type { WeightFormProps, FormErrors } from '../types/api';
+import type { FormErrors, WeightFormProps } from '../types/api';
 
 const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
   const { t } = useTranslation();

@@ -1,6 +1,6 @@
+import { Alert, Box, Typography } from '@mui/material';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Alert } from '@mui/material';
 
 const RegisterForm: React.FC = () => {
   const { t } = useTranslation();

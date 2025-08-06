@@ -1,24 +1,24 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 import {
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Button,
-  Box,
-  Chip,
-  IconButton,
-  Menu,
-  MenuItem,
-} from '@mui/material';
-import {
-  Edit as EditIcon,
   Delete as DeleteIcon,
+  Edit as EditIcon,
   MoreVert as MoreVertIcon,
   Pets as PetsIcon,
 } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  Grid,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+} from '@mui/material';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CatListProps } from '../types/api';
 
 const CatList: React.FC<CatListProps> = ({

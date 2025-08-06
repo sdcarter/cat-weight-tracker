@@ -1,7 +1,7 @@
+import { Person as PersonIcon } from '@mui/icons-material';
+import { Card, CardContent, Typography } from '@mui/material';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, Typography } from '@mui/material';
-import { Person as PersonIcon } from '@mui/icons-material';
 
 const ProfileForm: React.FC = () => {
   const { t } = useTranslation();

@@ -1,11 +1,11 @@
+import { Pets as PetsIcon } from '@mui/icons-material';
+import { Box, Container, Fade, Paper, Tab, Tabs, Typography } from '@mui/material';
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Container, Paper, Box, Typography, Tabs, Tab, Fade } from '@mui/material';
-import { Pets as PetsIcon } from '@mui/icons-material';
+import { useAuth } from '../context/AuthContext';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
-import { useAuth } from '../context/AuthContext';
 
 interface TabPanelProps {
   children?: React.ReactNode;

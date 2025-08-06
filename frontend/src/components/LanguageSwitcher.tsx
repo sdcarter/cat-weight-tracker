@@ -1,7 +1,7 @@
+import { Language as LanguageIcon } from '@mui/icons-material';
+import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
-import { Language as LanguageIcon } from '@mui/icons-material';
 
 const LanguageSwitcher: React.FC = () => {
   const { t, i18n } = useTranslation();

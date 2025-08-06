@@ -1,7 +1,7 @@
+import { TrendingUp as TrendingUpIcon } from '@mui/icons-material';
+import { Box, Paper, Typography } from '@mui/material';
 import type React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Paper } from '@mui/material';
-import { TrendingUp as TrendingUpIcon } from '@mui/icons-material';
 import type { WeightChartProps } from '../types/api';
 
 const WeightChart: React.FC<WeightChartProps> = ({ plotData }) => {

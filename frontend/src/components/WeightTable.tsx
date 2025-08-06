@@ -1,19 +1,19 @@
-import type React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Delete as DeleteIcon, Timeline as TimelineIcon } from '@mui/icons-material';
 import {
+  Box,
+  Chip,
+  IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  IconButton,
   Typography,
-  Box,
-  Chip,
 } from '@mui/material';
-import { Delete as DeleteIcon, Timeline as TimelineIcon } from '@mui/icons-material';
+import type React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { WeightTableProps } from '../types/api';
 
 const WeightTable: React.FC<WeightTableProps> = ({ weights, onDeleteWeight }) => {

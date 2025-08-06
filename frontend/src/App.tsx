@@ -1,42 +1,42 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import {
-  Container,
+  Alert,
   AppBar,
-  Toolbar,
-  Typography,
   Box,
+  Button,
   Card,
   CardContent,
-  Button,
-  Fab,
   CircularProgress,
+  Container,
+  Fab,
   Snackbar,
-  Alert,
+  Toolbar,
+  Typography,
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
+import AuthScreen from './components/AuthScreen';
 import CatForm from './components/CatForm';
 import CatList from './components/CatList';
+import UserMenu from './components/UserMenu';
+import WeightChart from './components/WeightChart';
 import WeightForm from './components/WeightForm';
 import WeightTable from './components/WeightTable';
-import WeightChart from './components/WeightChart';
-import AuthScreen from './components/AuthScreen';
-import ProfilePage from './pages/ProfilePage';
-import UserMenu from './components/UserMenu';
 import { useAuth } from './context/AuthContext';
-import type {
-  Cat,
-  WeightRecord,
-  PlotData,
-  ToastState,
-  CatCreate,
-  WeightRecordCreate,
-} from './types/api';
+import ProfilePage from './pages/ProfilePage';
 import { api, handleApiError } from './services/api';
 import { material3Theme } from './theme/material3Theme';
+import type {
+  Cat,
+  CatCreate,
+  PlotData,
+  ToastState,
+  WeightRecord,
+  WeightRecordCreate,
+} from './types/api';
 
 function App() {
   const { t } = useTranslation();

@@ -1,6 +1,6 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { describe, test, expect, vi } from 'vitest';
+import React from 'react';
+import { describe, expect, test, vi } from 'vitest';
 import WeightChart from '../WeightChart';
 
 // Mock i18next

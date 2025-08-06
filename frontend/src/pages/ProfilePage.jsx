@@ -1,9 +1,9 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Navigate } from 'react-router-dom';
 import ProfileForm from '../components/ProfileForm';
 import UserMenu from '../components/UserMenu';
+import { useAuth } from '../context/AuthContext';
 
 const ProfilePage = () => {
   const { t } = useTranslation();

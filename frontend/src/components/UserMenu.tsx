@@ -1,20 +1,20 @@
+import {
+  Logout as LogoutIcon,
+  Person as PersonIcon,
+  Settings as SettingsIcon,
+} from '@mui/icons-material';
+import {
+  Avatar,
+  Divider,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from '@mui/material';
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  IconButton,
-  Menu,
-  MenuItem,
-  Avatar,
-  ListItemIcon,
-  ListItemText,
-  Divider,
-} from '@mui/material';
-import {
-  Person as PersonIcon,
-  Settings as SettingsIcon,
-  Logout as LogoutIcon,
-} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 
 const UserMenu: React.FC = () => {

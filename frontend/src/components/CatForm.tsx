@@ -120,7 +120,7 @@ const CatForm: React.FC<CatFormProps> = ({ open, onSubmit, initialData = null, o
         </Box>
       </DialogTitle>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <DialogContent sx={{ pt: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             <TextField

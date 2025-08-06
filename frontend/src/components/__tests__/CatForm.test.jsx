@@ -64,7 +64,7 @@ describe('CatForm', () => {
     render(<CatForm onSubmit={mockSubmit} />);
 
     // Try to submit with empty fields
-    const submitButton = screen.getByRole('button', { name: /save/i });
+    const submitButton = screen.getByRole('button', { name: /add/i });
     fireEvent.click(submitButton);
 
     // The form should show validation errors and not call onSubmit

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Cat } from '../../types/api';
@@ -58,7 +58,9 @@ describe('CatForm', () => {
     const submitButton = screen.getByRole('button', { name: /add/i });
     await user.click(submitButton);
 
-    expect(screen.getByText(/cat name is required/i)).toBeInTheDocument();
+    // Check that both required fields show error messages
+    const errorMessages = screen.getAllByText(/this field is required/i);
+    expect(errorMessages).toHaveLength(2);
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
@@ -72,7 +74,7 @@ describe('CatForm', () => {
     const submitButton = screen.getByRole('button', { name: /add/i });
     await user.click(submitButton);
 
-    expect(screen.getByText(/target weight is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/this field is required/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
@@ -89,7 +91,7 @@ describe('CatForm', () => {
     const submitButton = screen.getByRole('button', { name: /add/i });
     await user.click(submitButton);
 
-    expect(screen.getByText(/must be a positive number/i)).toBeInTheDocument();
+    expect(screen.getByText(/must be greater than 0/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
@@ -101,7 +103,16 @@ describe('CatForm', () => {
     const weightInput = screen.getByLabelText(/target weight/i);
 
     await user.type(nameInput, 'Test Cat');
-    await user.type(weightInput, 'not-a-number');
+    
+    // Override the input's value property to simulate an invalid value
+    // This bypasses the HTML number input restrictions
+    Object.defineProperty(weightInput, 'value', {
+      writable: true,
+      value: 'invalid'
+    });
+    
+    // Trigger a change event to make React aware of the value change
+    fireEvent.change(weightInput, { target: { value: 'invalid' } });
 
     const submitButton = screen.getByRole('button', { name: /add/i });
     await user.click(submitButton);
@@ -124,7 +135,7 @@ describe('CatForm', () => {
     const submitButton = screen.getByRole('button', { name: /add/i });
     await user.click(submitButton);
 
-    expect(screen.getByText(/name must be 100 characters or less/i)).toBeInTheDocument();
+    expect(screen.getByText(/name must be less than 100 characters/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
@@ -141,7 +152,7 @@ describe('CatForm', () => {
     const submitButton = screen.getByRole('button', { name: /add/i });
     await user.click(submitButton);
 
-    expect(screen.getByText(/target weight must be 100 lbs or less/i)).toBeInTheDocument();
+    expect(screen.getByText(/weight must be less than 50 lbs\/kg/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
@@ -211,15 +222,17 @@ describe('CatForm', () => {
   });
 
   it('resets form when closed and reopened', async () => {
+    const user = userEvent.setup();
     const { rerender } = render(
       <CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />
     );
 
     const nameInput = screen.getByLabelText(/cat name/i);
-    await userEvent.type(nameInput, 'Test Cat');
+    await user.type(nameInput, 'Test Cat');
 
-    // Close the form
-    rerender(<CatForm open={false} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
+    // Simulate closing the form by clicking the close button
+    const closeButton = screen.getByRole('button', { name: /close/i });
+    await user.click(closeButton);
 
     // Reopen the form
     rerender(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);

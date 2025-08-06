@@ -251,3 +251,11 @@ tasks:
         echo "To push changes and tag, run: git push && git push --tags"
     vars:
       TYPE: '{{.TYPE | default ""}}'
+
+  ci-test:
+    desc: Run CI tests locally (matches GitHub Actions exactly)
+    cmds:
+      - echo "🧪 Running local CI tests that match GitHub Actions..."
+      - ./scripts/test-ci-locally.sh
+    vars:
+      ENV: '{{.ENV | default "dev"}}'

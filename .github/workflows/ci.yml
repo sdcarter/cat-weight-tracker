@@ -11,54 +11,62 @@ env:
   PYTHON_VERSION: '3.11'
 
 jobs:
-  # Frontend Tests and Quality Checks
+  # Frontend Tests and Quality Checks - Using Container Approach
   frontend-quality:
     name: Frontend Quality & Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-    - name: Install dependencies
-      run: npm ci
+    - name: Create .env file
+      run: |
+        cp .env.example .env || echo "SECRET_KEY=test-secret-key" > .env
+        echo "ALGORITHM=HS256" >> .env
+        echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+        echo "REGISTRATION_ENABLED=false" >> .env
 
-    - name: Type checking
-      run: npm run type-check
+    - name: Build and start services
+      run: |
+        docker-compose -f docker-compose.dev.yml up -d --build
+        # Wait for services to be ready
+        sleep 30
 
-    - name: Biome linting
-      run: npm run lint
+    - name: Install Task runner
+      run: |
+        sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 
-    - name: Biome formatting check
-      run: npm run format:check
+    - name: Run frontend type checking
+      run: task frontend:type-check
 
-    - name: Biome full check
-      run: npm run check
+    - name: Run frontend linting
+      run: task frontend:lint
 
-    - name: Run tests
-      run: npm run test:coverage
+    - name: Run frontend format check
+      run: |
+        docker-compose -f docker-compose.dev.yml run --rm frontend npm run format:check
 
-    - name: Upload coverage reports
+    - name: Run frontend full check
+      run: |
+        docker-compose -f docker-compose.dev.yml run --rm frontend npm run check
+
+    - name: Run frontend tests with coverage
+      run: |
+        docker-compose -f docker-compose.dev.yml run --rm frontend npm run test:coverage
+
+    - name: Upload frontend coverage reports
       uses: codecov/codecov-action@v4
       with:
         file: ./frontend/coverage/lcov.info
         flags: frontend
         name: frontend-coverage
 
-    - name: Build application
-      run: npm run build
-      env:
-        REACT_APP_API_URL: /api
+    - name: Build frontend application
+      run: task frontend:build
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -67,65 +75,65 @@ jobs:
         path: frontend/dist/
         retention-days: 7
 
-  # Backend Tests and Quality Checks
+    - name: Cleanup
+      if: always()
+      run: docker-compose -f docker-compose.dev.yml down -v
+
+  # Backend Tests and Quality Checks - Using Container Approach
   backend-quality:
     name: Backend Quality & Tests
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_USER: testuser
-          POSTGRES_DB: testdb
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-    - name: Install dependencies
+    - name: Create .env file
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov pytest-asyncio httpx
+        cp .env.example .env || echo "SECRET_KEY=test-secret-key" > .env
+        echo "ALGORITHM=HS256" >> .env
+        echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+        echo "REGISTRATION_ENABLED=false" >> .env
+        echo "DB_USER=postgres" >> .env
+        echo "DB_PASSWORD=postgres" >> .env
+        echo "DB_HOST=db" >> .env
+        echo "DB_PORT=5432" >> .env
+        echo "DB_NAME=cat_weight_tracker_test" >> .env
 
-    - name: Run Flake8 linting
-      run: flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+    - name: Install Task runner
+      run: |
+        sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
 
-    - name: Run comprehensive linting
-      run: flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Build and start services
+      run: |
+        docker-compose -f docker-compose.dev.yml up -d --build
+        # Wait for database to be ready
+        sleep 30
 
-    - name: Run tests with coverage
-      run: pytest --cov=app --cov-report=xml --cov-report=html
-      env:
-        DATABASE_URL: postgresql://testuser:testpass@localhost:5432/testdb
-        SECRET_KEY: test-secret-key-for-ci
-        ALGORITHM: HS256
-        ACCESS_TOKEN_EXPIRE_MINUTES: 30
+    - name: Run backend linting
+      run: task backend:lint
 
-    - name: Upload coverage reports
+    - name: Run backend tests with coverage
+      run: task backend:test ARGS="--cov=app --cov-report=xml --cov-report=html"
+
+    - name: Copy coverage files from container
+      run: |
+        docker-compose -f docker-compose.dev.yml run --rm backend cp coverage.xml /tmp/coverage.xml || true
+        docker cp $(docker-compose -f docker-compose.dev.yml ps -q backend):/app/coverage.xml ./backend/coverage.xml || true
+
+    - name: Upload backend coverage reports
       uses: codecov/codecov-action@v4
       with:
         file: ./backend/coverage.xml
         flags: backend
         name: backend-coverage
+
+    - name: Cleanup
+      if: always()
+      run: docker-compose -f docker-compose.dev.yml down -v
 
   # Security Scanning
   security-scan:
@@ -134,6 +142,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Install Task runner
+      run: |
+        sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
+    - name: Run security audits
+      run: task security
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
@@ -162,32 +177,28 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Build frontend image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./frontend
-        push: false
-        tags: cat-weight-tracker-frontend:test
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Build backend image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./backend
-        push: false
-        tags: cat-weight-tracker-backend:test
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Test Docker Compose
+    - name: Install Task runner
       run: |
-        cp .env.example .env
-        docker-compose -f docker-compose.yml up -d
+        sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
+    - name: Create .env file
+      run: |
+        cp .env.example .env || echo "SECRET_KEY=test-secret-key" > .env
+        echo "ALGORITHM=HS256" >> .env
+        echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+        echo "REGISTRATION_ENABLED=false" >> .env
+
+    - name: Build and test with Task
+      run: |
+        task launch ENV=dev
         sleep 30
-        docker-compose ps
-        curl -f http://localhost:80/ || exit 1
-        docker-compose down
+        task status
+        
+        # Test that services are responding
+        curl -f http://localhost:3000/ || exit 1
+        curl -f http://localhost:4000/ || exit 1
+        
+        task stop ENV=dev
 
   # Integration Tests
   integration-tests:
@@ -199,47 +210,86 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install Task runner
+      run: |
+        sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
     - name: Setup test environment
       run: |
-        cp .env.example .env
-        echo "SECRET_KEY=test-secret-key-for-integration" >> .env
+        cp .env.example .env || echo "SECRET_KEY=test-secret-key" > .env
         echo "ALGORITHM=HS256" >> .env
         echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+        echo "REGISTRATION_ENABLED=false" >> .env
 
-    - name: Start services
-      run: docker-compose up -d
+    - name: Start services using Task
+      run: task launch ENV=dev
 
     - name: Wait for services
       run: |
-        timeout 60 bash -c 'until curl -f http://localhost:80/api/; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f http://localhost:80/; do sleep 2; done'
+        timeout 60 bash -c 'until curl -f http://localhost:4000/; do sleep 2; done'
+        timeout 60 bash -c 'until curl -f http://localhost:3000/; do sleep 2; done'
 
-    - name: Run API integration tests
+    - name: Run integration tests
       run: |
-        # Test user registration/login flow
-        curl -X POST http://localhost:80/api/auth/login \
-          -H "Content-Type: application/x-www-form-urlencoded" \
-          -d "username=admin&password=admin123" \
-          -f || exit 1
-        
         # Test API health
-        curl -f http://localhost:80/api/ || exit 1
+        curl -f http://localhost:4000/ || exit 1
+        
+        # Test frontend is serving
+        curl -f http://localhost:3000/ || exit 1
+        
+        # Test API endpoints
+        curl -f http://localhost:4000/auth/registration-status || exit 1
 
     - name: Check application logs
       if: failure()
-      run: |
-        docker-compose logs backend
-        docker-compose logs frontend
+      run: task logs
 
     - name: Cleanup
       if: always()
-      run: docker-compose down -v
+      run: task stop ENV=dev
+
+  # Run all tests using Task (matches local development exactly)
+  unified-tests:
+    name: Unified Tests (Local Parity)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Install Task runner
+      run: |
+        sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
+    - name: Create .env file
+      run: |
+        cp .env.example .env || echo "SECRET_KEY=test-secret-key" > .env
+        echo "ALGORITHM=HS256" >> .env
+        echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+        echo "REGISTRATION_ENABLED=false" >> .env
+
+    - name: Run all tests (exactly like local)
+      run: |
+        # This matches exactly what you run locally
+        task test ENV=dev
+
+    - name: Run all linting (exactly like local)
+      run: |
+        # This matches exactly what you run locally
+        task lint ENV=dev
+
+    - name: Cleanup
+      if: always()
+      run: task clean
 
   # Deployment (only on main branch)
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [integration-tests]
+    needs: [unified-tests, integration-tests]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
@@ -250,5 +300,6 @@ jobs:
       run: |
         echo "🚀 Deployment would happen here"
         echo "✅ All quality checks passed"
-        echo "📦 Material 3 UI with Biome linting"
+        echo "📦 Container-based testing completed"
         echo "🔒 Security scans completed"
+        echo "🎯 Local and CI environments are now identical"

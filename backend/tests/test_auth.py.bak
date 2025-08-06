@@ -1,5 +1,4 @@
 import pytest
-import uuid
 from sqlalchemy.orm import Session
 
 from app import crud, schemas
@@ -10,10 +9,9 @@ class TestAuthentication:
 
     def test_register_user_success(self, client, test_db: Session):
         """Test successful user registration."""
-        unique_id = str(uuid.uuid4())[:8]
         user_data = {
-            "username": f"testuser_{unique_id}",
-            "email": f"test_{unique_id}@example.com",
+            "username": "testuser",
+            "email": "test@example.com",
             "password": "TestPassword123"
         }
         
@@ -26,7 +24,7 @@ class TestAuthentication:
         assert data["is_active"] is True
         assert "id" in data
 
-    def test_register_user_duplicate_username(self, client, test_db: Session):
+    def test_register_user_duplicate_username(self, test_db: Session):
         """Test registration with duplicate username."""
         # Create first user
         user1_data = {
@@ -48,7 +46,7 @@ class TestAuthentication:
         assert response.status_code == 409
         assert "Username already exists" in response.json()["detail"]
 
-    def test_register_user_duplicate_email(self, client, test_db: Session):
+    def test_register_user_duplicate_email(self, test_db: Session):
         """Test registration with duplicate email."""
         # Create first user
         user1_data = {
@@ -70,7 +68,7 @@ class TestAuthentication:
         assert response.status_code == 409
         assert "Email already registered" in response.json()["detail"]
 
-    def test_register_user_invalid_password(self, client, test_db: Session):
+    def test_register_user_invalid_password(self, test_db: Session):
         """Test registration with invalid password."""
         user_data = {
             "username": "testuser",
@@ -83,7 +81,7 @@ class TestAuthentication:
         assert response.status_code == 422
         assert "validation error" in response.json()["detail"].lower()
 
-    def test_register_user_invalid_email(self, client, test_db: Session):
+    def test_register_user_invalid_email(self, test_db: Session):
         """Test registration with invalid email."""
         user_data = {
             "username": "testuser",
@@ -95,7 +93,7 @@ class TestAuthentication:
         
         assert response.status_code == 422
 
-    def test_login_success(self, client, test_db: Session):
+    def test_login_success(self, test_db: Session):
         """Test successful login."""
         # Create user first
         user_data = schemas.UserCreate(
@@ -118,7 +116,7 @@ class TestAuthentication:
         assert "access_token" in data
         assert data["token_type"] == "bearer"
 
-    def test_login_invalid_credentials(self, client, test_db: Session):
+    def test_login_invalid_credentials(self, test_db: Session):
         """Test login with invalid credentials."""
         login_data = {
             "username": "nonexistent",
@@ -130,7 +128,7 @@ class TestAuthentication:
         assert response.status_code == 401
         assert "Invalid credentials" in response.json()["detail"]
 
-    def test_login_inactive_user(self, client, test_db: Session):
+    def test_login_inactive_user(self, test_db: Session):
         """Test login with inactive user."""
         # Create inactive user
         user_data = schemas.UserCreate(
@@ -155,7 +153,7 @@ class TestAuthentication:
         assert response.status_code == 401
         assert "Account is disabled" in response.json()["detail"]
 
-    def test_get_current_user_success(self, client, test_db: Session):
+    def test_get_current_user_success(self, test_db: Session):
         """Test getting current user with valid token."""
         user = create_test_user(test_db)
         
@@ -178,7 +176,7 @@ class TestAuthentication:
         assert data["username"] == user.username
         assert data["email"] == user.email
 
-    def test_get_current_user_invalid_token(self, client, test_db: Session):
+    def test_get_current_user_invalid_token(self, test_db: Session):
         """Test getting current user with invalid token."""
         response = client.get(
             "/auth/me",
@@ -187,7 +185,7 @@ class TestAuthentication:
         
         assert response.status_code == 401
 
-    def test_get_current_user_no_token(self, client, test_db: Session):
+    def test_get_current_user_no_token(self, test_db: Session):
         """Test getting current user without token."""
         response = client.get("/auth/me")
         

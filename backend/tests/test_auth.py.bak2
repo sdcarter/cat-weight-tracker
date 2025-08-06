@@ -1,5 +1,4 @@
 import pytest
-import uuid
 from sqlalchemy.orm import Session
 
 from app import crud, schemas
@@ -10,10 +9,9 @@ class TestAuthentication:
 
     def test_register_user_success(self, client, test_db: Session):
         """Test successful user registration."""
-        unique_id = str(uuid.uuid4())[:8]
         user_data = {
-            "username": f"testuser_{unique_id}",
-            "email": f"test_{unique_id}@example.com",
+            "username": "testuser",
+            "email": "test@example.com",
             "password": "TestPassword123"
         }
         

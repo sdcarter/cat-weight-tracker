@@ -26,7 +26,7 @@ class User(Base):
     __table_args__ = (
         CheckConstraint('length(username) >= 3', name='username_min_length'),
         CheckConstraint('length(username) <= 50', name='username_max_length'),
-        CheckConstraint('email LIKE "%@%.%"', name='email_format'),
+        CheckConstraint("email LIKE '%@%.%'", name='email_format'),
     )
 
     def __repr__(self) -> str:

@@ -10,6 +10,12 @@ from sqlalchemy.pool import StaticPool
 from app.database import Base, get_db
 from app.main import app
 
+# Set test environment variables
+os.environ['REGISTRATION_ENABLED'] = 'true'
+os.environ['SECRET_KEY'] = 'test-secret-key-for-testing-minimum-32-characters-long'
+os.environ['ALGORITHM'] = 'HS256'
+os.environ['ACCESS_TOKEN_EXPIRE_MINUTES'] = '30'
+
 # Filter out deprecation warnings using warnings module instead
 warnings.filterwarnings(
     "ignore",

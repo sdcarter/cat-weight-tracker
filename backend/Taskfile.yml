@@ -5,7 +5,7 @@ tasks:
     desc: Run backend tests
     cmds:
       - echo "Running backend tests..."
-      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm backend pytest {{.ARGS}}
+      - docker-compose {{if eq .ENV "dev"}}-f ../docker-compose.dev.yml{{end}} run --rm -e REGISTRATION_ENABLED=true -e SECRET_KEY=test-secret-key-for-testing-minimum-32-characters-long -e ALGORITHM=HS256 -e ACCESS_TOKEN_EXPIRE_MINUTES=30 backend pytest {{.ARGS}}
     vars:
       ENV: '{{.ENV | default "prod"}}'
       ARGS: '{{.ARGS | default ""}}'

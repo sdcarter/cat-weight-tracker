@@ -1,5 +1,5 @@
 import type React from 'react';
-import { createContext, useState, useContext, useEffect, type ReactNode } from 'react'
+import { createContext, useState, useContext, useEffect, useCallback, type ReactNode } from 'react'
 import axios from 'axios';
 import { type User, UserCreate, UserLogin, UserUpdate, UserPasswordChange, type Token } from '../types/api';
 
@@ -43,7 +43,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (token) {
       // If token was in localStorage, move it to sessionStorage
       if (localStorage.getItem('token')) {
-        sessionStorage.setItem('token', localStorage.getItem('token')!);
+        const token = localStorage.getItem('token');
+        if (token) {
+          sessionStorage.setItem('token', token);
+        }
         localStorage.removeItem('token');
       }
       fetchUserData(token);
@@ -60,7 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } else {
       delete axios.defaults.headers.common['Authorization'];
     }
-  }, [user]);
+  }, []);
 
   const fetchUserData = async (token: string): Promise<void> => {
     try {
@@ -108,9 +111,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('token'); // Remove from localStorage if it exists
       await fetchUserData(access_token);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      setError(error.response?.data?.detail || 'Login failed');
+      const errorMessage = error instanceof Error && 'response' in error 
+        ? (error as any).response?.data?.detail || 'Login failed'
+        : 'Login failed';
+      setError(errorMessage);
       return false;
     }
   };
@@ -144,9 +150,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password
       });
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Registration error:', error);
-      setError(error.response?.data?.detail || 'Registration failed');
+      const errorMessage = error instanceof Error && 'response' in error 
+        ? (error as any).response?.data?.detail || 'Registration failed'
+        : 'Registration failed';
+      setError(errorMessage);
       return false;
     }
   };
@@ -159,7 +168,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Check if registration is enabled
-  const checkRegistrationStatus = async (): Promise<void> => {
+  const checkRegistrationStatus = useCallback(async (): Promise<void> => {
     try {
       const response = await axios.get<{ enabled: boolean }>(`${API_URL}/auth/registration-status`);
       setRegistrationEnabled(response.data.enabled);
@@ -167,12 +176,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Error checking registration status:', error);
       setRegistrationEnabled(false); // Default to disabled if there's an error
     }
-  };
+  }, []);
 
   // Check registration status on initial load
   useEffect(() => {
     checkRegistrationStatus();
-  }, []);
+  }, [checkRegistrationStatus]);
 
   const value: AuthContextType = {
     user,

@@ -18,7 +18,7 @@ const WeightChart: React.FC<WeightChartProps> = ({ plotData }) => {
       </Typography>
       <Box sx={{ mt: 2 }}>
         <Typography variant="body2">
-          {t('chart.dataPoints', 'Data points')}: {plotData?.x?.length || 0}
+          {t('chart.dataPoints', 'Data points')}: {plotData?.dates?.length || 0}
         </Typography>
         <Typography variant="body2">
           {t('chart.targetWeight', 'Target weight')}: {plotData?.target_weight || 0} lbs

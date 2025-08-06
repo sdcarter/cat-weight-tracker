@@ -1,18 +1,40 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import axios from 'axios';
+import { User, UserCreate, UserLogin, UserUpdate, UserPasswordChange, Token } from '../types/api';
 
 // API base URL - use environment variable or fallback
 const API_URL = process.env.REACT_APP_API_URL || '/api';
 
-const AuthContext = createContext();
+interface AuthContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  loading: boolean;
+  error: string | null;
+  login: (username: string, password: string) => Promise<boolean>;
+  register: (username: string, email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  registrationEnabled: boolean;
+}
 
-export const useAuth = () => useContext(AuthContext);
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [registrationEnabled, setRegistrationEnabled] = useState(false);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [registrationEnabled, setRegistrationEnabled] = useState<boolean>(false);
 
   // Initialize auth state from sessionStorage (with localStorage fallback for existing users)
   useEffect(() => {
@@ -20,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       // If token was in localStorage, move it to sessionStorage
       if (localStorage.getItem('token')) {
-        sessionStorage.setItem('token', localStorage.getItem('token'));
+        sessionStorage.setItem('token', localStorage.getItem('token')!);
         localStorage.removeItem('token');
       }
       fetchUserData(token);
@@ -39,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  const fetchUserData = async (token) => {
+  const fetchUserData = async (token: string): Promise<void> => {
     try {
       if (!token) {
         setLoading(false);
@@ -47,7 +69,7 @@ export const AuthProvider = ({ children }) => {
       }
       
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const response = await axios.get(`${API_URL}/auth/me`);
+      const response = await axios.get<User>(`${API_URL}/auth/me`);
       setUser(response.data);
       setLoading(false);
     } catch (error) {
@@ -59,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (username, password) => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     try {
       setError(null);
       
@@ -73,7 +95,7 @@ export const AuthProvider = ({ children }) => {
       formData.append('username', username);
       formData.append('password', password);
       
-      const response = await axios.post(`${API_URL}/auth/login`, formData, {
+      const response = await axios.post<Token>(`${API_URL}/auth/login`, formData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -85,14 +107,14 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('token'); // Remove from localStorage if it exists
       await fetchUserData(access_token);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       setError(error.response?.data?.detail || 'Login failed');
       return false;
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (username: string, email: string, password: string): Promise<boolean> => {
     try {
       setError(null);
       
@@ -115,20 +137,20 @@ export const AuthProvider = ({ children }) => {
         return false;
       }
       
-      await axios.post(`${API_URL}/auth/register`, {
+      await axios.post<User>(`${API_URL}/auth/register`, {
         username,
         email,
         password
       });
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration error:', error);
       setError(error.response?.data?.detail || 'Registration failed');
       return false;
     }
   };
 
-  const logout = () => {
+  const logout = (): void => {
     sessionStorage.removeItem('token');
     localStorage.removeItem('token'); // Clean up any old tokens
     delete axios.defaults.headers.common['Authorization'];
@@ -136,9 +158,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Check if registration is enabled
-  const checkRegistrationStatus = async () => {
+  const checkRegistrationStatus = async (): Promise<void> => {
     try {
-      const response = await axios.get(`${API_URL}/auth/registration-status`);
+      const response = await axios.get<{ enabled: boolean }>(`${API_URL}/auth/registration-status`);
       setRegistrationEnabled(response.data.enabled);
     } catch (error) {
       console.error('Error checking registration status:', error);
@@ -151,7 +173,7 @@ export const AuthProvider = ({ children }) => {
     checkRegistrationStatus();
   }, []);
 
-  const value = {
+  const value: AuthContextType = {
     user,
     setUser,
     loading,

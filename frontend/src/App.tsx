@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider, CssBaseline } from '@mui/material';
@@ -76,7 +76,7 @@ function App(): JSX.Element {
 
   const fetchWeights = async (catId: number): Promise<void> => {
     try {
-      const fetchedWeights = await api.weights.getWeights(catId);
+      const fetchedWeights = await api.weights.getWeightRecords(catId);
       setWeights(fetchedWeights);
     } catch (error) {
       console.error('Error fetching weights:', error);
@@ -86,7 +86,7 @@ function App(): JSX.Element {
 
   const fetchPlotData = async (catId: number): Promise<void> => {
     try {
-      const data = await api.plots.getPlotData(catId);
+      const data = await api.weights.getPlotData(catId);
       setPlotData(data);
     } catch (error) {
       console.error('Error fetching plot data:', error);
@@ -123,7 +123,7 @@ function App(): JSX.Element {
     }
 
     try {
-      await api.weights.createWeight(selectedCatId, weightData);
+      await api.weights.createWeightRecord(selectedCatId, weightData);
       showToast('Success', 'Weight recorded successfully!');
       fetchWeights(selectedCatId);
       fetchPlotData(selectedCatId);
@@ -157,7 +157,7 @@ function App(): JSX.Element {
     }
 
     try {
-      await api.weights.deleteWeight(recordId);
+      await api.weights.deleteWeightRecord(recordId);
       showToast('Success', 'Weight record deleted successfully!');
       if (selectedCatId) {
         fetchWeights(selectedCatId);

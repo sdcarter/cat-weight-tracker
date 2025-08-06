@@ -63,3 +63,12 @@ tasks:
     vars:
       ENV: '{{.ENV | default "dev"}}'
       ROOT_DIR: '{{.ROOT_DIR | default ".."}}'
+
+  type-check:
+    desc: Run TypeScript type checking
+    cmds:
+      - echo "Running TypeScript type checking..."
+      - docker-compose -f {{.ROOT_DIR}}/docker-compose.{{.ENV}}.yml run --rm frontend npm run type-check
+    vars:
+      ENV: '{{.ENV | default "dev"}}'
+      ROOT_DIR: '{{.ROOT_DIR | default ".."}}'

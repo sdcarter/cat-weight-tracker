@@ -47,7 +47,7 @@ const AuthScreen: React.FC = () => {
   const { registrationEnabled } = useAuth();
   const [tabValue, setTabValue] = useState(0);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 

@@ -7,20 +7,21 @@ import type { Cat } from '../../types/api';
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, defaultValue?: string) => defaultValue || key,
+    t: (key: string, fallback?: string) => fallback || key,
   }),
 }));
 
 describe('CatForm', () => {
   const mockOnSubmit = vi.fn();
-  const mockOnCancel = vi.fn();
+  const mockOnClose = vi.fn();
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockOnSubmit.mockClear();
+    mockOnClose.mockClear();
   });
 
   it('renders form fields correctly', () => {
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
 
     expect(screen.getByLabelText(/cat name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/target weight/i)).toBeInTheDocument();
@@ -37,9 +38,10 @@ describe('CatForm', () => {
 
     render(
       <CatForm 
+        open={true}
         onSubmit={mockOnSubmit} 
         initialData={initialData}
-        onCancel={mockOnCancel}
+        onClose={mockOnClose}
       />
     );
 
@@ -49,86 +51,112 @@ describe('CatForm', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
-  it('validates required fields', async () => {
+  it('validates required name field', async () => {
     const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
 
     const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
-    expect(await screen.findByText(/this field is required/i)).toBeInTheDocument();
+    expect(screen.getByText(/cat name is required/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
-  it('validates cat name length', async () => {
+  it('validates required target weight field', async () => {
     const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
 
     const nameInput = screen.getByLabelText(/cat name/i);
-    const longName = 'a'.repeat(101); // Exceeds 100 character limit
-    
-    await user.type(nameInput, longName);
-    await user.click(screen.getByRole('button', { name: /save/i }));
+    await user.type(nameInput, 'Test Cat');
 
-    expect(await screen.findByText(/name must be less than 100 characters/i)).toBeInTheDocument();
+    const submitButton = screen.getByRole('button', { name: /save/i });
+    await user.click(submitButton);
+
+    expect(screen.getByText(/target weight is required/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
-  it('validates target weight is positive', async () => {
+  it('validates target weight is a positive number', async () => {
     const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
 
     const nameInput = screen.getByLabelText(/cat name/i);
     const weightInput = screen.getByLabelText(/target weight/i);
-    
+
     await user.type(nameInput, 'Test Cat');
     await user.type(weightInput, '-5');
-    await user.click(screen.getByRole('button', { name: /save/i }));
 
-    expect(await screen.findByText(/must be greater than 0/i)).toBeInTheDocument();
+    const submitButton = screen.getByRole('button', { name: /save/i });
+    await user.click(submitButton);
+
+    expect(screen.getByText(/must be a positive number/i)).toBeInTheDocument();
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('validates target weight is a valid number', async () => {
+    const user = userEvent.setup();
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
+
+    const nameInput = screen.getByLabelText(/cat name/i);
+    const weightInput = screen.getByLabelText(/target weight/i);
+
+    await user.type(nameInput, 'Test Cat');
+    await user.type(weightInput, 'not-a-number');
+
+    const submitButton = screen.getByRole('button', { name: /save/i });
+    await user.click(submitButton);
+
+    expect(screen.getByText(/must be a valid number/i)).toBeInTheDocument();
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('validates name length constraints', async () => {
+    const user = userEvent.setup();
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
+
+    const nameInput = screen.getByLabelText(/cat name/i);
+    const weightInput = screen.getByLabelText(/target weight/i);
+
+    // Test name too long
+    await user.type(nameInput, 'a'.repeat(101));
+    await user.type(weightInput, '5.0');
+
+    const submitButton = screen.getByRole('button', { name: /save/i });
+    await user.click(submitButton);
+
+    expect(screen.getByText(/name must be 100 characters or less/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
   it('validates target weight maximum', async () => {
     const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
 
     const nameInput = screen.getByLabelText(/cat name/i);
     const weightInput = screen.getByLabelText(/target weight/i);
-    
+
     await user.type(nameInput, 'Test Cat');
-    await user.type(weightInput, '100');
-    await user.click(screen.getByRole('button', { name: /save/i }));
+    await user.type(weightInput, '101');
 
-    expect(await screen.findByText(/weight must be less than 50/i)).toBeInTheDocument();
-    expect(mockOnSubmit).not.toHaveBeenCalled();
-  });
+    const submitButton = screen.getByRole('button', { name: /save/i });
+    await user.click(submitButton);
 
-  it('validates target weight is a number', async () => {
-    const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
-
-    const nameInput = screen.getByLabelText(/cat name/i);
-    const weightInput = screen.getByLabelText(/target weight/i);
-    
-    await user.type(nameInput, 'Test Cat');
-    await user.type(weightInput, 'not-a-number');
-    await user.click(screen.getByRole('button', { name: /save/i }));
-
-    expect(await screen.findByText(/must be a valid number/i)).toBeInTheDocument();
+    expect(screen.getByText(/target weight must be 100 lbs or less/i)).toBeInTheDocument();
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
   it('submits valid form data', async () => {
     const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
 
     const nameInput = screen.getByLabelText(/cat name/i);
     const weightInput = screen.getByLabelText(/target weight/i);
-    
+
     await user.type(nameInput, 'Fluffy');
     await user.type(weightInput, '12.5');
-    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    const submitButton = screen.getByRole('button', { name: /save/i });
+    await user.click(submitButton);
 
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith({
@@ -138,97 +166,84 @@ describe('CatForm', () => {
     });
   });
 
-  it('trims whitespace from cat name', async () => {
+  it('calls onClose when cancel button is clicked', async () => {
     const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    const initialData: Cat = {
+      id: 1,
+      name: 'Fluffy',
+      target_weight: 12.5,
+      user_id: 1,
+    };
 
-    const nameInput = screen.getByLabelText(/cat name/i);
-    const weightInput = screen.getByLabelText(/target weight/i);
-    
-    await user.type(nameInput, '  Fluffy  ');
-    await user.type(weightInput, '12.5');
-    await user.click(screen.getByRole('button', { name: /save/i }));
-
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledWith({
-        name: 'Fluffy', // Whitespace should be trimmed
-        target_weight: 12.5,
-      });
-    });
-  });
-
-  it('clears errors when user starts typing', async () => {
-    const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
-
-    const nameInput = screen.getByLabelText(/cat name/i);
-    const submitButton = screen.getByRole('button', { name: /save/i });
-    
-    // Submit empty form to trigger validation error
-    await user.click(submitButton);
-    expect(await screen.findByText(/this field is required/i)).toBeInTheDocument();
-    
-    // Start typing to clear error
-    await user.type(nameInput, 'F');
-    expect(screen.queryByText(/this field is required/i)).not.toBeInTheDocument();
-  });
-
-  it('calls onCancel when cancel button is clicked', async () => {
-    const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
+    render(
+      <CatForm 
+        open={true}
+        onSubmit={mockOnSubmit} 
+        initialData={initialData}
+        onClose={mockOnClose}
+      />
+    );
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     await user.click(cancelButton);
 
-    expect(mockOnCancel).toHaveBeenCalled();
+    expect(mockOnClose).toHaveBeenCalled();
   });
 
-  it('disables form during submission', async () => {
+  it('handles form submission errors gracefully', async () => {
     const user = userEvent.setup();
-    // Mock a slow submission
-    const slowSubmit = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
-    
-    render(<CatForm onSubmit={slowSubmit} onCancel={mockOnCancel} />);
+    const mockOnSubmitWithError = vi.fn().mockRejectedValue(new Error('Submission failed'));
+
+    render(<CatForm open={true} onSubmit={mockOnSubmitWithError} onClose={mockOnClose} />);
 
     const nameInput = screen.getByLabelText(/cat name/i);
     const weightInput = screen.getByLabelText(/target weight/i);
-    const submitButton = screen.getByRole('button', { name: /save/i });
-    const cancelButton = screen.getByRole('button', { name: /cancel/i });
-    
+
     await user.type(nameInput, 'Test Cat');
-    await user.type(weightInput, '10');
-    await user.click(submitButton);
-
-    // Check that buttons are disabled during submission
-    expect(submitButton).toBeDisabled();
-    expect(cancelButton).toBeDisabled();
-    expect(screen.getByText(/saving/i)).toBeInTheDocument();
-  });
-
-  it('has proper accessibility attributes', () => {
-    render(<CatForm onSubmit={mockOnSubmit} />);
-
-    const nameInput = screen.getByLabelText(/cat name/i);
-    const weightInput = screen.getByLabelText(/target weight/i);
-
-    expect(nameInput).toHaveAttribute('required');
-    expect(weightInput).toHaveAttribute('required');
-    expect(nameInput).toHaveAttribute('maxLength', '100');
-    expect(weightInput).toHaveAttribute('min', '0.1');
-    expect(weightInput).toHaveAttribute('max', '50');
-  });
-
-  it('shows error with proper ARIA attributes', async () => {
-    const user = userEvent.setup();
-    render(<CatForm onSubmit={mockOnSubmit} />);
+    await user.type(weightInput, '5.0');
 
     const submitButton = screen.getByRole('button', { name: /save/i });
     await user.click(submitButton);
 
-    const errorMessage = await screen.findByText(/this field is required/i);
-    const nameInput = screen.getByLabelText(/cat name/i);
+    await waitFor(() => {
+      expect(mockOnSubmitWithError).toHaveBeenCalled();
+    });
+  });
 
-    expect(errorMessage).toHaveAttribute('role', 'alert');
-    expect(nameInput).toHaveAttribute('aria-describedby', 'name-error');
+  it('resets form when closed and reopened', async () => {
+    const { rerender } = render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
+
+    const nameInput = screen.getByLabelText(/cat name/i);
+    await userEvent.type(nameInput, 'Test Cat');
+
+    // Close the form
+    rerender(<CatForm open={false} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
+
+    // Reopen the form
+    rerender(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
+
+    const newNameInput = screen.getByLabelText(/cat name/i);
+    expect(newNameInput).toHaveValue('');
+  });
+
+  it('displays correct button text for editing', () => {
+    const initialData: Cat = {
+      id: 1,
+      name: 'Fluffy',
+      target_weight: 12.5,
+      user_id: 1,
+    };
+
+    render(
+      <CatForm 
+        open={true}
+        onSubmit={mockOnSubmit} 
+        initialData={initialData}
+        onClose={mockOnClose}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: /update/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 });

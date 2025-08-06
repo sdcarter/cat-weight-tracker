@@ -57,7 +57,14 @@ services:
       - backend
     volumes:
       - ./frontend/package.json:/app/package.json
+      - ./frontend/package-lock.json:/app/package-lock.json
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tsconfig.node.json:/app/tsconfig.node.json
+      - ./frontend/vite.config.ts:/app/vite.config.ts
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/biome.json:/app/biome.json
       - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
       - ./frontend/public:/app/public
       - ./frontend/.env.development:/app/.env
       - ./frontend/tailwind.config.js:/app/tailwind.config.js

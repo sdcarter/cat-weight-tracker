@@ -1,5 +1,5 @@
 import type React from 'react';
-import { createContext, useState, useContext, useEffect, useCallback, type ReactNode } from 'react'
+import { createContext, useState, useContext, useEffect, useCallback, type ReactNode } from 'react';
 import axios from 'axios';
 import type { User, Token } from '../types/api';
 
@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setLoading(false);
         return;
       }
-      
+
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       const response = await axios.get<User>(`${API_URL}/auth/me`);
       setUser(response.data);
@@ -88,24 +88,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       setError(null);
-      
+
       // Validate inputs
       if (!username || !password) {
         setError('Username and password are required');
         return false;
       }
-      
+
       const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
-      
+
       const response = await axios.post<Token>(`${API_URL}/auth/login`, formData, {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       });
       const { access_token } = response.data;
-      
+
       // Store token in sessionStorage instead of localStorage for better security
       sessionStorage.setItem('token', access_token);
       localStorage.removeItem('token'); // Remove from localStorage if it exists
@@ -113,9 +113,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return true;
     } catch (error: unknown) {
       console.error('Login error:', error);
-      const errorMessage = error instanceof Error && 'response' in error 
-        ? (error as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Login failed'
-        : 'Login failed';
+      const errorMessage =
+        error instanceof Error && 'response' in error
+          ? (error as { response?: { data?: { detail?: string } } }).response?.data?.detail ||
+            'Login failed'
+          : 'Login failed';
       setError(errorMessage);
       return false;
     }
@@ -124,37 +126,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (username: string, email: string, password: string): Promise<boolean> => {
     try {
       setError(null);
-      
+
       // Validate inputs
       if (!username || !email || !password) {
         setError('Username, email, and password are required');
         return false;
       }
-      
+
       // Basic email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         setError('Please enter a valid email address');
         return false;
       }
-      
+
       // Password strength validation
       if (password.length < 8) {
         setError('Password must be at least 8 characters long');
         return false;
       }
-      
+
       await axios.post<User>(`${API_URL}/auth/register`, {
         username,
         email,
-        password
+        password,
       });
       return true;
     } catch (error: unknown) {
       console.error('Registration error:', error);
-      const errorMessage = error instanceof Error && 'response' in error 
-        ? (error as { response?: { data?: { detail?: string } } }).response?.data?.detail || 'Registration failed'
-        : 'Registration failed';
+      const errorMessage =
+        error instanceof Error && 'response' in error
+          ? (error as { response?: { data?: { detail?: string } } }).response?.data?.detail ||
+            'Registration failed'
+          : 'Registration failed';
       setError(errorMessage);
       return false;
     }
@@ -191,7 +195,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
-    registrationEnabled
+    registrationEnabled,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

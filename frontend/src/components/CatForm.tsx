@@ -15,12 +15,7 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import type { CatFormProps, FormErrors } from '../types/api';
 
-const CatForm: React.FC<CatFormProps> = ({ 
-  open, 
-  onSubmit, 
-  initialData = null, 
-  onClose 
-}) => {
+const CatForm: React.FC<CatFormProps> = ({ open, onSubmit, initialData = null, onClose }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
@@ -59,14 +54,14 @@ const CatForm: React.FC<CatFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: '',
       }));
@@ -75,19 +70,19 @@ const CatForm: React.FC<CatFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await onSubmit({
         name: formData.name.trim(),
         target_weight: Number.parseFloat(formData.target_weight),
       });
-      
+
       // Reset form
       setFormData({ name: '', target_weight: '' });
       setErrors({});
@@ -105,28 +100,21 @@ const CatForm: React.FC<CatFormProps> = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 4 }
+        sx: { borderRadius: 4 },
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h5" component="h2">
-            {initialData 
-              ? t('cats.edit', 'Edit Cat') 
-              : t('cats.add', 'Add New Cat')
-            }
+            {initialData ? t('cats.edit', 'Edit Cat') : t('cats.add', 'Add New Cat')}
           </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{ color: 'text.secondary' }}
-          >
+          <IconButton aria-label="close" onClick={handleClose} sx={{ color: 'text.secondary' }}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -145,7 +133,7 @@ const CatForm: React.FC<CatFormProps> = ({
               fullWidth
               required
               variant="outlined"
-              placeholder={t('cats.namePlaceholder', 'Enter your cat\'s name')}
+              placeholder={t('cats.namePlaceholder', "Enter your cat's name")}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
@@ -180,11 +168,7 @@ const CatForm: React.FC<CatFormProps> = ({
         </DialogContent>
 
         <DialogActions sx={{ p: 3, pt: 2 }}>
-          <Button 
-            onClick={handleClose}
-            variant="text"
-            sx={{ mr: 1 }}
-          >
+          <Button onClick={handleClose} variant="text" sx={{ mr: 1 }}>
             {t('common.cancel', 'Cancel')}
           </Button>
           <Button
@@ -193,12 +177,11 @@ const CatForm: React.FC<CatFormProps> = ({
             disabled={isSubmitting}
             sx={{ borderRadius: 3, minWidth: 100 }}
           >
-            {isSubmitting 
-              ? t('common.saving', 'Saving...') 
-              : initialData 
+            {isSubmitting
+              ? t('common.saving', 'Saving...')
+              : initialData
                 ? t('common.update', 'Update')
-                : t('common.add', 'Add')
-            }
+                : t('common.add', 'Add')}
           </Button>
         </DialogActions>
       </form>

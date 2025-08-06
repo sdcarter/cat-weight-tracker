@@ -11,17 +11,17 @@ i18n
   .init({
     resources: {
       en: {
-        translation: enTranslation
+        translation: enTranslation,
       },
       de: {
-        translation: deTranslation
-      }
+        translation: deTranslation,
+      },
     },
     fallbackLng: 'en',
     debug: process.env.NODE_ENV === 'development',
     interpolation: {
-      escapeValue: false // React already escapes values
-    }
+      escapeValue: false, // React already escapes values
+    },
   });
 
 export default i18n;

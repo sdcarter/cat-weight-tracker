@@ -1,15 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Container,
-  Paper,
-  Box,
-  Typography,
-  Tabs,
-  Tab,
-  Fade,
-} from '@mui/material';
+import { Container, Paper, Box, Typography, Tabs, Tab, Fade } from '@mui/material';
 import { Pets as PetsIcon } from '@mui/icons-material';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
@@ -34,9 +26,7 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Fade in={true} timeout={300}>
-          <Box sx={{ pt: 3 }}>
-            {children}
-          </Box>
+          <Box sx={{ pt: 3 }}>{children}</Box>
         </Fade>
       )}
     </div>
@@ -88,7 +78,7 @@ const AuthScreen: React.FC = () => {
               {t('app.title', 'Cat Weight Tracker')}
             </Typography>
             <Typography variant="body1" sx={{ opacity: 0.9 }}>
-              {t('auth.subtitle', 'Track your feline friend\'s health journey')}
+              {t('auth.subtitle', "Track your feline friend's health journey")}
             </Typography>
           </Box>
 

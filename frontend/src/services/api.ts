@@ -1,9 +1,9 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
-import type { 
-  User, 
-  Cat, 
-  WeightRecord, 
-  PlotData, 
+import type {
+  User,
+  Cat,
+  WeightRecord,
+  PlotData,
   Token,
   UserCreate,
   UserLogin,
@@ -12,7 +12,7 @@ import type {
   CatCreate,
   CatUpdate,
   WeightRecordCreate,
-  ApiError
+  ApiError,
 } from '../types/api';
 
 // API Configuration
@@ -58,15 +58,15 @@ apiClient.interceptors.response.use(
 export const handleApiError = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     const axiosError = error as AxiosError<ApiError>;
-    
+
     if (axiosError.response?.data?.detail) {
       return axiosError.response.data.detail;
     }
-    
+
     if (axiosError.response?.data?.errors) {
       return axiosError.response.data.errors.join(', ');
     }
-    
+
     switch (axiosError.response?.status) {
       case 400:
         return 'Invalid request. Please check your input.';
@@ -88,11 +88,11 @@ export const handleApiError = (error: unknown): string => {
         return 'An unexpected error occurred. Please try again.';
     }
   }
-  
+
   if (error instanceof Error) {
     return error.message;
   }
-  
+
   return 'An unexpected error occurred. Please try again.';
 };
 
@@ -102,7 +102,7 @@ export const authApi = {
     const formData = new FormData();
     formData.append('username', credentials.username);
     formData.append('password', credentials.password);
-    
+
     const response: AxiosResponse<Token> = await apiClient.post('/auth/login', formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -167,15 +167,18 @@ export const weightApi = {
 
   async createWeightRecord(catId: number, weightData: WeightRecordCreate): Promise<WeightRecord> {
     const response: AxiosResponse<WeightRecord> = await apiClient.post(
-      `/cats/${catId}/weights`, 
+      `/cats/${catId}/weights`,
       weightData
     );
     return response.data;
   },
 
-  async updateWeightRecord(weightId: number, weightData: Partial<WeightRecordCreate>): Promise<WeightRecord> {
+  async updateWeightRecord(
+    weightId: number,
+    weightData: Partial<WeightRecordCreate>
+  ): Promise<WeightRecord> {
     const response: AxiosResponse<WeightRecord> = await apiClient.put(
-      `/weights/${weightId}`, 
+      `/weights/${weightId}`,
       weightData
     );
     return response.data;

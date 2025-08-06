@@ -50,18 +50,18 @@ class ErrorBoundary extends Component<Props, State> {
               borderRadius: 3,
             }}
           >
-            <BugReportIcon 
-              sx={{ 
-                fontSize: 64, 
-                color: 'error.main', 
-                mb: 2 
-              }} 
+            <BugReportIcon
+              sx={{
+                fontSize: 64,
+                color: 'error.main',
+                mb: 2,
+              }}
             />
-            
+
             <Typography variant="h4" gutterBottom color="error">
               Oops! Something went wrong
             </Typography>
-            
+
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
               We're sorry, but something unexpected happened. Please try refreshing the page.
             </Typography>

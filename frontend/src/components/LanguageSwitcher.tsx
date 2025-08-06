@@ -27,24 +27,18 @@ const LanguageSwitcher: React.FC = () => {
           <LanguageIcon />
         </IconButton>
       </Tooltip>
-      
+
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleClose}
         PaperProps={{
-          sx: { borderRadius: 2 }
+          sx: { borderRadius: 2 },
         }}
       >
-        <MenuItem onClick={() => handleLanguageChange('en')}>
-          English
-        </MenuItem>
-        <MenuItem onClick={() => handleLanguageChange('es')}>
-          Español
-        </MenuItem>
-        <MenuItem onClick={() => handleLanguageChange('fr')}>
-          Français
-        </MenuItem>
+        <MenuItem onClick={() => handleLanguageChange('en')}>English</MenuItem>
+        <MenuItem onClick={() => handleLanguageChange('es')}>Español</MenuItem>
+        <MenuItem onClick={() => handleLanguageChange('fr')}>Français</MenuItem>
       </Menu>
     </>
   );

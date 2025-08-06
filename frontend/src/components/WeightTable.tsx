@@ -54,36 +54,18 @@ const WeightTable: React.FC<WeightTableProps> = ({ weights, onDeleteWeight }) =>
             const catWeight = calculateCatWeight(record.user_weight, record.combined_weight);
             return (
               <TableRow key={record.id} hover>
-                <TableCell>
-                  {new Date(record.date).toLocaleDateString()}
+                <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
+                <TableCell align="right">
+                  <Chip label={`${record.user_weight} lbs`} size="small" variant="outlined" />
                 </TableCell>
                 <TableCell align="right">
-                  <Chip 
-                    label={`${record.user_weight} lbs`} 
-                    size="small" 
-                    variant="outlined" 
-                  />
+                  <Chip label={`${record.combined_weight} lbs`} size="small" variant="outlined" />
                 </TableCell>
                 <TableCell align="right">
-                  <Chip 
-                    label={`${record.combined_weight} lbs`} 
-                    size="small" 
-                    variant="outlined" 
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <Chip 
-                    label={`${catWeight.toFixed(1)} lbs`} 
-                    size="small" 
-                    color="primary"
-                  />
+                  <Chip label={`${catWeight.toFixed(1)} lbs`} size="small" color="primary" />
                 </TableCell>
                 <TableCell align="center">
-                  <IconButton
-                    onClick={() => onDeleteWeight(record.id)}
-                    color="error"
-                    size="small"
-                  >
+                  <IconButton onClick={() => onDeleteWeight(record.id)} color="error" size="small">
                     <DeleteIcon />
                   </IconButton>
                 </TableCell>

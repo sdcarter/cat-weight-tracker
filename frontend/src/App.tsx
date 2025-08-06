@@ -2,19 +2,19 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider, CssBaseline } from '@mui/material';
-import { 
-  Container, 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  Box, 
-  Card, 
-  CardContent, 
+import {
+  Container,
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Card,
+  CardContent,
   Button,
   Fab,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 
@@ -27,7 +27,14 @@ import AuthScreen from './components/AuthScreen';
 import ProfilePage from './pages/ProfilePage';
 import UserMenu from './components/UserMenu';
 import { useAuth } from './context/AuthContext';
-import type { Cat, WeightRecord, PlotData, ToastState, CatCreate, WeightRecordCreate } from './types/api';
+import type {
+  Cat,
+  WeightRecord,
+  PlotData,
+  ToastState,
+  CatCreate,
+  WeightRecordCreate,
+} from './types/api';
 import { api, handleApiError } from './services/api';
 import { material3Theme } from './theme/material3Theme';
 
@@ -134,7 +141,14 @@ function App() {
   };
 
   const handleDeleteCat = async (catId: number): Promise<void> => {
-    if (!window.confirm(t('cats.confirmDelete', 'Are you sure you want to delete this cat? This action cannot be undone.'))) {
+    if (
+      !window.confirm(
+        t(
+          'cats.confirmDelete',
+          'Are you sure you want to delete this cat? This action cannot be undone.'
+        )
+      )
+    ) {
       return;
     }
 
@@ -152,7 +166,11 @@ function App() {
   };
 
   const handleDeleteWeight = async (recordId: number): Promise<void> => {
-    if (!window.confirm(t('weights.confirmDelete', 'Are you sure you want to delete this weight record?'))) {
+    if (
+      !window.confirm(
+        t('weights.confirmDelete', 'Are you sure you want to delete this weight record?')
+      )
+    ) {
       return;
     }
 
@@ -173,10 +191,10 @@ function App() {
     return (
       <ThemeProvider theme={material3Theme}>
         <CssBaseline />
-        <Box 
-          display="flex" 
-          justifyContent="center" 
-          alignItems="center" 
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
           minHeight="100vh"
           bgcolor="background.default"
         >
@@ -214,73 +232,95 @@ function App() {
           <Container maxWidth="lg" sx={{ py: 4 }}>
             <Routes>
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/" element={
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  {/* Cat Management Section */}
-                  <Card elevation={1}>
-                    <CardContent>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                        <Typography variant="h5" component="h2" color="text.primary">
-                          {t('cats.title', 'My Cats')}
-                        </Typography>
-                        <Button 
-                          variant="contained"
-                          startIcon={<AddIcon />}
-                          onClick={() => setShowAddCat(true)}
-                          sx={{ borderRadius: 3 }}
+              <Route
+                path="/"
+                element={
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    {/* Cat Management Section */}
+                    <Card elevation={1}>
+                      <CardContent>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            mb: 3,
+                          }}
                         >
-                          {t('cats.add', 'Add Cat')}
-                        </Button>
-                      </Box>
-                      
-                      <CatList 
-                        cats={cats}
-                        selectedCatId={selectedCatId}
-                        onSelectCat={setSelectedCatId}
-                        onEditCat={setEditingCat}
-                        onDeleteCat={handleDeleteCat}
-                      />
-                    </CardContent>
-                  </Card>
-
-                  {/* Weight Management Section */}
-                  {selectedCatId && (
-                    <>
-                      <Card elevation={1}>
-                        <CardContent>
-                          <Typography variant="h5" component="h2" color="text.primary" sx={{ mb: 3 }}>
-                            {t('weights.title', 'Weight Management')}
+                          <Typography variant="h5" component="h2" color="text.primary">
+                            {t('cats.title', 'My Cats')}
                           </Typography>
-                          <WeightForm onSubmit={handleWeightSubmit} />
-                        </CardContent>
-                      </Card>
+                          <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={() => setShowAddCat(true)}
+                            sx={{ borderRadius: 3 }}
+                          >
+                            {t('cats.add', 'Add Cat')}
+                          </Button>
+                        </Box>
 
-                      <Card elevation={1}>
-                        <CardContent>
-                          <Typography variant="h5" component="h2" color="text.primary" sx={{ mb: 3 }}>
-                            {t('weights.history', 'Weight History')}
-                          </Typography>
-                          <WeightTable 
-                            weights={weights} 
-                            onDeleteWeight={handleDeleteWeight}
-                          />
-                        </CardContent>
-                      </Card>
+                        <CatList
+                          cats={cats}
+                          selectedCatId={selectedCatId}
+                          onSelectCat={setSelectedCatId}
+                          onEditCat={setEditingCat}
+                          onDeleteCat={handleDeleteCat}
+                        />
+                      </CardContent>
+                    </Card>
 
-                      {plotData && (
+                    {/* Weight Management Section */}
+                    {selectedCatId && (
+                      <>
                         <Card elevation={1}>
                           <CardContent>
-                            <Typography variant="h5" component="h2" color="text.primary" sx={{ mb: 3 }}>
-                              {t('chart.title', 'Weight Progress')}
+                            <Typography
+                              variant="h5"
+                              component="h2"
+                              color="text.primary"
+                              sx={{ mb: 3 }}
+                            >
+                              {t('weights.title', 'Weight Management')}
                             </Typography>
-                            <WeightChart plotData={plotData} />
+                            <WeightForm onSubmit={handleWeightSubmit} />
                           </CardContent>
                         </Card>
-                      )}
-                    </>
-                  )}
-                </Box>
-              } />
+
+                        <Card elevation={1}>
+                          <CardContent>
+                            <Typography
+                              variant="h5"
+                              component="h2"
+                              color="text.primary"
+                              sx={{ mb: 3 }}
+                            >
+                              {t('weights.history', 'Weight History')}
+                            </Typography>
+                            <WeightTable weights={weights} onDeleteWeight={handleDeleteWeight} />
+                          </CardContent>
+                        </Card>
+
+                        {plotData && (
+                          <Card elevation={1}>
+                            <CardContent>
+                              <Typography
+                                variant="h5"
+                                component="h2"
+                                color="text.primary"
+                                sx={{ mb: 3 }}
+                              >
+                                {t('chart.title', 'Weight Progress')}
+                              </Typography>
+                              <WeightChart plotData={plotData} />
+                            </CardContent>
+                          </Card>
+                        )}
+                      </>
+                    )}
+                  </Box>
+                }
+              />
             </Routes>
           </Container>
 
@@ -318,8 +358,8 @@ function App() {
             onClose={() => setToast({ ...toast, open: false })}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           >
-            <Alert 
-              onClose={() => setToast({ ...toast, open: false })} 
+            <Alert
+              onClose={() => setToast({ ...toast, open: false })}
               severity={toast.title === 'Error' ? 'error' : 'success'}
               variant="filled"
               sx={{ width: '100%' }}

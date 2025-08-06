@@ -37,9 +37,9 @@ describe('CatForm', () => {
     };
 
     render(
-      <CatForm 
+      <CatForm
         open={true}
-        onSubmit={mockOnSubmit} 
+        onSubmit={mockOnSubmit}
         initialData={initialData}
         onClose={mockOnClose}
       />
@@ -176,9 +176,9 @@ describe('CatForm', () => {
     };
 
     render(
-      <CatForm 
+      <CatForm
         open={true}
-        onSubmit={mockOnSubmit} 
+        onSubmit={mockOnSubmit}
         initialData={initialData}
         onClose={mockOnClose}
       />
@@ -211,7 +211,9 @@ describe('CatForm', () => {
   });
 
   it('resets form when closed and reopened', async () => {
-    const { rerender } = render(<CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />);
+    const { rerender } = render(
+      <CatForm open={true} onSubmit={mockOnSubmit} onClose={mockOnClose} />
+    );
 
     const nameInput = screen.getByLabelText(/cat name/i);
     await userEvent.type(nameInput, 'Test Cat');
@@ -235,9 +237,9 @@ describe('CatForm', () => {
     };
 
     render(
-      <CatForm 
+      <CatForm
         open={true}
-        onSubmit={mockOnSubmit} 
+        onSubmit={mockOnSubmit}
         initialData={initialData}
         onClose={mockOnClose}
       />

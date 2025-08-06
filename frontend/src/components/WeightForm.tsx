@@ -1,15 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-} from '@mui/material';
+import { Box, TextField, Button, Typography, Card, CardContent, Grid } from '@mui/material';
 import { Scale as ScaleIcon } from '@mui/icons-material';
 import type { WeightFormProps, FormErrors } from '../types/api';
 
@@ -54,14 +46,14 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: '',
       }));
@@ -70,20 +62,20 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await onSubmit({
         date: formData.date,
         user_weight: Number.parseFloat(formData.user_weight),
         combined_weight: Number.parseFloat(formData.combined_weight),
       });
-      
+
       // Reset form
       setFormData({
         date: new Date().toISOString().split('T')[0],
@@ -164,7 +156,9 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
                 value={formData.combined_weight}
                 onChange={handleChange}
                 error={!!errors.combined_weight}
-                helperText={errors.combined_weight || t('weights.combinedWeightHelp', 'You + cat weight')}
+                helperText={
+                  errors.combined_weight || t('weights.combinedWeightHelp', 'You + cat weight')
+                }
                 fullWidth
                 required
                 variant="outlined"
@@ -189,10 +183,9 @@ const WeightForm: React.FC<WeightFormProps> = ({ onSubmit }) => {
                   disabled={isSubmitting}
                   sx={{ borderRadius: 3, px: 4 }}
                 >
-                  {isSubmitting 
-                    ? t('common.saving', 'Saving...') 
-                    : t('weights.addRecord', 'Add Record')
-                  }
+                  {isSubmitting
+                    ? t('common.saving', 'Saving...')
+                    : t('weights.addRecord', 'Add Record')}
                 </Button>
               </Box>
             </Grid>

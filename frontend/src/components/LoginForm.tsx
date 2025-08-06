@@ -1,14 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Box,
-  TextField,
-  Button,
-  Alert,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
+import { Box, TextField, Button, Alert, InputAdornment, IconButton } from '@mui/material';
 import {
   Visibility,
   VisibilityOff,
@@ -47,14 +40,14 @@ const LoginForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: '',
       }));
@@ -68,14 +61,14 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
     setLoginError('');
-    
+
     try {
       const success = await login(formData.username.trim(), formData.password);
       if (!success) {

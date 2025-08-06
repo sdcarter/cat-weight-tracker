@@ -21,26 +21,26 @@ import {
 } from '@mui/icons-material';
 import type { CatListProps } from '../types/api';
 
-const CatList: React.FC<CatListProps> = ({ 
-  cats, 
-  selectedCatId, 
-  onSelectCat, 
-  onEditCat, 
-  onDeleteCat 
+const CatList: React.FC<CatListProps> = ({
+  cats,
+  selectedCatId,
+  onSelectCat,
+  onEditCat,
+  onDeleteCat,
 }) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [menuCatId, setMenuCatId] = React.useState<number | null>(null);
-  
+
   if (!cats || cats.length === 0) {
     return (
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           py: 6,
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         <PetsIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
@@ -99,7 +99,14 @@ const CatList: React.FC<CatListProps> = ({
               onClick={() => handleCatSelect(cat.id)}
             >
               <CardContent sx={{ pb: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    mb: 2,
+                  }}
+                >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <PetsIcon color="primary" />
                     <Typography variant="h6" component="h3" noWrap>
@@ -116,7 +123,9 @@ const CatList: React.FC<CatListProps> = ({
                 </Box>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  >
                     <Typography variant="body2" color="text.secondary">
                       {t('cats.targetWeight', 'Target Weight')}
                     </Typography>
@@ -140,10 +149,9 @@ const CatList: React.FC<CatListProps> = ({
                   }}
                   sx={{ borderRadius: 2 }}
                 >
-                  {selectedCatId === cat.id 
-                    ? t('cats.selected', 'Selected') 
-                    : t('cats.select', 'Select')
-                  }
+                  {selectedCatId === cat.id
+                    ? t('cats.selected', 'Selected')
+                    : t('cats.select', 'Select')}
                 </Button>
               </CardActions>
             </Card>
@@ -157,22 +165,19 @@ const CatList: React.FC<CatListProps> = ({
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
         PaperProps={{
-          sx: { borderRadius: 2 }
+          sx: { borderRadius: 2 },
         }}
       >
-        <MenuItem 
+        <MenuItem
           onClick={() => {
-            const cat = cats.find(c => c.id === menuCatId);
+            const cat = cats.find((c) => c.id === menuCatId);
             if (cat) handleEdit(cat);
           }}
         >
           <EditIcon sx={{ mr: 1, fontSize: 20 }} />
           {t('common.edit', 'Edit')}
         </MenuItem>
-        <MenuItem 
-          onClick={() => menuCatId && handleDelete(menuCatId)}
-          sx={{ color: 'error.main' }}
-        >
+        <MenuItem onClick={() => menuCatId && handleDelete(menuCatId)} sx={{ color: 'error.main' }}>
           <DeleteIcon sx={{ mr: 1, fontSize: 20 }} />
           {t('common.delete', 'Delete')}
         </MenuItem>

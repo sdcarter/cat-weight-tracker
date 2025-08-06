@@ -39,13 +39,8 @@ const UserMenu: React.FC = () => {
 
   return (
     <>
-      <IconButton
-        onClick={handleMenuOpen}
-        sx={{ p: 0 }}
-      >
-        <Avatar sx={{ bgcolor: 'primary.main' }}>
-          {user.username.charAt(0).toUpperCase()}
-        </Avatar>
+      <IconButton onClick={handleMenuOpen} sx={{ p: 0 }}>
+        <Avatar sx={{ bgcolor: 'primary.main' }}>{user.username.charAt(0).toUpperCase()}</Avatar>
       </IconButton>
 
       <Menu
@@ -53,7 +48,7 @@ const UserMenu: React.FC = () => {
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
         PaperProps={{
-          sx: { borderRadius: 2, minWidth: 200 }
+          sx: { borderRadius: 2, minWidth: 200 },
         }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
@@ -62,21 +57,18 @@ const UserMenu: React.FC = () => {
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
-          <ListItemText 
-            primary={user.username}
-            secondary={user.email}
-          />
+          <ListItemText primary={user.username} secondary={user.email} />
         </MenuItem>
-        
+
         <Divider />
-        
+
         <MenuItem onClick={handleMenuClose}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary={t('menu.settings', 'Settings')} />
         </MenuItem>
-        
+
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon />

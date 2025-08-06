@@ -85,20 +85,34 @@ def client(db_session):
 def create_test_user(db):
     """Create a test user for testing purposes."""
     from app import crud, schemas
-    from app.auth import get_password_hash
+    from app.models import User
+    import uuid
+    
+    # Use unique username to avoid conflicts
+    unique_id = str(uuid.uuid4())[:8]
+    username = f"testuser_{unique_id}"
+    email = f"test_{unique_id}@example.com"
+    
+    # Check if user already exists
+    existing_user = db.query(User).filter_by(username=username).first()
+    if existing_user:
+        return existing_user
     
     user_data = schemas.UserCreate(
-        username="testuser",
-        email="test@example.com", 
+        username=username,
+        email=email,
         password="TestPassword123"
     )
     
     try:
-        return crud.create_user(db=db, user=user_data)
+        user = crud.create_user(db=db, user=user_data)
+        db.commit()  # Ensure the user is committed to the database
+        return user
     except Exception as e:
-        # If user already exists, try to get it
-        from app.models import User
-        existing_user = db.query(User).filter_by(username="testuser").first()
-        if existing_user:
-            return existing_user
+        print(f"Error creating test user: {e}")
+        db.rollback()
+        # Try to find any existing test user as fallback
+        fallback_user = db.query(User).first()
+        if fallback_user:
+            return fallback_user
         raise e

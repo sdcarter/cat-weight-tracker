@@ -98,17 +98,13 @@ class TestAuthentication:
 
     def test_login_success(self, client, test_db: Session):
         """Test successful login."""
-        # Create user first
-        user_data = schemas.UserCreate(
-            username="testuser",
-            email="test@example.com",
-            password="TestPassword123"
-        )
-        crud.create_user(db=test_db, user=user_data)
+        # Create user first using the helper function
+        user = create_test_user(test_db)
+        assert user is not None, "Failed to create test user"
         
         # Login
         login_data = {
-            "username": "testuser",
+            "username": user.username,
             "password": "TestPassword123"
         }
         
@@ -163,7 +159,7 @@ class TestAuthentication:
         # Get token
         login_data = {
             "username": user.username,
-            "password": "testpassword"
+            "password": "TestPassword123"
         }
         login_response = client.post("/auth/login", data=login_data)
         token = login_response.json()["access_token"]

@@ -39,8 +39,11 @@ def test_get_cats(client, test_db):
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 2
-    assert data[0]["name"] == "Whiskers"
-    assert data[1]["name"] == "Mittens"
+    
+    # Check that both cats are present (order doesn't matter)
+    cat_names = [cat["name"] for cat in data]
+    assert "Whiskers" in cat_names
+    assert "Mittens" in cat_names
 
 
 def test_get_cat(client, test_db):
